@@ -1,0 +1,53 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.innotech.itpushlibrary"
+        minSdkVersion 16
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders = [
+                INNOTECH_PUSH_DEBUG : true,
+
+                MI_APP_ID           : "2882303761517759216",
+                MI_APP_KEY          : "5221775952216",
+
+                MEIZU_APP_ID        : "112950",
+                MEIZU_APP_KEY       : "509a337735ba497ebba21d981924c9f4",
+
+                HMS_APP_ID          : "100244129",
+
+                GETUI_APP_ID        : "PH4qx2Le8w9Nz8pMyCPMZ7",
+                GETUI_APP_KEY       : "qy4AYz75roAJiQjzkPLfc3",
+                GETUI_APP_SECRET    : "tz6QPHBAOY8Scmcxo6y9P2",
+
+                UMENG_APP_KEY       : "5acd8033b27b0a025600002d",
+                UMENG_MESSAGE_SECRET: "2e632fc558e68901337a8864ef0c33bc"
+
+        ]
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir {
+        dirs 'libs', '../innotechpush/libs'
+    }
+}
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation project(':innotechpush')
+}
