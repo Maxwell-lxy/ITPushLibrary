@@ -75,7 +75,7 @@ Android Studio是Google力推的Android开发环境，在IntelliJ IDEA基础上�
    	
    	dependencies {
    		...
-   		compile 'com.github.hgw900109:ITPushLibrary:1.0.0'
+   		compile 'com.github.hgw900109:ITPushLibrary:1.0.1'
    	}
    ```
 
