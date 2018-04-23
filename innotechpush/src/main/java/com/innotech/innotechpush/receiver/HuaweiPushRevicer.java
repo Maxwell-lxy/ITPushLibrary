@@ -5,9 +5,12 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.huawei.hms.support.api.push.PushReceiver;
+import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.PushApplication;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.utils.LogUtils;
+import com.innotech.innotechpush.utils.UserInfoUtils;
+import com.innotech.innotechpush.utils.Utils;
 import com.xiaomi.mipush.sdk.MiPushMessage;
 
 /**
@@ -18,6 +21,8 @@ public class HuaweiPushRevicer extends PushReceiver{
     @Override
     public void onToken(Context context, String token, Bundle extras) {
         LogUtils.e(context,LogUtils.TAG_HUAWEI+"HuaweiPushRevicer onToken: end" + token);
+        UserInfoUtils.deviceToken.setHuawei(token);
+        UserInfoUtils.sendBroadcast(context);
     }
     @Override
     public boolean onPushMsg(Context context, byte[] msg, Bundle bundle) {
@@ -25,7 +30,11 @@ public class HuaweiPushRevicer extends PushReceiver{
             //CP可以自己解析消息内容，然后做相应的处理
             String content = new String(msg, "UTF-8");
             LogUtils.e(context,LogUtils.TAG_HUAWEI+"收到PUSH透传消息,消息内容为:" + content);
-            PushApplication.mPushReciver.onReceivePassThroughMessage(context,getCreateMessge(content));
+            if(InnotechPushManager.getPushReciver()!=null){
+                InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context,getCreateMessge(content));
+            } else {
+                InnotechPushManager.innotechPushReciverIsNull(context);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -42,8 +51,12 @@ public class HuaweiPushRevicer extends PushReceiver{
             }
 
         }
+        if(InnotechPushManager.getPushReciver()!=null){
+            InnotechPushManager.getPushReciver().onNotificationMessageClicked(context,getCreateMessge(extras));
+        } else {
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
 
-        PushApplication.mPushReciver.onNotificationMessageClicked(context,getCreateMessge(extras));
 
         super.onEvent(context, event, extras);
     }

@@ -7,10 +7,12 @@ import com.igexin.sdk.GTIntentService;
 import com.igexin.sdk.message.GTCmdMessage;
 import com.igexin.sdk.message.GTNotificationMessage;
 import com.igexin.sdk.message.GTTransmitMessage;
+import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.PushApplication;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.SPUtils;
+import com.innotech.innotechpush.utils.UserInfoUtils;
 import com.innotech.innotechpush.utils.Utils;
 
 import org.json.JSONException;
@@ -33,6 +35,8 @@ public class GTPushIntentService extends GTIntentService {
     @Override
     public void onReceiveClientId(Context context, String clientid) {
         LogUtils.e(context, LogUtils.TAG_GETUI+"onReceiveClientId -> " + "clientid = " + clientid);
+        UserInfoUtils.deviceToken.setGetui(clientid);
+        UserInfoUtils.sendBroadcast(context);
     }
 
     @Override
@@ -62,7 +66,11 @@ public class GTPushIntentService extends GTIntentService {
         } catch (JSONException e) {
             LogUtils.e(context,LogUtils.TAG_GETUI+" dealWithCustomMessage方法中json转换失败");
         }
-        PushApplication.mPushReciver.onReceivePassThroughMessage(context,getCreateMessge(gtTransmitMessage));
+        if(InnotechPushManager.getPushReciver()!=null){
+            InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context,getCreateMessge(gtTransmitMessage));
+        } else {
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
     }
 
     @Override
@@ -78,13 +86,21 @@ public class GTPushIntentService extends GTIntentService {
     @Override
     public void onNotificationMessageArrived(Context context, GTNotificationMessage gtNotificationMessage) {
         LogUtils.e(context, LogUtils.TAG_GETUI+"onNotificationMessageArrived() -> ");
-        PushApplication.mPushReciver.onNotificationMessageArrived(context,getCreateMessge(gtNotificationMessage));
+        if(InnotechPushManager.getPushReciver()!=null){
+            InnotechPushManager.getPushReciver().onNotificationMessageArrived(context,getCreateMessge(gtNotificationMessage));
+        } else {
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
     }
 
     @Override
     public void onNotificationMessageClicked(Context context, GTNotificationMessage gtNotificationMessage) {
         LogUtils.e(context, LogUtils.TAG_GETUI+"onNotificationMessageClicked() -> ");
-        PushApplication.mPushReciver.onNotificationMessageClicked(context,getCreateMessge(gtNotificationMessage));
+        if(InnotechPushManager.getPushReciver()!=null){
+            InnotechPushManager.getPushReciver().onNotificationMessageClicked(context,getCreateMessge(gtNotificationMessage));
+        } else {
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
     }
 
     private InnotechMessage getCreateMessge(GTNotificationMessage gtNotificationMessage){

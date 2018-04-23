@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.PushApplication;
 import com.innotech.innotechpush.bean.InnotechMessage;
 
@@ -14,6 +15,10 @@ import com.innotech.innotechpush.bean.InnotechMessage;
 public class NotificationClickReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        PushApplication.mPushReciver.onNotificationMessageClicked(context,new InnotechMessage());
+        if(InnotechPushManager.getPushReciver()!=null) {
+            InnotechPushManager.getPushReciver().onNotificationMessageClicked(context,new InnotechMessage());
+        }else {
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
     }
 }

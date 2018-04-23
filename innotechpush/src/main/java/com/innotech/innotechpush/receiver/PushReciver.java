@@ -16,18 +16,29 @@ public class PushReciver {
     public PushReciver() {
 
     }
+
+    /**
+     * 透传信息处理回调方法
+     * @param var1
+     * @param mPushMessage
+     */
     public void onReceivePassThroughMessage(Context var1, InnotechMessage mPushMessage) {
     }
 
+    /**
+     * 点击通知栏消息回调方法
+     * @param var1
+     * @param mPushMessage
+     */
     public void onNotificationMessageClicked(Context var1,InnotechMessage mPushMessage) {
     }
 
+    /**
+     * 通知栏详细到达时回调
+     * @param var1
+     * @param mPushMessage
+     */
     public void onNotificationMessageArrived(Context var1, InnotechMessage mPushMessage) {
-
-    }
-
-    @Deprecated
-    public void onReceiveMessage(Context var1, InnotechMessage mPushMessage) {
 
     }
 

@@ -11,6 +11,8 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 INNOTECH_PUSH_DEBUG : true,
+                INNOTECH_APP_ID : "123",
+                INNOTECH_APP_KEY : "123",
 
                 MI_APP_ID           : "2882303761517759216",
                 MI_APP_KEY          : "5221775952216",

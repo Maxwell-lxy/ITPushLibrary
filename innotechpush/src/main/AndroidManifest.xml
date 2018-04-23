@@ -61,6 +61,12 @@
         <meta-data
             android:name="INNOTECH_PUSH_DEBUG"
             android:value="${INNOTECH_PUSH_DEBUG}" />
+        <meta-data
+            android:name="INNOTECH_APP_ID"
+            android:value="${INNOTECH_APP_ID}" />
+        <meta-data
+            android:name="INNOTECH_APP_KEY"
+            android:value="${INNOTECH_APP_KEY}" />
         <!--xiaomi push begin -->
         <meta-data
             android:name="MI_APP_ID"
@@ -231,42 +237,6 @@
                 android:name="hwc-theme"
                 android:value="androidhwext:style/Theme.Emui.Translucent" />
         </activity>
-
-        <activity
-            android:name="com.huawei.android.hms.agent.pay.HMSPayAgentActivity"
-            android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:hardwareAccelerated="true"
-            android:theme="@android:style/Theme.Translucent">
-            <meta-data
-                android:name="hwc-theme"
-                android:value="androidhwext:style/Theme.Emui.Translucent" />
-        </activity>
-
-        <activity
-            android:name="com.huawei.android.hms.agent.pay.HMSPMSPayAgentActivity"
-            android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:hardwareAccelerated="true"
-            android:theme="@android:style/Theme.Translucent">
-            <meta-data
-                android:name="hwc-theme"
-                android:value="androidhwext:style/Theme.Emui.Translucent" />
-        </activity>
-
-        <activity
-            android:name="com.huawei.android.hms.agent.hwid.HMSSignInAgentActivity"
-            android:configChanges="orientation|locale|screenSize|layoutDirection|fontScale"
-            android:excludeFromRecents="true"
-            android:exported="false"
-            android:hardwareAccelerated="true"
-            android:theme="@android:style/Theme.Translucent">
-            <meta-data
-                android:name="hwc-theme"
-                android:value="androidhwext:style/Theme.Emui.Translucent" />
-        </activity>
         <!--huawei end-->
         <!-- 个推SDK配置开始 -->
         <!-- 配置的第三⽅方参数属性 -->
@@ -337,5 +307,11 @@
             android:value="${UMENG_MESSAGE_SECRET}" />
         <!-- 友盟推送结束 -->
         <receiver android:name=".receiver.NotificationClickReceiver"/>
+
+        <receiver android:name=".receiver.UserInfoReceiver">
+            <intent-filter>
+                <action android:name="com.inno.push.action.UPDATEUSERINFO" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>
