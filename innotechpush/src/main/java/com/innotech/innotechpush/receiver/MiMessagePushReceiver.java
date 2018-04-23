@@ -5,10 +5,13 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.PushApplication;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.sdk.MiSDK;
 import com.innotech.innotechpush.utils.LogUtils;
+import com.innotech.innotechpush.utils.UserInfoUtils;
+import com.innotech.innotechpush.utils.Utils;
 import com.xiaomi.mipush.sdk.ErrorCode;
 import com.xiaomi.mipush.sdk.MiPushClient;
 import com.xiaomi.mipush.sdk.MiPushCommandMessage;
@@ -59,28 +62,39 @@ public class MiMessagePushReceiver  extends PushMessageReceiver {
     public void onReceivePassThroughMessage(Context context, MiPushMessage miPushMessage) {
        // super.onReceivePassThroughMessage(context, miPushMessage);
         showMessageInfoforTest(context,"onReceivePassThroughMessage",miPushMessage);
-        PushApplication.mPushReciver.onReceivePassThroughMessage(context,getCreateMessge(miPushMessage));
+        if(InnotechPushManager.getPushReciver()!=null) {
+            InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context, getCreateMessge(miPushMessage));
+        }else{
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
     }
 
     @Override
     public void onNotificationMessageClicked(Context context, MiPushMessage miPushMessage) {
        // super.onNotificationMessageClicked(context, miPushMessage);
         showMessageInfoforTest(context,"onNotificationMessageClicked",miPushMessage);
-        PushApplication.mPushReciver.onNotificationMessageClicked(context,getCreateMessge(miPushMessage));
+        if(InnotechPushManager.getPushReciver()!=null) {
+            InnotechPushManager.getPushReciver().onNotificationMessageClicked(context, getCreateMessge(miPushMessage));
+        }else{
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
     }
 
     @Override
     public void onNotificationMessageArrived(Context context, MiPushMessage miPushMessage) {
       //  super.onNotificationMessageArrived(context, miPushMessage);
         showMessageInfoforTest(context,"onNotificationMessageArrived",miPushMessage);
-        PushApplication.mPushReciver.onNotificationMessageArrived(context,getCreateMessge(miPushMessage));
+        if(InnotechPushManager.getPushReciver()!=null) {
+            InnotechPushManager.getPushReciver().onNotificationMessageArrived(context, getCreateMessge(miPushMessage));
+        }else{
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
     }
 
     @Override
     public void onReceiveMessage(Context context, MiPushMessage miPushMessage) {
       //  super.onReceiveMessage(context, miPushMessage);
-        showMessageInfoforTest(context,"onReceiveMessage",miPushMessage);
-        PushApplication.mPushReciver.onReceiveMessage(context,getCreateMessge(miPushMessage));
+        showMessageInfoforTest(context,"onReceiveMessage",miPushMessage);;
     }
 
     @Override
@@ -116,6 +130,8 @@ public class MiMessagePushReceiver  extends PushMessageReceiver {
             if (message.getResultCode() == ErrorCode.SUCCESS) {
                 mRegId = cmdArg1;
                 log = context.getString(R.string.register_success);
+                UserInfoUtils.deviceToken.setMi(mRegId);
+                UserInfoUtils.sendBroadcast(context);
             } else {
                 log = context.getString(R.string.register_fail);
             }

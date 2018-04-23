@@ -80,3 +80,8 @@
 -keep class com.innotech.innotechpush.receiver.MzPshMessageReceiver {*;}
 -dontwarn com.meizu.cloud.pushsdk.**
 #flyme push end
+
+# 不混淆反射相关
+-keep public class com.innotech.innotechpush.utils.Utils {
+    public boolean isNotificationEnable(***);
+}

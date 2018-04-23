@@ -6,11 +6,13 @@ import android.text.TextUtils;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.PushApplication;
 import com.innotech.innotechpush.R;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.SPUtils;
+import com.innotech.innotechpush.utils.UserInfoUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.umeng.message.IUmengRegisterCallback;
 import com.umeng.message.UTrack;
@@ -36,6 +38,9 @@ private Context context;
     public void onSuccess(String deviceToken) {
         //注册成功会返回device token
         LogUtils.e(context,LogUtils.TAG_UMENG+" register Success deviceToken:"+deviceToken);
+        UserInfoUtils.deviceToken.setUmeng(deviceToken);
+        UserInfoUtils.sendBroadcast(context);
+
     }
 
     @Override
@@ -54,7 +59,11 @@ private Context context;
        String custom =   msg.custom;
        String title = msg.title;
         LogUtils.e(context,LogUtils.TAG_UMENG+"dealWithNotificationMessage: title"+title+ " custom:"+custom+" text:"+text);
-        PushApplication.mPushReciver.onNotificationMessageArrived(context,getCreateMessge(msg));
+        if(InnotechPushManager.getPushReciver()!=null) {
+            InnotechPushManager.getPushReciver().onNotificationMessageArrived(context,getCreateMessge(msg));
+        }else {
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
     }
 
     /**
@@ -86,7 +95,11 @@ private Context context;
             LogUtils.e(context,LogUtils.TAG_UMENG+" dealWithCustomMessage方法中json转换失败");
         }
         LogUtils.e(context,LogUtils.TAG_UMENG+"dealWithCustomMessage:  msg"+msg.toString());
-        PushApplication.mPushReciver.onReceivePassThroughMessage(context,getCreateMessge(msg));
+        if(InnotechPushManager.getPushReciver()!=null) {
+            InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context,getCreateMessge(msg));
+        }else {
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
     }
 
     /**

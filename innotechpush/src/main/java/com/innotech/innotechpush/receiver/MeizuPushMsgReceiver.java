@@ -5,10 +5,13 @@ import android.content.Intent;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.PushApplication;
 import com.innotech.innotechpush.R;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.utils.LogUtils;
+import com.innotech.innotechpush.utils.UserInfoUtils;
+import com.innotech.innotechpush.utils.Utils;
 import com.meizu.cloud.pushsdk.MzPushMessageReceiver;
 import com.meizu.cloud.pushsdk.handler.MzPushMessage;
 import com.meizu.cloud.pushsdk.notification.PushNotificationBuilder;
@@ -33,6 +36,8 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
         //调用 PushManager.register(context）方法后，会在此回调注册状态
         //应用在接受返回的 pushid
         LogUtils.e(context, LogUtils.TAG_MEIZU+"MeizuPushMsgReceiver onRegister pushid:"+pushid);
+        UserInfoUtils.deviceToken.setMeizu(pushid);
+        UserInfoUtils.sendBroadcast(context);
     }
 
     /**
@@ -46,7 +51,12 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
     public void onMessage(Context context, String message) {
         //接收服务器推送的透传消息
         LogUtils.e(context, LogUtils.TAG_MEIZU+"MeizuPushMsgReceiver onMessage message:"+message);
-        PushApplication.mPushReciver.onReceivePassThroughMessage(context,getCreateMessge(message));
+        if(InnotechPushManager.getPushReciver()!=null){
+            InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context,getCreateMessge(message));
+        } else {
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
+
     }
 
     /**
@@ -129,7 +139,11 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
             mzPushMessage) {
         //通知栏消息到达回调，flyme6 基于 android6.0 以上不再回调
         LogUtils.e(context, LogUtils.TAG_MEIZU+"MeizuPushMsgReceiver onNotificationArrived mzPushMessage:"+mzPushMessage);
-        PushApplication.mPushReciver.onNotificationMessageArrived(context,getCreateMessge(mzPushMessage));
+        if(InnotechPushManager.getPushReciver()!=null){
+            InnotechPushManager.getPushReciver().onNotificationMessageArrived(context,getCreateMessge(mzPushMessage));
+        } else {
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
     }
 
     @Override
@@ -137,7 +151,11 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
             mzPushMessage) {
         //通知栏消息点击回调
         LogUtils.e(context, LogUtils.TAG_MEIZU+"MeizuPushMsgReceiver onNotificationClicked mzPushMessage:"+mzPushMessage);
-        PushApplication.mPushReciver.onNotificationMessageClicked(context,getCreateMessge(mzPushMessage));
+        if(InnotechPushManager.getPushReciver()!=null) {
+            InnotechPushManager.getPushReciver().onNotificationMessageClicked(context, getCreateMessge(mzPushMessage));
+        }else {
+            InnotechPushManager.innotechPushReciverIsNull(context);
+        }
     }
 
     @Override
