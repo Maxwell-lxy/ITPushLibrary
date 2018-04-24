@@ -82,6 +82,6 @@
 #flyme push end
 
 # 不混淆反射相关
--keep public class com.innotech.innotechpush.utils.Utils {
-    public boolean isNotificationEnable(***);
-}
+#-keep public class com.innotech.innotechpush.utils.Utils {
+#    public boolean isNotificationEnable(***);
+#}
