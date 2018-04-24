@@ -82,6 +82,13 @@
 #flyme push end
 
 # 不混淆反射相关
-#-keep public class com.innotech.innotechpush.utils.Utils {
-#    public boolean isNotificationEnable(***);
-#}
+-keep public class com.innotech.innotechpush.utils.Utils {
+    public boolean isNotificationEnable(***);
+}
+
+#对方开放的类和接口不能混淆
+-keep public class com.innotech.innotechpush.InnotechPushManager{
+    public getInstance();
+    public initPushSDK(android.app.Application);
+    public setPushRevicer();
+}
