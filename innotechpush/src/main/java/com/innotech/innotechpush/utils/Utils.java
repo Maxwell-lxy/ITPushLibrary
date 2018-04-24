@@ -275,7 +275,7 @@ public class Utils {
      * @return
      */
     public static String getSerialNumber() {
-        String serialNumber = android.os.Build.SERIAL;
+        String serialNumber = Build.SERIAL;
         return serialNumber;
     }
 
