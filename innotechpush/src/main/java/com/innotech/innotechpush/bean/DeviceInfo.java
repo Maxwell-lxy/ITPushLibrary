@@ -7,6 +7,26 @@ package com.innotech.innotechpush.bean;
 public class DeviceInfo {
     private String  android_id;
     private String sn;
+    private String imei;
+    private String os;
+
+    public String getOs() {
+        return os;
+    }
+
+    public void setOs(String os) {
+        this.os = os;
+    }
+
+    public String getImei() {
+        return imei;
+    }
+
+
+    public void setImei(String imei) {
+        this.imei = imei;
+    }
+
 
     public String getAndroid_id() {
         return android_id;

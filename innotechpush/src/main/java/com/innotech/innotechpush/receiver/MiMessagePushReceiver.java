@@ -2,16 +2,12 @@ package com.innotech.innotechpush.receiver;
 
 import android.content.Context;
 import android.text.TextUtils;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.innotech.innotechpush.InnotechPushManager;
-import com.innotech.innotechpush.PushApplication;
+import com.innotech.innotechpush.R;
 import com.innotech.innotechpush.bean.InnotechMessage;
-import com.innotech.innotechpush.sdk.MiSDK;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.UserInfoUtils;
-import com.innotech.innotechpush.utils.Utils;
 import com.xiaomi.mipush.sdk.ErrorCode;
 import com.xiaomi.mipush.sdk.MiPushClient;
 import com.xiaomi.mipush.sdk.MiPushCommandMessage;
@@ -19,7 +15,6 @@ import com.xiaomi.mipush.sdk.MiPushMessage;
 import com.xiaomi.mipush.sdk.PushMessageReceiver;
 
 import java.util.List;
-import com.innotech.innotechpush.R;
 
 /**
  * 1、PushMessageReceiver 是个抽象类，该类继承了 BroadcastReceiver。<br/>
@@ -130,7 +125,7 @@ public class MiMessagePushReceiver  extends PushMessageReceiver {
             if (message.getResultCode() == ErrorCode.SUCCESS) {
                 mRegId = cmdArg1;
                 log = context.getString(R.string.register_success);
-                UserInfoUtils.deviceToken.setMi(mRegId);
+                UserInfoUtils.deviceToken.setDevice_token1(mRegId);
                 UserInfoUtils.sendBroadcast(context);
             } else {
                 log = context.getString(R.string.register_fail);

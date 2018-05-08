@@ -1,27 +1,24 @@
 package com.innotech.innotechpush.receiver;
+
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.huawei.hms.support.api.push.PushReceiver;
 import com.innotech.innotechpush.InnotechPushManager;
-import com.innotech.innotechpush.PushApplication;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.UserInfoUtils;
-import com.innotech.innotechpush.utils.Utils;
-import com.xiaomi.mipush.sdk.MiPushMessage;
 
 /**
- * Created by admin on 2018/4/4.
+ * 华为推送的接收器
  */
 
 public class HuaweiPushRevicer extends PushReceiver{
     @Override
     public void onToken(Context context, String token, Bundle extras) {
         LogUtils.e(context,LogUtils.TAG_HUAWEI+"HuaweiPushRevicer onToken: end" + token);
-        UserInfoUtils.deviceToken.setHuawei(token);
+        UserInfoUtils.deviceToken.setDevice_token1(token);
         UserInfoUtils.sendBroadcast(context);
     }
     @Override

@@ -7,6 +7,12 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_ADDED" />
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_CHANGED" />
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_INSTALL" />
+    <uses-permission android:name="android.permission.BROADCAST_PACKAGE_REPLACED" />
+    <uses-permission android:name="android.permission.RESTART_PACKAGES" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
 
     <permission android:name="android.permission.READ_PRIVILEGED_PHONE_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -54,7 +60,7 @@
     <uses-permission android:name="getui.permission.GetuiService.${applicationId}" />
     <permission
         android:name="getui.permission.GetuiService.${applicationId}"
-        android:protectionLevel="normal"/>
+        android:protectionLevel="normal" />
     <!-- 个推SDK权限配置结束 -->
     <application>
         <!-- 推送module是否调试模式 -->
@@ -196,12 +202,12 @@
             android:name="com.huawei.hms.update.provider.UpdateProvider"
             android:authorities="${applicationId}.hms.update.provider"
             android:exported="false"
-            android:grantUriPermissions="true"></provider>
+            android:grantUriPermissions="true" />
         <provider
             android:name="com.huawei.updatesdk.fileprovider.UpdateSdkFileProvider"
             android:authorities="${applicationId}.updateSdk.fileProvider"
             android:exported="false"
-            android:grantUriPermissions="true"></provider>
+            android:grantUriPermissions="true" />
 
         <service
             android:name="com.huawei.updatesdk.service.deamon.download.DownloadService"
@@ -239,16 +245,15 @@
         </activity>
         <!--huawei end-->
         <!-- 个推SDK配置开始 -->
-        <!-- 配置的第三⽅方参数属性 -->
-        <!--<meta-data-->
-        <!--android:name="PUSH_APPID"-->
-        <!--android:value="${GETUI_APP_ID}" />-->
-        <!--<meta-data-->
-        <!--android:name="PUSH_APPKEY"-->
-        <!--android:value="${GETUI_APP_KEY}" />-->
-        <!--<meta-data-->
-        <!--android:name="PUSH_APPSECRET"-->
-        <!--android:value="${GETUI_APP_SECRET}" />-->
+        <meta-data
+            android:name="PUSH_APPID"
+            android:value="${GETUI_APP_ID}" />
+        <meta-data
+            android:name="PUSH_APPKEY"
+            android:value="${GETUI_APP_KEY}" />
+        <meta-data
+            android:name="PUSH_APPSECRET"
+            android:value="${GETUI_APP_SECRET}" />
         <!-- 配置SDK核⼼心服务 -->
         <service
             android:name="com.igexin.sdk.PushService"
@@ -278,7 +283,7 @@
             android:exported="false"
             android:process=":pushservice"
             android:taskAffinity="com.igexin.sdk.PushActivityTask"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"></activity>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name="com.igexin.sdk.GActivity"
             android:excludeFromRecents="true"
@@ -291,7 +296,7 @@
             android:name="com.innotech.innotechpush.service.GeTuiPushService"
             android:exported="true"
             android:label="PushService"
-            android:process=":pushservice"></service>
+            android:process=":pushservice" />
         <service android:name="com.innotech.innotechpush.service.GTPushIntentService" />
         <!-- 个推SDK配置结束 -->
 
@@ -305,8 +310,149 @@
         <meta-data
             android:name="UMENG_MESSAGE_SECRET"
             android:value="${UMENG_MESSAGE_SECRET}" />
+
+        <service
+            android:name="com.taobao.accs.ChannelService"
+            android:exported="true"
+            android:process=":channel">
+            <intent-filter>
+                <action android:name="com.taobao.accs.intent.action.SERVICE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.taobao.accs.intent.action.ELECTION" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="com.taobao.accs.data.MsgDistributeService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.taobao.accs.intent.action.RECEIVE" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name="com.taobao.accs.EventReceiver"
+            android:process=":channel">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <data android:scheme="package" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name="com.taobao.accs.ServiceReceiver"
+            android:process=":channel">
+            <intent-filter>
+                <action android:name="com.taobao.accs.intent.action.COMMAND" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.taobao.accs.intent.action.START_FROM_AGOO" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.taobao.accs.internal.AccsJobService"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:process=":channel" />
+
+        <service
+            android:name="com.taobao.accs.ChannelService$KernelService"
+            android:process=":channel" />
+
+        <service
+            android:name="org.android.agoo.accs.AgooService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.taobao.accs.intent.action.RECEIVE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="com.umeng.message.UmengIntentService"
+            android:exported="true"
+            android:process=":channel">
+            <intent-filter>
+                <action android:name="org.agoo.android.intent.action.RECEIVE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="com.umeng.message.XiaomiIntentService"
+            android:exported="true"
+            android:process=":channel">
+            <intent-filter>
+                <action android:name="org.agoo.android.intent.action.RECEIVE" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name="com.taobao.agoo.AgooCommondReceiver"
+            android:exported="true"
+            android:process=":channel">
+            <intent-filter>
+                <action android:name="${applicationId}.intent.action.COMMAND" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REMOVED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.umeng.message.UmengMessageIntentReceiverService"
+            android:exported="true"
+            android:process=":channel">
+            <intent-filter>
+                <action android:name="org.android.agoo.client.MessageReceiverService" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name="com.umeng.message.NotificationProxyBroadcastReceiver"
+            android:exported="false" />
+
+        <service
+            android:name="com.umeng.message.UmengMessageCallbackHandlerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.umeng.messge.registercallback.action" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.umeng.message.enablecallback.action" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.umeng.message.disablecallback.action" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.umeng.message.message.handler.action" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.umeng.message.message.sendmessage.action" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="com.umeng.message.UmengDownloadResourceService"
+            android:exported="false" />
+
+        <provider
+            android:name="com.umeng.message.provider.MessageProvider"
+            android:authorities="${applicationId}.umeng.message"
+            android:exported="false">
+            <grant-uri-permission android:pathPattern=".*" />
+        </provider>
         <!-- 友盟推送结束 -->
-        <receiver android:name=".receiver.NotificationClickReceiver"/>
+        <receiver android:name=".receiver.NotificationClickReceiver" />
 
         <receiver android:name=".receiver.UserInfoReceiver">
             <intent-filter>

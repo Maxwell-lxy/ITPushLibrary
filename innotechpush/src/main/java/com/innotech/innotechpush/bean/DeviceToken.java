@@ -5,58 +5,22 @@ package com.innotech.innotechpush.bean;
  */
 
 public class DeviceToken {
-    private String getui;
-    private String umeng;
-    private String huawei;
-    private String mi;
-    private String meizu;
-    private String oppo;
+    private String device_token1;//推送token，个推：cid，华为：device_token，小米：regId，魅族：pushId
+    private String device_token2;//友盟：device_token
 
-    public String getGetui() {
-        return getui;
+    public String getDevice_token1() {
+        return device_token1;
     }
 
-    public void setGetui(String getui) {
-        this.getui = getui;
+    public void setDevice_token1(String device_token1) {
+        this.device_token1 = device_token1;
     }
 
-    public String getUmeng() {
-        return umeng;
+    public String getDevice_token2() {
+        return device_token2;
     }
 
-    public void setUmeng(String umeng) {
-        this.umeng = umeng;
-    }
-
-    public String getHuawei() {
-        return huawei;
-    }
-
-    public void setHuawei(String huawei) {
-        this.huawei = huawei;
-    }
-
-    public String getMi() {
-        return mi;
-    }
-
-    public void setMi(String mi) {
-        this.mi = mi;
-    }
-
-    public String getMeizu() {
-        return meizu;
-    }
-
-    public void setMeizu(String meizu) {
-        this.meizu = meizu;
-    }
-
-    public String getOppo() {
-        return oppo;
-    }
-
-    public void setOppo(String oppo) {
-        this.oppo = oppo;
+    public void setDevice_token2(String device_token2) {
+        this.device_token2 = device_token2;
     }
 }

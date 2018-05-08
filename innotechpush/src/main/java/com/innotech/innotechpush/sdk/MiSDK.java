@@ -6,7 +6,6 @@ import android.content.Context;
 import android.os.Process;
 import android.util.Log;
 
-import com.innotech.innotechpush.config.PushConfig;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.xiaomi.channel.commonutils.logger.LoggerInterface;
@@ -24,13 +23,13 @@ public class MiSDK {
     public MiSDK(Application application) {
         // 注册push服务，注册成功后会向DemoMessageReceiver发送广播
         // 可以从DemoMessageReceiver的onCommandResult方法中MiPushCommandMessage对象参数中获取注册信息
-        LogUtils.e(application.getApplicationContext(), LogUtils.TAG_XIAOMI+"call MiSDK()");
+        LogUtils.e(application.getApplicationContext(), LogUtils.TAG_XIAOMI + "call MiSDK()");
         if (shouldInit(application)) {
 
             String appId = Utils.getMetaDataString(application, "MI_APP_ID").replace("innotech-", "");
             String appKey = Utils.getMetaDataString(application, "MI_APP_KEY").replace("innotech-", "");
             MiPushClient.registerPush(application, appId, appKey);
-            LogUtils.e(application.getApplicationContext(),LogUtils.TAG_XIAOMI+"MiPushClient.registerPush appId:"+appId+" appKey:"+appKey);
+            LogUtils.e(application.getApplicationContext(), LogUtils.TAG_XIAOMI + "MiPushClient.registerPush appId:" + appId + " appKey:" + appKey);
         }
         LoggerInterface newLogger = new LoggerInterface() {
 

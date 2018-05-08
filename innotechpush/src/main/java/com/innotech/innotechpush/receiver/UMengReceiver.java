@@ -1,34 +1,27 @@
 package com.innotech.innotechpush.receiver;
 
-import android.app.Notification;
 import android.content.Context;
 import android.text.TextUtils;
-import android.widget.RemoteViews;
-import android.widget.Toast;
 
 import com.innotech.innotechpush.InnotechPushManager;
-import com.innotech.innotechpush.PushApplication;
-import com.innotech.innotechpush.R;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.SPUtils;
 import com.innotech.innotechpush.utils.UserInfoUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.umeng.message.IUmengRegisterCallback;
-import com.umeng.message.UTrack;
 import com.umeng.message.UmengMessageHandler;
 import com.umeng.message.entity.UMessage;
-import com.xiaomi.mipush.sdk.MiPushMessage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- *
+ * 友盟推送的接收器
  */
 
 public class UMengReceiver extends UmengMessageHandler implements IUmengRegisterCallback {
-private Context context;
+    private Context context;
 
     public UMengReceiver(Context context) {
         this.context = context;
@@ -37,15 +30,15 @@ private Context context;
     @Override
     public void onSuccess(String deviceToken) {
         //注册成功会返回device token
-        LogUtils.e(context,LogUtils.TAG_UMENG+" register Success deviceToken:"+deviceToken);
-        UserInfoUtils.deviceToken.setUmeng(deviceToken);
+        LogUtils.e(context, LogUtils.TAG_UMENG + " register Success deviceToken:" + deviceToken);
+        UserInfoUtils.deviceToken.setDevice_token2(deviceToken);
         UserInfoUtils.sendBroadcast(context);
 
     }
 
     @Override
     public void onFailure(String s, String s1) {
-        LogUtils.e(context,LogUtils.TAG_UMENG+" register Failure s:"+s+" s1:"+s1);
+        LogUtils.e(context, LogUtils.TAG_UMENG + " register Failure s:" + s + " s1:" + s1);
     }
 
     /**
@@ -55,13 +48,13 @@ private Context context;
     public void dealWithNotificationMessage(Context context, UMessage msg) {
         //调用super，会展示通知，不调用super，则不展示通知。
         super.dealWithNotificationMessage(context, msg);
-       String text =  msg.text;
-       String custom =   msg.custom;
-       String title = msg.title;
-        LogUtils.e(context,LogUtils.TAG_UMENG+"dealWithNotificationMessage: title"+title+ " custom:"+custom+" text:"+text);
-        if(InnotechPushManager.getPushReciver()!=null) {
-            InnotechPushManager.getPushReciver().onNotificationMessageArrived(context,getCreateMessge(msg));
-        }else {
+        String text = msg.text;
+        String custom = msg.custom;
+        String title = msg.title;
+        LogUtils.e(context, LogUtils.TAG_UMENG + "dealWithNotificationMessage: title" + title + " custom:" + custom + " text:" + text);
+        if (InnotechPushManager.getPushReciver() != null) {
+            InnotechPushManager.getPushReciver().onNotificationMessageArrived(context, getCreateMessge(msg));
+        } else {
             InnotechPushManager.innotechPushReciverIsNull(context);
         }
     }
@@ -76,28 +69,28 @@ private Context context;
             String title = object.getString("title");
             String content = object.getString("content");
             String idempotent = object.getString("idempotent");
-            if(!TextUtils.isEmpty(idempotent)){
+            if (!TextUtils.isEmpty(idempotent)) {
                 //消息池去重验证
-                if(SPUtils.isPass(context,idempotent)){
+                if (SPUtils.isPass(context, idempotent)) {
                     //展示通知
-                    Utils.showNotification(context,title,content);
+                    Utils.showNotification(context, title, content);
                     //消息存入消息池中
-                    SPUtils.put(context,idempotent,System.currentTimeMillis());
-                }else{
-                    LogUtils.e(context,LogUtils.TAG_UMENG+" 该消息为重复消息，过滤掉，不做处理"+msg.custom);
+                    SPUtils.put(context, idempotent, System.currentTimeMillis());
+                } else {
+                    LogUtils.e(context, LogUtils.TAG_UMENG + " 该消息为重复消息，过滤掉，不做处理" + msg.custom);
                     //触发一次消息池的清理
                     SPUtils.clearPoor(context);
                 }
-            }else{
-                LogUtils.e(context,LogUtils.TAG_UMENG+" 该消息中没有包含idempotent字段，不做处理"+msg.custom);
+            } else {
+                LogUtils.e(context, LogUtils.TAG_UMENG + " 该消息中没有包含idempotent字段，不做处理" + msg.custom);
             }
         } catch (JSONException e) {
-            LogUtils.e(context,LogUtils.TAG_UMENG+" dealWithCustomMessage方法中json转换失败");
+            LogUtils.e(context, LogUtils.TAG_UMENG + " dealWithCustomMessage方法中json转换失败");
         }
-        LogUtils.e(context,LogUtils.TAG_UMENG+"dealWithCustomMessage:  msg"+msg.toString());
-        if(InnotechPushManager.getPushReciver()!=null) {
-            InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context,getCreateMessge(msg));
-        }else {
+        LogUtils.e(context, LogUtils.TAG_UMENG + "dealWithCustomMessage:  msg" + msg.toString());
+        if (InnotechPushManager.getPushReciver() != null) {
+            InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context, getCreateMessge(msg));
+        } else {
             InnotechPushManager.innotechPushReciverIsNull(context);
         }
     }
@@ -128,8 +121,7 @@ private Context context;
 //                return super.getNotification(context, msg);
 //        }
 //    }
-
-    private InnotechMessage getCreateMessge(UMessage uMessage){
+    private InnotechMessage getCreateMessge(UMessage uMessage) {
         InnotechMessage mPushMessage = new InnotechMessage();
         mPushMessage.setTitle(uMessage.title);
         mPushMessage.setData(uMessage.custom);

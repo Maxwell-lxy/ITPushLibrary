@@ -81,15 +81,9 @@
 -dontwarn com.meizu.cloud.pushsdk.**
 #flyme push end
 
+#对方开放的类和接口不能混淆
 -keep class com.innotech.** {*;}
 # 不混淆反射相关
 #-keep public class com.innotech.innotechpush.utils.Utils {
 #    public boolean isNotificationEnable(***);
-#}
-
-#对方开放的类和接口不能混淆
-#-keep class com.innotech.innotechpush.InnotechPushManager{
-#    public getInstance();
-#    public void initPushSDK(android.app.Application);
-#    public setPushRevicer();
 #}

@@ -2,16 +2,11 @@ package com.innotech.innotechpush.receiver;
 
 import android.content.Context;
 import android.content.Intent;
-import android.text.TextUtils;
-import android.util.Log;
 
 import com.innotech.innotechpush.InnotechPushManager;
-import com.innotech.innotechpush.PushApplication;
-import com.innotech.innotechpush.R;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.UserInfoUtils;
-import com.innotech.innotechpush.utils.Utils;
 import com.meizu.cloud.pushsdk.MzPushMessageReceiver;
 import com.meizu.cloud.pushsdk.handler.MzPushMessage;
 import com.meizu.cloud.pushsdk.notification.PushNotificationBuilder;
@@ -20,7 +15,6 @@ import com.meizu.cloud.pushsdk.platform.message.RegisterStatus;
 import com.meizu.cloud.pushsdk.platform.message.SubAliasStatus;
 import com.meizu.cloud.pushsdk.platform.message.SubTagsStatus;
 import com.meizu.cloud.pushsdk.platform.message.UnRegisterStatus;
-import com.xiaomi.mipush.sdk.MiPushMessage;
 
 /**
  * 魅族推送的接收器
@@ -36,7 +30,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
         //调用 PushManager.register(context）方法后，会在此回调注册状态
         //应用在接受返回的 pushid
         LogUtils.e(context, LogUtils.TAG_MEIZU+"MeizuPushMsgReceiver onRegister pushid:"+pushid);
-        UserInfoUtils.deviceToken.setMeizu(pushid);
+        UserInfoUtils.deviceToken.setDevice_token1(pushid);
         UserInfoUtils.sendBroadcast(context);
     }
 

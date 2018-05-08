@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.innotech.innotechpush.InnotechPushManager;
-import com.innotech.innotechpush.PushApplication;
 import com.innotech.innotechpush.bean.InnotechMessage;
 
 /**

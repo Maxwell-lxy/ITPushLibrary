@@ -275,7 +275,7 @@ public class Utils {
      * @return
      */
     public static String getSerialNumber() {
-        String serialNumber = Build.SERIAL;
+        String serialNumber = android.os.Build.SERIAL;
         return serialNumber;
     }
 
@@ -288,11 +288,11 @@ public class Utils {
      */
     public static boolean isNotificationEnabled(Context context) {
         boolean result = true;
-        if(Build.VERSION.SDK_INT>Build.VERSION_CODES.M){
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.M) {
             NotificationManagerCompat manager = NotificationManagerCompat.from(context);
-            result =   manager.areNotificationsEnabled();
-        }else if(Build.VERSION.SDK_INT<=Build.VERSION_CODES.M&&Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
-            result =  isNotificationEnable(context);
+            result = manager.areNotificationsEnabled();
+        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            result = isNotificationEnable(context);
         }
         return result;
     }
@@ -309,22 +309,22 @@ public class Utils {
 
         Class appOpsClass = null; /* Context.APP_OPS_MANAGER */
 
-        try{
+        try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 appOpsClass = Class.forName(AppOpsManager.class.getName());
             }
-            Method checkOpNoThrowMethod  = appOpsClass.getMethod("checkOpNoThrow", Integer.TYPE, Integer.TYPE, String.class);
+            Method checkOpNoThrowMethod = appOpsClass.getMethod("checkOpNoThrow", Integer.TYPE, Integer.TYPE, String.class);
 
             Field opPostNotificationValue = appOpsClass.getDeclaredField("OP_POST_NOTIFICATION");
-            int value = (int)opPostNotificationValue.get(Integer.class);
-            return ((int)checkOpNoThrowMethod.invoke(mAppOps,value, uid, pkg) == AppOpsManager.MODE_ALLOWED);
-        }catch(Exception e){
+            int value = (int) opPostNotificationValue.get(Integer.class);
+            return ((int) checkOpNoThrowMethod.invoke(mAppOps, value, uid, pkg) == AppOpsManager.MODE_ALLOWED);
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return true;
     }
 
-    public static String  getOS(){
+    public static String getOS() {
         return Build.BRAND;
     }
 
@@ -373,17 +373,22 @@ public class Utils {
                 (ip >> 24 & 0xFF);
     }
 
-
-    public static boolean getChange(Context context){boolean result = false;
-      int openNopticeLastValue =   UserInfoSPUtils.get(context,UserInfoSPUtils.KEY_OPEN_NOTICE,-1);
-      int openNopticeCurValue = isNotificationEnabled(context)?0:1;
-        if(openNopticeLastValue==-1){
+    /**
+     * 判断用户是否修改过通知权限
+     * @param context
+     * @return
+     */
+    public static boolean getChange(Context context) {
+        boolean result = false;
+        int openNopticeLastValue = UserInfoSPUtils.getInt(context, UserInfoSPUtils.KEY_OPEN_NOTICE, -1);
+        int openNopticeCurValue = isNotificationEnabled(context) ? 0 : 1;
+        if (openNopticeLastValue == -1) {
             result = true;
-        }else{
-            result =  openNopticeLastValue!=openNopticeCurValue?true:false;
+        } else {
+            result = openNopticeLastValue != openNopticeCurValue ? true : false;
         }
-        UserInfoSPUtils.put(context,UserInfoSPUtils.KEY_OPEN_NOTICE,openNopticeCurValue);
-        LogUtils.e(context, "openNopticeLastValue=" + openNopticeLastValue+" openNopticeCurValue="+openNopticeCurValue+" result:"+result);
+        UserInfoSPUtils.putInt(context, UserInfoSPUtils.KEY_OPEN_NOTICE, openNopticeCurValue);
+        LogUtils.e(context, "openNopticeLastValue=" + openNopticeLastValue + " openNopticeCurValue=" + openNopticeCurValue + " result:" + result);
         return result;
     }
 
