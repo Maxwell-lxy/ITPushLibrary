@@ -85,11 +85,8 @@ public class UserInfoUtils {
 
 
     public static void sendBroadcast(Context context) {
-        LogUtils.e(context, ">>>>>sendBroadcast() sdkname:" + InnotechPushManager.pushSDKName + " geTuiIsOk:" + UserInfoUtils.geTuiIsOk+" uMengIsOk:"+UserInfoUtils.uMengIsOk );
-        if(canUupdateUserInfo(context)){
             Intent sendBIntent = new Intent(UserInfoReceiver.ACTION_UPDATEUSERINFO);
             context.sendBroadcast(sendBIntent);
-        }
     }
 
     public static void saveTokenToSP(Context context, String token1, String token2) {
@@ -102,7 +99,7 @@ public class UserInfoUtils {
 
     }
 
-    private  static boolean canUupdateUserInfo(Context context){
+    public  static boolean canUupdateUserInfo(Context context){
         boolean result = false;
         long curTime =  System.currentTimeMillis();
         long lastTime = UserInfoSPUtils.getLong(context,UserInfoSPUtils.KEY_UPDATEUSERINFO_TIME,curTime);
