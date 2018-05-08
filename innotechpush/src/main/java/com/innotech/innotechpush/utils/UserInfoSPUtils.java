@@ -14,6 +14,7 @@ public class UserInfoSPUtils {
     public static final String KEY_ACCESSID = "accessid";
     public static final String KEY_TOKEN1= "device_token1";
     public static final String KEY_TOKEN2 = "device_token2";
+    public static final String KEY_UPDATEUSERINFO_TIME="update_userinfo_time";
 
     /**
      * 保存数据的方法
@@ -72,5 +73,35 @@ public class UserInfoSPUtils {
         SharedPreferences sp = context.getSharedPreferences(FILE_NAME,
                 Context.MODE_PRIVATE);
         return  sp.getString(key,defaultValue);
+    }
+
+
+    /**
+     * 保存数据的方法
+     *
+     * @param context
+     * @param key
+     * @param value
+     */
+    public static void putLong(Context context, String key, long value) {
+        SharedPreferences sp = context.getSharedPreferences(FILE_NAME,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putLong(key,value);
+        editor.commit();
+    }
+
+    /**
+     * 得到保存数据的方法
+     *
+     * @param context
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public static long getLong(Context context, String key, long defaultValue) {
+        SharedPreferences sp = context.getSharedPreferences(FILE_NAME,
+                Context.MODE_PRIVATE);
+        return  sp.getLong(key,defaultValue);
     }
 }

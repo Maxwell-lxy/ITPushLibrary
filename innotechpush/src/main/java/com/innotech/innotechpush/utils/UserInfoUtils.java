@@ -23,7 +23,8 @@ import org.json.JSONObject;
 public class UserInfoUtils {
 
     public static DeviceToken deviceToken = new DeviceToken();
-    public static int geTuiAndUmengIsOk = -1;
+    public static boolean geTuiIsOk =false;
+    public static boolean uMengIsOk =false;
 
     public static UserInfo getUserInfo(Context context, Integer appId, String appKey) {
         UserInfo userInfo = new UserInfo();
@@ -84,8 +85,11 @@ public class UserInfoUtils {
 
 
     public static void sendBroadcast(Context context) {
-        Intent sendBIntent = new Intent(UserInfoReceiver.ACTION_UPDATEUSERINFO);
-        context.sendBroadcast(sendBIntent);
+        LogUtils.e(context, ">>>>>sendBroadcast() sdkname:" + InnotechPushManager.pushSDKName + " geTuiIsOk:" + UserInfoUtils.geTuiIsOk+" uMengIsOk:"+UserInfoUtils.uMengIsOk );
+        if(canUupdateUserInfo(context)){
+            Intent sendBIntent = new Intent(UserInfoReceiver.ACTION_UPDATEUSERINFO);
+            context.sendBroadcast(sendBIntent);
+        }
     }
 
     public static void saveTokenToSP(Context context, String token1, String token2) {
@@ -96,5 +100,25 @@ public class UserInfoUtils {
             UserInfoSPUtils.putString(context, UserInfoSPUtils.KEY_TOKEN2, token2);
         }
 
+    }
+
+    private  static boolean canUupdateUserInfo(Context context){
+        boolean result = false;
+        long curTime =  System.currentTimeMillis();
+        long lastTime = UserInfoSPUtils.getLong(context,UserInfoSPUtils.KEY_UPDATEUSERINFO_TIME,curTime);
+        long diffTime = curTime-lastTime;
+        LogUtils.d(context,"canUupdateUserInfo() curTime:"+curTime+" lastTime:"+lastTime+" diffTime:"+diffTime);
+        long standardDiffTime = 1000*60*60*24;
+        if(diffTime>=standardDiffTime||diffTime==0){
+            result = true;
+            UserInfoSPUtils.putLong(context,UserInfoSPUtils.KEY_UPDATEUSERINFO_TIME,curTime);
+        }
+        LogUtils.d(context,"canUupdateUserInfo() result:"+result);
+        return result;
+    }
+
+    public static void resetGeTuiAndUmeng(){
+        geTuiIsOk =  false;
+        uMengIsOk  = false;
     }
 }

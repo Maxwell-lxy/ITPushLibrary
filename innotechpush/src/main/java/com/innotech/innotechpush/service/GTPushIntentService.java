@@ -34,6 +34,7 @@ public class GTPushIntentService extends GTIntentService {
     @Override
     public void onReceiveClientId(Context context, String clientid) {
         LogUtils.e(context, LogUtils.TAG_GETUI+"onReceiveClientId -> " + "clientid = " + clientid);
+        UserInfoUtils.geTuiIsOk = true;
         UserInfoUtils.deviceToken.setDevice_token1(clientid);
         UserInfoUtils.sendBroadcast(context);
     }

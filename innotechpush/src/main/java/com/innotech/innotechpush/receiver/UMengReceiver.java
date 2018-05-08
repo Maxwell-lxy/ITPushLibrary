@@ -31,6 +31,7 @@ public class UMengReceiver extends UmengMessageHandler implements IUmengRegister
     public void onSuccess(String deviceToken) {
         //注册成功会返回device token
         LogUtils.e(context, LogUtils.TAG_UMENG + " register Success deviceToken:" + deviceToken);
+        UserInfoUtils.uMengIsOk = true;
         UserInfoUtils.deviceToken.setDevice_token2(deviceToken);
         UserInfoUtils.sendBroadcast(context);
 
@@ -39,6 +40,8 @@ public class UMengReceiver extends UmengMessageHandler implements IUmengRegister
     @Override
     public void onFailure(String s, String s1) {
         LogUtils.e(context, LogUtils.TAG_UMENG + " register Failure s:" + s + " s1:" + s1);
+        UserInfoUtils.uMengIsOk = true;
+        UserInfoUtils.sendBroadcast(context);
     }
 
     /**

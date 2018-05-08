@@ -3,6 +3,8 @@ package com.innotech.innotechpush.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.innotech.innotechpush.RequestCallback;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -71,7 +73,7 @@ public class NetWorkUtils {
         }).start();
     }
 
-    public static void sendPostRequest(final Context context, final String urlStr, final String paramsStr, final String sign) {
+    public static void sendPostRequest(final Context context, final String urlStr, final String paramsStr, final String sign, final RequestCallback mCallBack) {
         //开启线程来发起网络请求
         new Thread(new Runnable() {
             @Override
@@ -106,15 +108,21 @@ public class NetWorkUtils {
                         response.append(line);
                     }
                     LogUtils.e(context, "sendPostRequest() response:" + response.toString());
-                    SaveData.saveData(context, response.toString(), urlStr);
+                    SaveData.saveData(context, response.toString(), urlStr,mCallBack);
                 } catch (Exception e) {
                     LogUtils.e(context, "sendPostRequest方法出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
+                    if(mCallBack!=null) {
+                        mCallBack.onFail("sendPostRequest方法出现异常 Exception:" + e.getMessage());
+                    }
                 } finally {
                     if (reader != null) {
                         try {
                             reader.close();
                         } catch (IOException e) {
                             LogUtils.e(context, "BufferedReader关闭出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
+                            if(mCallBack!=null){
+                                mCallBack.onFail("BufferedReader关闭出现异常 Exception:" + e.getMessage());
+                            }
                         }
                     }
                     if (connection != null) {
