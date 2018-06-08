@@ -18,19 +18,13 @@ import java.net.URL;
  */
 
 public class NetWorkUtils {
-    //    public static final String HOST = "139.196.71.160:1323";
-//    private static final String BASE_URL = "http://" + HOST + "/v1/pushaksk";
-//    public static final String URL_UPDATEUSERINFO = BASE_URL + "/updateuserinfo";
-//    public static final String URL_ALIAS = BASE_URL + "/userbindalias";
-//    public static final String PATH_UPDATEUSERINFO = "/v1/pushaksk/updateuserinfo";
-//    public static final String PATH_ALIAS = "/v1/pushaksk/userbindalias";
-    //星星的测试环境
-    public static final String HOST = "139.196.3.78:8081";
-    private static final String BASE_URL = "http://" + HOST;
-    public static final String URL_UPDATEUSERINFO = BASE_URL + "/update-user-info";
-    public static final String URL_ALIAS = BASE_URL + "/user-bind-alias";
-    public static final String PATH_UPDATEUSERINFO = "/update-user-info";
-    public static final String PATH_ALIAS = "/user-bind-alias";
+    //测试环境
+    public static final String HOST = "gw.d.ywopt.com";
+    private static final String BASE_URL = "http://" + HOST + "/v1/pushaksk";
+    public static final String URL_UPDATEUSERINFO = BASE_URL + "/updateuserinfo";
+    public static final String URL_ALIAS = BASE_URL + "/userbindalias";
+    public static final String PATH_UPDATEUSERINFO = "/v1/pushaksk/updateuserinfo";
+    public static final String PATH_ALIAS = "/v1/pushaksk/userbindalias";
     private static int CONNECT_TIMEOUT = 5000;
 
     public static void sendGetRequest(final String urlStr) {
@@ -81,7 +75,7 @@ public class NetWorkUtils {
                 HttpURLConnection connection = null;
                 BufferedReader reader = null;
                 try {
-                    LogUtils.e(context, "sendPostRequest() url:" + urlStr);
+                    LogUtils.e(context, "sendPostRequest() url:" + urlStr+" sign:"+sign+" paramsStr:"+paramsStr);
                     URL url = new URL(urlStr);
                     connection = (HttpURLConnection) url.openConnection();
                     if (sign != null) {
@@ -93,12 +87,12 @@ public class NetWorkUtils {
                     connection.setRequestProperty("Connection", "Keep-Alive");
                     connection.setRequestProperty("Charset", "UTF-8");
                     // 设置文件类型:
-                    connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                    connection.setRequestProperty("Content-Type", "application/json");
                     // 设置接收类型否则返回415错误
                     //conn.setRequestProperty("accept","*/*")此处为暴力方法设置接受所有类型，以此来防范返回415;
-                    connection.setRequestProperty("accept", "application/json");
+//                    connection.setRequestProperty("accept", "application/json");
                     DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-                    out.writeBytes(paramsStr);
+                    out.write(paramsStr.getBytes());
                     InputStream in = connection.getInputStream();
                     //下面对获取到的输入流进行读取
                     reader = new BufferedReader(new InputStreamReader(in));
@@ -111,6 +105,7 @@ public class NetWorkUtils {
                     SaveData.saveData(context, response.toString(), urlStr,mCallBack);
                 } catch (Exception e) {
                     LogUtils.e(context, "sendPostRequest方法出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
+                    e.printStackTrace();
                     if(mCallBack!=null) {
                         mCallBack.onFail("sendPostRequest方法出现异常 Exception:" + e.getMessage());
                     }
@@ -119,6 +114,7 @@ public class NetWorkUtils {
                         try {
                             reader.close();
                         } catch (IOException e) {
+                            e.printStackTrace();
                             LogUtils.e(context, "BufferedReader关闭出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
                             if(mCallBack!=null){
                                 mCallBack.onFail("BufferedReader关闭出现异常 Exception:" + e.getMessage());

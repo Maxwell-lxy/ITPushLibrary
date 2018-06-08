@@ -30,8 +30,6 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
         //调用 PushManager.register(context）方法后，会在此回调注册状态
         //应用在接受返回的 pushid
         LogUtils.e(context, LogUtils.TAG_MEIZU+"MeizuPushMsgReceiver onRegister pushid:"+pushid);
-        UserInfoUtils.deviceToken.setDevice_token1(pushid);
-        UserInfoUtils.sendBroadcast(context);
     }
 
     /**
@@ -99,6 +97,10 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
             registerStatus) {
         //调用新版订阅 PushManager.register(context,appId,appKey)回调
         LogUtils.e(context, LogUtils.TAG_MEIZU+"MeizuPushMsgReceiver onRegisterStatus registerStatus:"+registerStatus);
+        if(registerStatus.getCode().equals(RegisterStatus.SUCCESS_CODE)){
+            UserInfoUtils.deviceToken.setDevice_token1(registerStatus.getPushId());
+            UserInfoUtils.sendBroadcast(context);
+        }
     }
 
     /**

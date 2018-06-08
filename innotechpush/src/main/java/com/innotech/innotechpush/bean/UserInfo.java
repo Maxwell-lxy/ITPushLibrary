@@ -13,6 +13,7 @@ public class UserInfo {
     private String channel;
     private String ip;
     private boolean open_notice;
+    private String guid;
 
     public Integer getApp_id() {
         return app_id;
@@ -76,5 +77,13 @@ public class UserInfo {
 
     public void setChannel(String channel) {
         this.channel = channel;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 }

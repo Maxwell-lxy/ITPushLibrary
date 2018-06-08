@@ -3,12 +3,15 @@ package com.innotech.innotechpush.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.InnotechPushMethod;
 import com.innotech.innotechpush.RequestCallback;
 import com.innotech.innotechpush.utils.LogUtils;
+import com.innotech.innotechpush.utils.UserInfoSPUtils;
 import com.innotech.innotechpush.utils.UserInfoUtils;
 
 /**
@@ -22,13 +25,27 @@ public class UserInfoReceiver extends BroadcastReceiver {
         @Override
         public void onSuccess(String msg) {
             Log.i("Innotech_Push",">>>>>>>>>>>> UserInfo onSuccess msg:"+msg);
+            updateUI(msg);
+
         }
 
         @Override
         public void onFail(String msg) {
             Log.i("Innotech_Push",">>>>>>>>>>> UserInfo onFail msg:"+msg);
+            updateUI(msg);
         }
     };
+
+    private void updateUI(String guid){
+        Message msg = new Message();
+        msg.what = 2;
+        Bundle b = new Bundle();// 存放数据
+        b.putString("guid", guid);
+        msg.setData(b);
+        if (InnotechPushMethod.getMyHandler()!=null){
+            InnotechPushMethod.getMyHandler().sendMessage(msg);
+        }
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {

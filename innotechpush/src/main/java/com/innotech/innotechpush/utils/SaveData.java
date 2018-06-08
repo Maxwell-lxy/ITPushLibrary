@@ -20,7 +20,7 @@ public class SaveData {
             if (response.getCode() == 0) {
                 UserInfoSPUtils.putString(context, UserInfoSPUtils.KEY_GUID, response.getData().getGuid());
                 if(mCallBack!=null){
-                    mCallBack.onSuccess("app上传用户信息成功！");
+                    mCallBack.onSuccess(response.getData().getGuid());
                 }
                 LogUtils.e(context, "app上传用户信息成功！");
             } else {

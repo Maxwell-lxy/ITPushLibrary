@@ -33,6 +33,8 @@ public class UserInfoUtils {
         userInfo.setDevice_token1(deviceToken.getDevice_token1());
         userInfo.setDevice_token2(deviceToken.getDevice_token2());
         userInfo.setIp(Utils.getIPAddress(context));
+        String  guid = UserInfoSPUtils.getString(context,UserInfoSPUtils.KEY_GUID,null);
+        userInfo.setGuid(guid);
         userInfo.setOpen_notice(Utils.isNotificationEnabled(context));
         DeviceInfo deviceInfo = new DeviceInfo();
         deviceInfo.setImei(Utils.getIMEI(context));
@@ -77,6 +79,7 @@ public class UserInfoUtils {
         userInfo.put("device_token2", mUserInfo.getDevice_token2());
         userInfo.put("channel", mUserInfo.getChannel());
         userInfo.put("ip", mUserInfo.getIp());
+        userInfo.put("guid", mUserInfo.getGuid());
         userInfo.put("open_notice", mUserInfo.isOpen_notice());
 
         userInfoObj.put("info", userInfo);
@@ -100,18 +103,18 @@ public class UserInfoUtils {
     }
 
     public  static boolean canUupdateUserInfo(Context context){
-        boolean result = false;
-        long curTime =  System.currentTimeMillis();
-        long lastTime = UserInfoSPUtils.getLong(context,UserInfoSPUtils.KEY_UPDATEUSERINFO_TIME,curTime);
-        long diffTime = curTime-lastTime;
-        LogUtils.d(context,"canUupdateUserInfo() curTime:"+curTime+" lastTime:"+lastTime+" diffTime:"+diffTime);
-        long standardDiffTime = 1000*60*60*24;
-        if(diffTime>=standardDiffTime||diffTime==0){
-            result = true;
-            UserInfoSPUtils.putLong(context,UserInfoSPUtils.KEY_UPDATEUSERINFO_TIME,curTime);
-        }
-        LogUtils.d(context,"canUupdateUserInfo() result:"+result);
-        return result;
+//        boolean result = false;
+//        long curTime =  System.currentTimeMillis();
+//        long lastTime = UserInfoSPUtils.getLong(context,UserInfoSPUtils.KEY_UPDATEUSERINFO_TIME,curTime);
+//        long diffTime = curTime-lastTime;
+//        LogUtils.d(context,"canUupdateUserInfo() curTime:"+curTime+" lastTime:"+lastTime+" diffTime:"+diffTime);
+//        long standardDiffTime = 1000*60*60*24;
+//        if(diffTime>=standardDiffTime||diffTime==0){
+//            result = true;
+//            UserInfoSPUtils.putLong(context,UserInfoSPUtils.KEY_UPDATEUSERINFO_TIME,curTime);
+//        }
+//        LogUtils.d(context,"canUupdateUserInfo() result:"+result);
+        return true;
     }
 
     public static void resetGeTuiAndUmeng(){
