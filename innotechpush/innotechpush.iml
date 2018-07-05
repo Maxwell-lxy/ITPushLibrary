@@ -124,7 +124,6 @@
     <orderEntry type="library" name="Gradle: com.android.support:support-compat-25.4.0" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:C.\Users\admin\Documents\ITPushLibrary\innotechpush\libs\MiPush_SDK_Client_3_6_2.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.umeng.sdk:common:1.5.3@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.umeng.sdk:utdid:1.1.5.3@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-25.4.0" level="project" />
   </component>
 </module>
