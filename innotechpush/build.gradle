@@ -43,15 +43,15 @@ dependencies {
     //testImplementation 'junit:junit:4.12'
     // androidTestImplementation 'com.android.support.test:runner:1.0.1'
     //androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    compile 'com.android.support:support-v4:25.4.0'
+    implementation 'com.android.support:support-v4:25.4.0'
     //魅族推送
-    compile 'com.meizu.flyme.internet:push-internal:3.5.0@aar'
-    //PushSDK必须依赖基础组件库，所以需要加入对应依赖
-//    compile 'com.umeng.sdk:common:1.5.0'
+    implementation 'com.meizu.flyme.internet:push-internal:3.5.0@aar'
+//PushSDK必须依赖基础组件库，所以需要加入对应依赖
+    implementation 'com.umeng.sdk:common:1.5.3'
     //PushSDK必须依赖utdid库，所以需要加入对应依赖
-//    compile 'com.umeng.sdk:utdid:1.1.5.3'
+    implementation 'com.umeng.sdk:utdid:1.1.5.3'
     //PushSDK
-//    compile 'com.umeng.sdk:push:4.1.0'
+    implementation 'com.umeng.sdk:push:4.2.0'
     //个推推送
 //    compile 'com.getui:sdk:2.12.3.0'
 }

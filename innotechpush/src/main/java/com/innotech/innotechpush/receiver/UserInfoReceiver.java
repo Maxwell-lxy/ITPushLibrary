@@ -21,42 +21,42 @@ import com.innotech.innotechpush.utils.UserInfoUtils;
 public class UserInfoReceiver extends BroadcastReceiver {
 
     public static final String ACTION_UPDATEUSERINFO = "com.inno.push.action.UPDATEUSERINFO";
-    RequestCallback mCallBack   =  new RequestCallback() {
+    RequestCallback mCallBack = new RequestCallback() {
         @Override
         public void onSuccess(String msg) {
-            Log.i("Innotech_Push",">>>>>>>>>>>> UserInfo onSuccess msg:"+msg);
+            Log.i("Innotech_Push", ">>>>>>>>>>>> UserInfo onSuccess msg:" + msg);
             updateUI(msg);
 
         }
 
         @Override
         public void onFail(String msg) {
-            Log.i("Innotech_Push",">>>>>>>>>>> UserInfo onFail msg:"+msg);
+            Log.i("Innotech_Push", ">>>>>>>>>>> UserInfo onFail msg:" + msg);
             updateUI(msg);
         }
     };
 
-    private void updateUI(String guid){
+    private void updateUI(String guid) {
         Message msg = new Message();
         msg.what = 2;
         Bundle b = new Bundle();// 存放数据
         b.putString("guid", guid);
         msg.setData(b);
-        if (InnotechPushMethod.getMyHandler()!=null){
+        if (InnotechPushMethod.getMyHandler() != null) {
             InnotechPushMethod.getMyHandler().sendMessage(msg);
         }
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        LogUtils.e(context, "sdkname:" + InnotechPushManager.pushSDKName + " geTuiIsOk:" + UserInfoUtils.geTuiIsOk+" uMengIsOk:"+UserInfoUtils.uMengIsOk );
+        LogUtils.e(context, "sdkname:" + InnotechPushManager.pushSDKName + " geTuiIsOk:" + UserInfoUtils.geTuiIsOk + " uMengIsOk:" + UserInfoUtils.uMengIsOk);
         if (InnotechPushManager.pushSDKName != InnotechPushManager.otherSDKName) {
-            if(UserInfoUtils.canUupdateUserInfo(context)){
-                InnotechPushMethod.updateUserInfo(context,mCallBack);
+            if (UserInfoUtils.canUupdateUserInfo(context)) {
+                InnotechPushMethod.updateUserInfo(context, mCallBack);
             }
         } else {
-            if(UserInfoUtils.geTuiIsOk&&UserInfoUtils.uMengIsOk){
-                if(UserInfoUtils.canUupdateUserInfo(context)) {
+            if (UserInfoUtils.geTuiIsOk && UserInfoUtils.uMengIsOk) {
+                if (UserInfoUtils.canUupdateUserInfo(context)) {
                     InnotechPushMethod.updateUserInfo(context, mCallBack);
                     UserInfoUtils.resetGeTuiAndUmeng();
                 }

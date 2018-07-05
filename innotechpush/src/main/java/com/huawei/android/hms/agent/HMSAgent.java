@@ -10,15 +10,12 @@ import android.widget.Toast;
 
 import com.huawei.android.hms.agent.common.ActivityMgr;
 import com.huawei.android.hms.agent.common.ApiClientMgr;
+import com.huawei.android.hms.agent.common.CheckUpdateApi;
 import com.huawei.android.hms.agent.common.HMSAgentLog;
-import com.huawei.android.hms.agent.common.INoProguard;
 import com.huawei.android.hms.agent.common.IClientConnectCallback;
+import com.huawei.android.hms.agent.common.INoProguard;
+import com.huawei.android.hms.agent.common.handler.CheckUpdateHandler;
 import com.huawei.android.hms.agent.common.handler.ConnectHandler;
-import com.huawei.android.hms.agent.hwid.CheckSignInApi;
-import com.huawei.android.hms.agent.hwid.SignInApi;
-import com.huawei.android.hms.agent.hwid.SignOutApi;
-import com.huawei.android.hms.agent.hwid.handler.SignInHandler;
-import com.huawei.android.hms.agent.hwid.handler.SignOutHandler;
 import com.huawei.android.hms.agent.push.DeleteTokenApi;
 import com.huawei.android.hms.agent.push.EnableReceiveNormalMsgApi;
 import com.huawei.android.hms.agent.push.EnableReceiveNotifyMsgApi;
@@ -68,18 +65,12 @@ public final class HMSAgent implements INoProguard {
      */
     private static final String VER_020600200 = "020600200";
 
-    /**
-     * 2.6.0.302                                         | 2.6.0.302
-     * 修改manifest，删除hms版本号配置；增加直接传入请求和私钥的签名方法封装
-     */
-    private static final String VER_020600302 = "020600302";
 
+    private static final String VER_020601002 = "020601002";
     /**
      * 当前版本号 | Current version number
      */
-    public static final String CURVER = VER_020600302;
-
-
+    public static final String CURVER = VER_020601002;
 
     public static final class AgentResultCode {
 
@@ -256,53 +247,16 @@ public final class HMSAgent implements INoProguard {
     /**
      * 检查本应用的升级 | Check for upgrades to this application
      * @param activity 上下文 | context
+     * @param callback 升级结果回调 | check update Callback
      */
-    public static void checkUpdate (final Activity activity) {
-        HMSAgentLog.i("start checkUpdate");
-        ApiClientMgr.INST.connect(new IClientConnectCallback() {
-            @Override
-            public void onConnect(int rst, HuaweiApiClient client) {
-                Activity activityCur = ActivityMgr.INST.getLastActivity();
-
-                if (activityCur != null && client != null) {
-                    client.checkUpdate(activityCur);
-                } else if (activity != null && client != null){
-                    client.checkUpdate(activity);
-                } else {
-                    // 跟SE确认：activity 为 null ， 不处理 | Activity is null and does not need to be processed
-                    HMSAgentLog.e("no activity to checkUpdate");
-                }
-            }
-        }, true);
+    public static void checkUpdate (Activity activity, CheckUpdateHandler callback) {
+        new CheckUpdateApi().checkUpdate(activity, callback);
     }
 
-    /**
-     * 帐号接口封装 | Account Interface Encapsulation
-     */
-    public static final class Hwid {
-        /**
-         * 帐号登录请求 | Account Login Request
-         * 当forceLogin为false时，如果当前没有登录授权，则直接回调错误码。| When Forcelogin is false, the error code is directly invoked if there is currently no login authorization.
-         * 当forceLogin为true时，如果当前没有登录授权，则会拉起相应界面引导用户登录授权。 | When Forcelogin is true, if there is currently no login authorization, the corresponding interface is pulled to boot the user to logon authorization.
-         * @param forceLogin 是否强制登录。 | Whether to force a login.
-         * @param handler 登录结果回调（结果会在主线程回调） | Login result Callback (result is in main thread callback)
-         */
-        public static void signIn(boolean forceLogin, SignInHandler handler){
-            if (forceLogin) {
-                SignInApi.INST.signIn(handler);
-            } else {
-                new CheckSignInApi().checkSignIn(handler);
-            }
-        }
 
-        /**
-         * 帐号登出请求。此接口调用后，下次再调用signIn会拉起界面，请谨慎调用。如果不确定就不要调用了。 | Account Login Request. After this method is called, the next time you call signIn will pull the interface, please call carefully. Do not call if you are unsure.
-         * @param handler 登出结果回调（结果会在主线程回调） | Logout result callback (result will be callback in main thread)
-         */
-        public static void signOut(SignOutHandler handler){
-            new SignOutApi().signOut(handler);
-        }
-    }
+
+
+
 
     /**
      * push接口封装 | Push interface Encapsulation

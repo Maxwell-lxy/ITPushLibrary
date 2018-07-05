@@ -94,7 +94,6 @@ public class InnotechPushManager {
         }
     }
 
-
     /**
      * 初始化并开启个推推送
      */
@@ -139,12 +138,8 @@ public class InnotechPushManager {
             public void onConnect(int rst) {
                 LogUtils.e(activity.getApplicationContext(), LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
                 getToken();
-                getPushStatus();
-                setReceiveNormalMsg(true);
-                setReceiveNotifyMsg(true);
             }
         });
-        //  getToken();
     }
 
     /**
@@ -155,59 +150,6 @@ public class InnotechPushManager {
             @Override
             public void onResult(int rtnCode) {
                 LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + "get token: end" + rtnCode);
-            }
-        });
-    }
-
-    /**
-     * 获取push状态 | Get Push State
-     */
-    public void getPushStatus() {
-        HMSAgent.Push.getPushState(new GetPushStateHandler() {
-            @Override
-            public void onResult(int rst) {
-                LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + "onResult:end code=" + rst);
-            }
-        });
-    }
-
-    /**
-     * 设置是否接收普通透传消息 | Set whether to receive normal pass messages
-     *
-     * @param enable 是否开启 | enabled or not
-     */
-    public void setReceiveNormalMsg(boolean enable) {
-        HMSAgent.Push.enableReceiveNormalMsg(enable, new EnableReceiveNormalMsgHandler() {
-            @Override
-            public void onResult(int rst) {
-                LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + "enableReceiveNormalMsg:end code=" + rst);
-            }
-        });
-    }
-
-    /**
-     * 设置接收通知消息 | Set up receive notification messages
-     *
-     * @param enable 是否开启 | enabled or not
-     */
-    public void setReceiveNotifyMsg(boolean enable) {
-        HMSAgent.Push.enableReceiveNotifyMsg(enable, new EnableReceiveNotifyMsgHandler() {
-            @Override
-            public void onResult(int rst) {
-
-                LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + "enableReceiveNotifyMsg:end code=" + rst);
-            }
-        });
-    }
-
-    /**
-     * 显示push协议 | Show Push protocol
-     */
-    public void showAgreement() {
-        HMSAgent.Push.queryAgreement(new QueryAgreementHandler() {
-            @Override
-            public void onResult(int rst) {
-                LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + "queryAgreement:end code=" + rst);
             }
         });
     }
