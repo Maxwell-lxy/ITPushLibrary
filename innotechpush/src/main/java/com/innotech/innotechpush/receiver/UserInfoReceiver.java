@@ -55,7 +55,7 @@ public class UserInfoReceiver extends BroadcastReceiver {
                 InnotechPushMethod.updateUserInfo(context, mCallBack);
             }
         } else {
-            if (UserInfoUtils.geTuiIsOk && UserInfoUtils.uMengIsOk) {
+            if (UserInfoUtils.geTuiIsOk || UserInfoUtils.uMengIsOk) {
                 if (UserInfoUtils.canUupdateUserInfo(context)) {
                     InnotechPushMethod.updateUserInfo(context, mCallBack);
                     UserInfoUtils.resetGeTuiAndUmeng();

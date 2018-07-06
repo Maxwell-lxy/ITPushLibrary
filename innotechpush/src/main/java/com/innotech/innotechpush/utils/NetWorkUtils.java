@@ -18,8 +18,10 @@ import java.net.URL;
  */
 
 public class NetWorkUtils {
-    //测试环境
+    //正式环境
     public static final String HOST = "gw.d.ywopt.com";
+    //测试环境
+//    public static final String HOST = "gw.t.ywopt.com";
     private static final String BASE_URL = "https://" + HOST + "/v1/pushaksk";
     public static final String URL_UPDATEUSERINFO = BASE_URL + "/updateuserinfo";
     public static final String URL_ALIAS = BASE_URL + "/userbindalias";
@@ -75,7 +77,7 @@ public class NetWorkUtils {
                 HttpURLConnection connection = null;
                 BufferedReader reader = null;
                 try {
-                    LogUtils.e(context, "sendPostRequest() url:" + urlStr+" sign:"+sign+" paramsStr:"+paramsStr);
+                    LogUtils.e(context, "sendPostRequest() url:" + urlStr + " sign:" + sign + " paramsStr:" + paramsStr);
                     URL url = new URL(urlStr);
                     connection = (HttpURLConnection) url.openConnection();
                     if (sign != null) {
@@ -102,11 +104,11 @@ public class NetWorkUtils {
                         response.append(line);
                     }
                     LogUtils.e(context, "sendPostRequest() response:" + response.toString());
-                    SaveData.saveData(context, response.toString(), urlStr,mCallBack);
+                    SaveData.saveData(context, response.toString(), urlStr, mCallBack);
                 } catch (Exception e) {
                     LogUtils.e(context, "sendPostRequest方法出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
                     e.printStackTrace();
-                    if(mCallBack!=null) {
+                    if (mCallBack != null) {
                         mCallBack.onFail("sendPostRequest方法出现异常 Exception:" + e.getMessage());
                     }
                 } finally {
@@ -116,7 +118,7 @@ public class NetWorkUtils {
                         } catch (IOException e) {
                             e.printStackTrace();
                             LogUtils.e(context, "BufferedReader关闭出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
-                            if(mCallBack!=null){
+                            if (mCallBack != null) {
                                 mCallBack.onFail("BufferedReader关闭出现异常 Exception:" + e.getMessage());
                             }
                         }

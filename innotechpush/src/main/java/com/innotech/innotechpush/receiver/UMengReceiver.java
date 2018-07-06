@@ -68,7 +68,7 @@ public class UMengReceiver extends UmengMessageHandler implements IUmengRegister
     @Override
     public void dealWithCustomMessage(final Context context, final UMessage msg) {
         try {
-            LogUtils.i(context,"uMeng dealWithCustomMessage() msg.custom:"+msg.custom);
+            LogUtils.i(context, "uMeng dealWithCustomMessage() msg.custom:" + msg.custom);
             JSONObject object = new JSONObject(msg.custom);
             String idempotent = object.getString("idempotent");
             if (!TextUtils.isEmpty(idempotent)) {
@@ -123,18 +123,19 @@ public class UMengReceiver extends UmengMessageHandler implements IUmengRegister
 //                return super.getNotification(context, msg);
 //        }
 //    }
+
     /**
      * {
-     "action_content": "{"url":"http://www.baidu.com"}",  //action_type为2时读取url
-     "action_type": 1,            // 1打开应用 2打开链接
-     "content": "App全推测试内容3",  //通知内容
-     "extra": "", //用户自定义json数据
-     "idempotent": "XVlBzg1527500648", //唯一标识
-     "unfold":"app全推展开内容", //通知展开显示文本
-     "title": "App全推测试标题3" //通知标题
-     }
+     * "action_content": "{"url":"http://www.baidu.com"}",  //action_type为2时读取url
+     * "action_type": 1,            // 1打开应用 2打开链接
+     * "content": "App全推测试内容3",  //通知内容
+     * "extra": "", //用户自定义json数据
+     * "idempotent": "XVlBzg1527500648", //唯一标识
+     * "unfold":"app全推展开内容", //通知展开显示文本
+     * "title": "App全推测试标题3" //通知标题
+     * }
      */
-    private  InnotechMessage createMessageByJson(UMessage msg){
+    private InnotechMessage createMessageByJson(UMessage msg) {
         InnotechMessage mPushMessage = new InnotechMessage();
         JSONObject object = null;
         try {
@@ -144,9 +145,9 @@ public class UMengReceiver extends UmengMessageHandler implements IUmengRegister
             String extra = object.getString("extra");
             String unfold = object.getString("unfold");
             int action_type = object.getInt("action_type");
-            if(action_type==2){
+            if (action_type == 2) {
                 String action_content = object.getString("action_content");
-                JSONObject  con_object = new JSONObject(action_content);
+                JSONObject con_object = new JSONObject(action_content);
                 mPushMessage.setActionContent(con_object.getString("url"));
                 mPushMessage.setActionContent(action_content);
             }
@@ -162,6 +163,7 @@ public class UMengReceiver extends UmengMessageHandler implements IUmengRegister
 
         return mPushMessage;
     }
+
     private InnotechMessage getCreateMessge(UMessage uMessage) {
         InnotechMessage mPushMessage = new InnotechMessage();
         mPushMessage.setTitle(uMessage.title);

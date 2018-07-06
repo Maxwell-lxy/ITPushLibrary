@@ -24,13 +24,14 @@ import org.json.JSONObject;
 public class InnotechPushMethod {
 
     private static Handler myHandler;
+
     /**
      * app上传用户信息
      *
      * @param context：Android平台上app的上下文，建议传入当前app的application context
      */
     public static void updateUserInfo(Context context, RequestCallback mCallBack) {
-        if(tokenIsChange(context)){
+        if (tokenIsChange(context)) {
             Integer appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
             String appKey = Utils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
             UserInfo userInfo = UserInfoUtils.getUserInfo(context, appId, appKey);
@@ -51,22 +52,22 @@ public class InnotechPushMethod {
 
     }
 
-    private static boolean tokenIsChange(Context context){
+    private static boolean tokenIsChange(Context context) {
         boolean result = false;
-        String  oldToken = UserInfoSPUtils.getString(context,UserInfoSPUtils.KEY_TOKEN1,null);
-        String  newToken =  UserInfoUtils.deviceToken.getDevice_token1();
-        String  oldToken2 = UserInfoSPUtils.getString(context,UserInfoSPUtils.KEY_TOKEN2,null);
-        String  newToken2 =  UserInfoUtils.deviceToken.getDevice_token2();
-        LogUtils.e(context, "oldToken:"+oldToken+" newToken:"+newToken);
-        LogUtils.e(context, "oldToken2:"+oldToken2+" newToken2:"+newToken2);
+        String oldToken = UserInfoSPUtils.getString(context, UserInfoSPUtils.KEY_TOKEN1, null);
+        String newToken = UserInfoUtils.deviceToken.getDevice_token1();
+        String oldToken2 = UserInfoSPUtils.getString(context, UserInfoSPUtils.KEY_TOKEN2, null);
+        String newToken2 = UserInfoUtils.deviceToken.getDevice_token2();
+        LogUtils.e(context, "oldToken:" + oldToken + " newToken:" + newToken);
+        LogUtils.e(context, "oldToken2:" + oldToken2 + " newToken2:" + newToken2);
         try {
-            if(newToken!=null&&!newToken.equals(oldToken)){
+            if (newToken != null && !newToken.equals(oldToken)) {
                 result = true;
             }
-            if((newToken2!=null&&!newToken2.equals(oldToken2))){
+            if ((newToken2 != null && !newToken2.equals(oldToken2))) {
                 result = true;
             }
-        }catch (NullPointerException ex){
+        } catch (NullPointerException ex) {
             ex.printStackTrace();
         }
         return result;
@@ -113,11 +114,12 @@ public class InnotechPushMethod {
     public static void launcher(Activity activity) {
         InnotechPushManager.getInstance().setLauncherActivity(activity);
     }
-    public static void setHandler(Handler handler){
+
+    public static void setHandler(Handler handler) {
         myHandler = handler;
     }
 
-    public static Handler getMyHandler(){
+    public static Handler getMyHandler() {
         return myHandler;
     }
 }

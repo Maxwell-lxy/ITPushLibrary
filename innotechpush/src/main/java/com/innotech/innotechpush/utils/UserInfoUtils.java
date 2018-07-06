@@ -23,8 +23,8 @@ import org.json.JSONObject;
 public class UserInfoUtils {
 
     public static DeviceToken deviceToken = new DeviceToken();
-    public static boolean geTuiIsOk =false;
-    public static boolean uMengIsOk =false;
+    public static boolean geTuiIsOk = false;
+    public static boolean uMengIsOk = false;
 
     public static UserInfo getUserInfo(Context context, Integer appId, String appKey) {
         UserInfo userInfo = new UserInfo();
@@ -33,7 +33,7 @@ public class UserInfoUtils {
         userInfo.setDevice_token1(deviceToken.getDevice_token1());
         userInfo.setDevice_token2(deviceToken.getDevice_token2());
         userInfo.setIp(Utils.getIPAddress(context));
-        String  guid = UserInfoSPUtils.getString(context,UserInfoSPUtils.KEY_GUID,null);
+        String guid = UserInfoSPUtils.getString(context, UserInfoSPUtils.KEY_GUID, null);
         userInfo.setGuid(guid);
         userInfo.setOpen_notice(Utils.isNotificationEnabled(context));
         DeviceInfo deviceInfo = new DeviceInfo();
@@ -88,8 +88,8 @@ public class UserInfoUtils {
 
 
     public static void sendBroadcast(Context context) {
-            Intent sendBIntent = new Intent(UserInfoReceiver.ACTION_UPDATEUSERINFO);
-            context.sendBroadcast(sendBIntent);
+        Intent sendBIntent = new Intent(UserInfoReceiver.ACTION_UPDATEUSERINFO);
+        context.sendBroadcast(sendBIntent);
     }
 
     public static void saveTokenToSP(Context context, String token1, String token2) {
@@ -102,7 +102,7 @@ public class UserInfoUtils {
 
     }
 
-    public  static boolean canUupdateUserInfo(Context context){
+    public static boolean canUupdateUserInfo(Context context) {
 //        boolean result = false;
 //        long curTime =  System.currentTimeMillis();
 //        long lastTime = UserInfoSPUtils.getLong(context,UserInfoSPUtils.KEY_UPDATEUSERINFO_TIME,curTime);
@@ -117,8 +117,8 @@ public class UserInfoUtils {
         return true;
     }
 
-    public static void resetGeTuiAndUmeng(){
-        geTuiIsOk =  false;
-        uMengIsOk  = false;
+    public static void resetGeTuiAndUmeng() {
+        geTuiIsOk = false;
+        uMengIsOk = false;
     }
 }

@@ -3,12 +3,20 @@ package com.innotech.innotechpush.receiver;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.huawei.hms.support.api.push.PushReceiver;
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.UserInfoUtils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Iterator;
 
 /**
  * 华为推送的接收器
@@ -67,7 +75,24 @@ public class HuaweiPushRevicer extends PushReceiver {
     private InnotechMessage getCreateMessge(Bundle extras) {
         InnotechMessage mPushMessage = new InnotechMessage();
         String message = extras.getString(BOUND_KEY.pushMsgKey);
-        mPushMessage.setData(message);
+//        mPushMessage.setData(message);
+        if (!TextUtils.isEmpty(message)) {
+            try {
+                JSONArray array = new JSONArray(message);
+                JSONObject object = new JSONObject();
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject o = array.getJSONObject(i);
+                    Iterator<String> it = o.keys();
+                    while (it.hasNext()) {
+                        String key = it.next();
+                        object.put(key, o.get(key));
+                    }
+                }
+                mPushMessage.setCustom(object.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         return mPushMessage;
     }
 

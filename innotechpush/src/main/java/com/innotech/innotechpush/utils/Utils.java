@@ -80,7 +80,7 @@ public class Utils {
      * @return
      */
     public static boolean isMeizuDevice() {
-        if (MEIZU.equals(Build.BRAND)) {
+        if (MEIZU.toLowerCase().equals(Build.BRAND.toLowerCase())) {
             return true;
         }
         return false;
@@ -217,7 +217,7 @@ public class Utils {
     public static void showNotification(Context context, InnotechMessage msg) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
-        if(msg.getNotiBigText()!=null&&msg.getNotiBigText().length()>0){
+        if (msg.getNotiBigText() != null && msg.getNotiBigText().length() > 0) {
             mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
                     .setContentText(msg.getContent())
                     .setAutoCancel(true)
@@ -229,7 +229,7 @@ public class Utils {
                     .setStyle(new NotificationCompat.BigTextStyle()
                             .setBigContentTitle(msg.getTitle())
                             .bigText(msg.getNotiBigText()));
-        }else{
+        } else {
             mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
                     .setContentText(msg.getContent())
                     .setAutoCancel(true)
@@ -241,7 +241,7 @@ public class Utils {
         }
 
         Intent clickIntent = new Intent(context, NotificationClickReceiver.class); //点击通知之后要发送的广播
-        clickIntent.putExtra("InnotechMessage",msg);
+        clickIntent.putExtra("InnotechMessage", msg);
         int id = (int) (System.currentTimeMillis() / 1000);
         PendingIntent contentIntent = PendingIntent.getBroadcast(context.getApplicationContext(), id, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
@@ -314,8 +314,8 @@ public class Utils {
     }
 
     /*
-    * 判断通知权限是否打开
-    */
+     * 判断通知权限是否打开
+     */
     private static boolean isNotificationEnable(Context context) {
         AppOpsManager mAppOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
         ApplicationInfo appInfo = context.getApplicationInfo();
@@ -391,6 +391,7 @@ public class Utils {
 
     /**
      * 判断用户是否修改过通知权限
+     *
      * @param context
      * @return
      */
