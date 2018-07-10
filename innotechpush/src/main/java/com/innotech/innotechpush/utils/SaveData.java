@@ -19,12 +19,12 @@ public class SaveData {
             BaseResponse<Guid> response = new DataAnalysis<Guid>().analysisData(json, Guid.class.getName());
             if (response.getCode() == 0) {
                 UserInfoSPUtils.putString(context, UserInfoSPUtils.KEY_GUID, response.getData().getGuid());
-                if(mCallBack!=null){
+                if (mCallBack != null) {
                     mCallBack.onSuccess(response.getData().getGuid());
                 }
                 LogUtils.e(context, "app上传用户信息成功！");
             } else {
-                if(mCallBack!=null){
+                if (mCallBack != null) {
                     mCallBack.onFail("app上传用户信息失败！");
                 }
                 LogUtils.e(context, "app上传用户信息失败！");
@@ -35,14 +35,14 @@ public class SaveData {
             BaseResponse response = new DataAnalysis().analysisData(json, null);
             if (response.getCode() == 0) {
                 LogUtils.e(context, "绑定用户别名成功！");
-                if(mCallBack!=null){
+                if (mCallBack != null) {
                     mCallBack.onSuccess("绑定用户别名成功！");
                 }
 
             } else {
                 LogUtils.e(context, "绑定用户别名失败！");
-                if(mCallBack!=null){
-                    mCallBack.onSuccess("绑定用户别名失败！");
+                if (mCallBack != null) {
+                    mCallBack.onFail("绑定用户别名失败！");
                 }
             }
         }
