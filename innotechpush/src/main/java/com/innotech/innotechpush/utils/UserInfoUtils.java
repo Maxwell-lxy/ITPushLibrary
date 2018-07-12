@@ -3,15 +3,11 @@ package com.innotech.innotechpush.utils;
 import android.content.Context;
 import android.content.Intent;
 
-import com.huawei.android.hms.agent.HMSAgent;
-import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.bean.Channel;
 import com.innotech.innotechpush.bean.DeviceInfo;
 import com.innotech.innotechpush.bean.DeviceToken;
 import com.innotech.innotechpush.bean.UserInfo;
 import com.innotech.innotechpush.receiver.UserInfoReceiver;
-import com.innotech.innotechpush.sdk.MiSDK;
-import com.meizu.cloud.pushsdk.PushManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;

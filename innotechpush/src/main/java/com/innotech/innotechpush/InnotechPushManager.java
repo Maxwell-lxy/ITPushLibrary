@@ -4,13 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 
-import com.huawei.android.hms.agent.HMSAgent;
-import com.huawei.android.hms.agent.common.handler.ConnectHandler;
-import com.huawei.android.hms.agent.push.handler.EnableReceiveNormalMsgHandler;
-import com.huawei.android.hms.agent.push.handler.EnableReceiveNotifyMsgHandler;
-import com.huawei.android.hms.agent.push.handler.GetPushStateHandler;
-import com.huawei.android.hms.agent.push.handler.GetTokenHandler;
-import com.huawei.android.hms.agent.push.handler.QueryAgreementHandler;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.receiver.PushReciver;
 import com.innotech.innotechpush.receiver.UMengReceiver;
@@ -34,7 +27,7 @@ public class InnotechPushManager {
     private static PushReciver mPushReciver;
     public static String pushSDKName = null;
     public static String miSDKName = "mi";
-    public static String huaweiSDKName = "huawei";
+//    public static String huaweiSDKName = "huawei";
     public static String meizuSDKName = "meizu";
     public static String otherSDKName = "union ";
 
@@ -57,7 +50,7 @@ public class InnotechPushManager {
      */
     public void setLauncherActivity(Activity activity) {
         if (Utils.isHuaweiDevice()) {
-            huaWeiConnect(activity);
+//            huaWeiConnect(activity);
         }
     }
 
@@ -81,15 +74,15 @@ public class InnotechPushManager {
             PushManager.register(application, appId, appKey);
         }
         //华为设备时，开启华为推送
-        else if (Utils.isHuaweiDevice()) {
-            pushSDKName = huaweiSDKName;
-            LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + " HMSAgent.init");
-            HMSAgent.init(application);
-        }
+//        else if (Utils.isHuaweiDevice()) {
+////            pushSDKName = huaweiSDKName;
+////            LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + " HMSAgent.init");
+////            HMSAgent.init(application);
+////        }
         //其他设备时，开启个推推送和友盟推送
         else {
             pushSDKName = otherSDKName;
-            initGeTuiPush();
+//            initGeTuiPush();
             initUMengPush();
         }
     }
@@ -132,26 +125,26 @@ public class InnotechPushManager {
         LogUtils.e(context, "InnotechPushReciver is null!");
     }
 
-    private void huaWeiConnect(final Activity activity) {
-        HMSAgent.connect(activity, new ConnectHandler() {
-            @Override
-            public void onConnect(int rst) {
-                LogUtils.e(activity.getApplicationContext(), LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
-                getToken();
-            }
-        });
-    }
+//    private void huaWeiConnect(final Activity activity) {
+//        HMSAgent.connect(activity, new ConnectHandler() {
+//            @Override
+//            public void onConnect(int rst) {
+//                LogUtils.e(activity.getApplicationContext(), LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
+//                getToken();
+//            }
+//        });
+//    }
 
     /**
      * 获取token
      */
-    public void getToken() {
-        HMSAgent.Push.getToken(new GetTokenHandler() {
-            @Override
-            public void onResult(int rtnCode) {
-                LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + "get token: end" + rtnCode);
-            }
-        });
-    }
+//    public void getToken() {
+//        HMSAgent.Push.getToken(new GetTokenHandler() {
+//            @Override
+//            public void onResult(int rtnCode) {
+//                LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + "get token: end" + rtnCode);
+//            }
+//        });
+//    }
 
 }

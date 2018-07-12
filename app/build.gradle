@@ -19,20 +19,20 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 INNOTECH_PUSH_DEBUG : true,
-                INNOTECH_APP_ID : "123",
-                INNOTECH_APP_KEY : "123",
+                INNOTECH_APP_ID     : 1008,
+                INNOTECH_APP_KEY    : "ddddddd",
 
-                MI_APP_ID           : "2882303761517759216",
-                MI_APP_KEY          : "5221775952216",
+                MI_APP_ID           : "2882303761517836599",
+                MI_APP_KEY          : "5131783646599",
 
                 MEIZU_APP_ID        : "112950",
                 MEIZU_APP_KEY       : "509a337735ba497ebba21d981924c9f4",
 
                 HMS_APP_ID          : "100244129",
 
-                GETUI_APP_ID        : "PH4qx2Le8w9Nz8pMyCPMZ7",
-                GETUI_APP_KEY       : "qy4AYz75roAJiQjzkPLfc3",
-                GETUI_APP_SECRET    : "tz6QPHBAOY8Scmcxo6y9P2",
+                GETUI_APP_ID        : "2e48RoYBrh65BC4HRmkAg6",
+                GETUI_APP_KEY       : "PwG112qeeV5UiQrtVObz3A",
+                GETUI_APP_SECRET    : "rvsZ98fb3K6I9UcPTBHzF9",
 
                 UMENG_APP_KEY       : "5acd8033b27b0a025600002d",
                 UMENG_MESSAGE_SECRET: "2e632fc558e68901337a8864ef0c33bc"
