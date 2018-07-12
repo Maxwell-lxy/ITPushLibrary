@@ -47,9 +47,9 @@ public class UserInfoUtils {
             userInfo.setChannel(Channel.MZ);
         }
         //华为设备
-        else if (Utils.isHuaweiDevice()) {
-            userInfo.setChannel(Channel.HW);
-        }
+//        else if (Utils.isHuaweiDevice()) {
+//            userInfo.setChannel(Channel.HW);
+//        }
         //其他设备
         else {
             userInfo.setChannel(Channel.UNION);
