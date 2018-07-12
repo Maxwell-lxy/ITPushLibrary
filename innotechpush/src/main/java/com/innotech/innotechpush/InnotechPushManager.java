@@ -8,8 +8,8 @@ import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.receiver.PushReciver;
 import com.innotech.innotechpush.receiver.UMengReceiver;
 import com.innotech.innotechpush.sdk.MiSDK;
-import com.innotech.innotechpush.service.GTPushIntentService;
-import com.innotech.innotechpush.service.GeTuiPushService;
+import com.innotech.innotechpush.service.PushIntentService;
+import com.innotech.innotechpush.service.PushService;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.meizu.cloud.pushsdk.PushManager;
@@ -82,7 +82,7 @@ public class InnotechPushManager {
         //其他设备时，开启个推推送和友盟推送
         else {
             pushSDKName = otherSDKName;
-//            initGeTuiPush();
+            initGeTuiPush();
             initUMengPush();
         }
     }
@@ -92,9 +92,9 @@ public class InnotechPushManager {
      */
     private void initGeTuiPush() {
         LogUtils.e(application.getApplicationContext(), LogUtils.TAG_GETUI + "call initGeTuiPush()");
-        com.igexin.sdk.PushManager.getInstance().initialize(application.getApplicationContext(), GeTuiPushService.class);
+        com.igexin.sdk.PushManager.getInstance().initialize(application.getApplicationContext(), PushService.class);
         // com.getui.demo.DemoIntentService 为第三⽅方⾃自定义的推送服务事件接收类
-        com.igexin.sdk.PushManager.getInstance().registerPushIntentService(application.getApplicationContext(), GTPushIntentService.class);
+        com.igexin.sdk.PushManager.getInstance().registerPushIntentService(application.getApplicationContext(), PushIntentService.class);
     }
 
     /**

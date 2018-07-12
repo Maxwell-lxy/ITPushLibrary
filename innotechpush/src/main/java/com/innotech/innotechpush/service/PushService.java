@@ -11,7 +11,7 @@ import com.igexin.sdk.GTServiceManager;
  * Created by admin on 2018/4/8.
  */
 
-public class GeTuiPushService  extends Service{
+public class PushService extends Service{
     @Override
     public void onCreate() {
         super.onCreate();

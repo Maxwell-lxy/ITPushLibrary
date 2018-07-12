@@ -292,11 +292,11 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <service
-            android:name="com.innotech.innotechpush.service.GeTuiPushService"
+            android:name="com.innotech.innotechpush.service.PushService"
             android:exported="true"
             android:label="PushService"
             android:process=":pushservice" />
-        <service android:name="com.innotech.innotechpush.service.GTPushIntentService" />
+        <service android:name="com.innotech.innotechpush.service.PushIntentService" />
         <!-- 个推SDK配置结束 -->
 
         <!-- 友盟推送开始 -->

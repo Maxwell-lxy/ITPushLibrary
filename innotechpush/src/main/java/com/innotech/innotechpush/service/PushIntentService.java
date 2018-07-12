@@ -21,9 +21,9 @@ import org.json.JSONObject;
  * 个推的回调方法
  */
 
-public class GTPushIntentService extends GTIntentService {
+public class PushIntentService extends GTIntentService {
 
-    public GTPushIntentService() {
+    public PushIntentService() {
 
     }
 
