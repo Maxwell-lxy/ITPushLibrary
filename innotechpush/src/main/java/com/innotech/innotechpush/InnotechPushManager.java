@@ -11,10 +11,13 @@ import com.innotech.innotechpush.sdk.MiSDK;
 import com.innotech.innotechpush.service.PushIntentService;
 import com.innotech.innotechpush.service.PushService;
 import com.innotech.innotechpush.utils.LogUtils;
+import com.innotech.innotechpush.utils.UserInfoUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.meizu.cloud.pushsdk.PushManager;
 import com.umeng.commonsdk.UMConfigure;
 import com.umeng.message.PushAgent;
+
+import java.util.UUID;
 
 /**
  * SDK核心类，SDK初始化用到
@@ -27,7 +30,7 @@ public class InnotechPushManager {
     private static PushReciver mPushReciver;
     public static String pushSDKName = null;
     public static String miSDKName = "mi";
-//    public static String huaweiSDKName = "huawei";
+    //    public static String huaweiSDKName = "huawei";
     public static String meizuSDKName = "meizu";
     public static String otherSDKName = "union ";
 
@@ -61,6 +64,7 @@ public class InnotechPushManager {
      */
     public void initPushSDK(Application application) {
         this.application = application;
+        UserInfoUtils.UUID = UUID.randomUUID().toString();
         if (Utils.isXiaomiDevice() || Utils.isMIUI()) {
             pushSDKName = miSDKName;
             new MiSDK(application);

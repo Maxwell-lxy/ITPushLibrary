@@ -21,6 +21,7 @@ public class UserInfoUtils {
     public static DeviceToken deviceToken = new DeviceToken();
     public static boolean geTuiIsOk = false;
     public static boolean uMengIsOk = false;
+    public static String UUID;
 
     public static UserInfo getUserInfo(Context context, Integer appId, String appKey) {
         UserInfo userInfo = new UserInfo();
@@ -77,6 +78,7 @@ public class UserInfoUtils {
         userInfo.put("ip", mUserInfo.getIp());
         userInfo.put("guid", mUserInfo.getGuid());
         userInfo.put("open_notice", mUserInfo.isOpen_notice());
+        userInfo.put("idempotent", UserInfoUtils.UUID);
 
         userInfoObj.put("info", userInfo);
         return userInfoObj.toString();
