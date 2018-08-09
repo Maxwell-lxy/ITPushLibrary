@@ -31,7 +31,7 @@ public class InnotechPushMethod {
      * @param context：Android平台上app的上下文，建议传入当前app的application context
      */
     public static void updateUserInfo(Context context, RequestCallback mCallBack) {
-        if (tokenIsChange(context)) {
+        if (context != null && tokenIsChange(context)) {
             Integer appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
             String appKey = Utils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
             UserInfo userInfo = UserInfoUtils.getUserInfo(context, appId, appKey);

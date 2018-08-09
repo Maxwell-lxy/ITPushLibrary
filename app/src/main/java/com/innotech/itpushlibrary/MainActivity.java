@@ -1,12 +1,7 @@
 package com.innotech.itpushlibrary;
 
 import android.app.Activity;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.Manifest;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 
 public class MainActivity extends Activity {
     private static final int REQUEST_PERMISSION = 0;
