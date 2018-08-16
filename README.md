@@ -41,6 +41,9 @@ Android Studio是Google力推的Android开发环境，在IntelliJ IDEA基础上�
    		repositories {
    			...
    			maven { url 'https://jitpack.io' }
+   			maven {
+               	url "http://mvn.gt.igexin.com/nexus/content/repositories/releases/"
+           	}
    		}
    	}
    ```
@@ -69,17 +72,15 @@ Android Studio是Google力推的Android开发环境，在IntelliJ IDEA基础上�
    			//个推配置
                 GETUI_APP_ID        : "PH4qx2Le8w9Nz8pMyCPMZ7",
                 GETUI_APP_KEY       : "qy4AYz75roAJiQjzkPLfc3",
-                GETUI_APP_SECRET    : "tz6QPHBAOY8Scmcxo6y9P2",
-   			//友盟配置
-                UMENG_APP_KEY       : "5acd8033b27b0a025600002d",
-                UMENG_MESSAGE_SECRET: "2e632fc558e68901337a8864ef0c33bc"
-
+                GETUI_APP_SECRET    : "tz6QPHBAOY8Scmcxo6y9P2"
+   
            ]
        }
    	
    	dependencies {
    		...
-   		compile 'com.github.hgw900109:ITPushLibrary:1.0.7'
+   		//{version}版本号需修改成最新版本
+   		implementation 'com.github.hgw900109:ITPushLibrary:{version}'
    	}
    ```
 
@@ -197,14 +198,12 @@ InnotechPushMethod.setAlias(MainActivity.this, "test", new RequestCallback() {
        Innotech_Push: [GeTuiPush] onReceiveServicePid -> ServicePid = 2132
        Innotech_Push: [GeTuiPush] onReceiveClientId -> clientid = 997ea4305ce2d6d0a7a6c352c0f70e8b
        Innotech_Push: [GeTuiPush] onReceiveOnlineState() -> b = true
-       //友盟成功的日志
-       Innotech_Push: [UmengPush]  register Success deviceToken:As6BEzt2XBkWf9XFpJgv0Brj5aBlHV0w3w03wMwMzFaF
 
 2. 进入各推送平台进行后台推送，小米/魅族/华为使用通知栏消息进行推送，个推和友盟使用透传消息进行推送。
 
 #### 疑问
 
-- 对接Innotech推送SDK之后，在小米手机上运行app，使用友盟后台推送消息，app未收到。
+- 集团推送SDK为什么达到率比单独推送平台（如：个推）到达率高？
 
-  这种情况是由Innotech推送SDK的策咯造成的，小米/魅族/华为三个手机厂商提供了系统级的推送方案，因为，我们在小米手机/魅族手机/华为手机上只会开启对应厂商的推送，而其他手机则会开启个推推送和友盟推送，因此，运行在小米手机上的app通过友盟后台推送消息是收不到的。
+  集团推送集成了小米、魅族、华为、个推和集团推送五部分推送，并根据用户手机进行匹配开启相应推送机制；如：小米手机用户开启应用将开启小米推送。由于小米、魅族、华为三家的推送在自家品牌手机上的进程级别为系统级别，故，不管是否在线，到达率都接近100%，而除了这三家之外的手机将开启个推和集团推送双通道来保证到达率。
 
