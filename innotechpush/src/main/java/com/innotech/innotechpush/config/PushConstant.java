@@ -17,13 +17,9 @@ public class PushConstant {
     public static final String INNOTECH_APP_KEY = "INNOTECH_APP_KEY";
 
     /**
-     * 友盟app_key
+     * 推送版本号
      */
-    public static final String UMENG_APP_KEY = "UMENG_APPKEY";
-    /**
-     * 友盟密钥
-     */
-    public static final String UMENG_MESSAGE_SECRET = "UMENG_MESSAGE_SECRET";
+    public static final String INNOTECH_PUSH_VERSION = "1.0.2";
 
 
 }

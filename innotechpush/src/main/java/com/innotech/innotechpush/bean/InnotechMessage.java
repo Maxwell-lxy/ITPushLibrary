@@ -17,6 +17,9 @@ public class InnotechMessage implements Serializable {
     private String notiBigText;
     private String actionContent;
 
+    public InnotechMessage() {
+    }
+    
     public String getData() {
         return data;
     }

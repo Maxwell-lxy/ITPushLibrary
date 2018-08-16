@@ -242,7 +242,7 @@ public class Utils {
 
         Intent clickIntent = new Intent(context, NotificationClickReceiver.class); //点击通知之后要发送的广播
         clickIntent.putExtra("InnotechMessage", msg);
-        int id = (int) (System.currentTimeMillis() / 1000);
+        int id = (int) ((Math.random() * 9 + 1) * 1000);
         PendingIntent contentIntent = PendingIntent.getBroadcast(context.getApplicationContext(), id, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
         notificationManager.notify(id, mBuilder.build());

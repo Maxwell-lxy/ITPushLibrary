@@ -22,12 +22,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-        }
-    }
 }
 
 repositories {
@@ -38,20 +32,9 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    //implementation 'com.android.support:appcompat-v7:26.1.0'
-    //testImplementation 'junit:junit:4.12'
-    // androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    //androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.android.support:support-v4:25.4.0'
     //魅族推送
     implementation 'com.meizu.flyme.internet:push-internal:3.5.0@aar'
-//PushSDK必须依赖基础组件库，所以需要加入对应依赖
-    implementation 'com.umeng.sdk:common:1.5.3'
-    //PushSDK必须依赖utdid库，所以需要加入对应依赖
-//    implementation 'com.umeng.sdk:utdid:1.1.5.3'
-    //PushSDK
-    implementation 'com.umeng.sdk:push:4.2.0'
     //个推推送
-//    compile 'com.getui:sdk:2.12.3.0'
+    implementation 'com.getui:sdk:2.12.3.0'
 }

@@ -7,6 +7,7 @@ import com.innotech.innotechpush.bean.Channel;
 import com.innotech.innotechpush.bean.DeviceInfo;
 import com.innotech.innotechpush.bean.DeviceToken;
 import com.innotech.innotechpush.bean.UserInfo;
+import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.receiver.UserInfoReceiver;
 
 import org.json.JSONException;
@@ -20,7 +21,6 @@ public class UserInfoUtils {
 
     public static DeviceToken deviceToken = new DeviceToken();
     public static boolean geTuiIsOk = false;
-    public static boolean uMengIsOk = false;
     public static String UUID;
 
     public static UserInfo getUserInfo(Context context, Integer appId, String appKey) {
@@ -79,6 +79,7 @@ public class UserInfoUtils {
         userInfo.put("guid", mUserInfo.getGuid());
         userInfo.put("open_notice", mUserInfo.isOpen_notice());
         userInfo.put("idempotent", UserInfoUtils.UUID);
+        userInfo.put("version", PushConstant.INNOTECH_PUSH_VERSION);
 
         userInfoObj.put("info", userInfo);
         return userInfoObj.toString();
@@ -100,23 +101,4 @@ public class UserInfoUtils {
 
     }
 
-    public static boolean canUupdateUserInfo(Context context) {
-//        boolean result = false;
-//        long curTime =  System.currentTimeMillis();
-//        long lastTime = UserInfoSPUtils.getLong(context,UserInfoSPUtils.KEY_UPDATEUSERINFO_TIME,curTime);
-//        long diffTime = curTime-lastTime;
-//        LogUtils.d(context,"canUupdateUserInfo() curTime:"+curTime+" lastTime:"+lastTime+" diffTime:"+diffTime);
-//        long standardDiffTime = 1000*60*60*24;
-//        if(diffTime>=standardDiffTime||diffTime==0){
-//            result = true;
-//            UserInfoSPUtils.putLong(context,UserInfoSPUtils.KEY_UPDATEUSERINFO_TIME,curTime);
-//        }
-//        LogUtils.d(context,"canUupdateUserInfo() result:"+result);
-        return true;
-    }
-
-    public static void resetGeTuiAndUmeng() {
-        geTuiIsOk = false;
-        uMengIsOk = false;
-    }
 }

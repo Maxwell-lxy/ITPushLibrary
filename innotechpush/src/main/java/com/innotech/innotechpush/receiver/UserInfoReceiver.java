@@ -49,17 +49,13 @@ public class UserInfoReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        LogUtils.e(context, "sdkname:" + InnotechPushManager.pushSDKName + " geTuiIsOk:" + UserInfoUtils.geTuiIsOk + " uMengIsOk:" + UserInfoUtils.uMengIsOk);
+        LogUtils.e(context, "sdkname:" + InnotechPushManager.pushSDKName + " geTuiIsOk:" + UserInfoUtils.geTuiIsOk);
         if (InnotechPushManager.pushSDKName != InnotechPushManager.otherSDKName) {
-            if (UserInfoUtils.canUupdateUserInfo(context)) {
-                InnotechPushMethod.updateUserInfo(context, mCallBack);
-            }
+            InnotechPushMethod.updateUserInfo(context, mCallBack);
         } else {
-            if (UserInfoUtils.geTuiIsOk || UserInfoUtils.uMengIsOk) {
-                if (UserInfoUtils.canUupdateUserInfo(context)) {
-                    InnotechPushMethod.updateUserInfo(context, mCallBack);
-                    UserInfoUtils.resetGeTuiAndUmeng();
-                }
+            if (UserInfoUtils.geTuiIsOk) {
+                InnotechPushMethod.updateUserInfo(context, mCallBack);
+                UserInfoUtils.geTuiIsOk = false;
             }
         }
     }

@@ -3,19 +3,18 @@ package com.innotech.innotechpush;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 
-import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.receiver.PushReciver;
-import com.innotech.innotechpush.receiver.UMengReceiver;
 import com.innotech.innotechpush.sdk.MiSDK;
 import com.innotech.innotechpush.service.PushIntentService;
 import com.innotech.innotechpush.service.PushService;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.UserInfoUtils;
 import com.innotech.innotechpush.utils.Utils;
+import com.innotech.socket_library.SocketClientService;
+import com.innotech.socket_library.utils.SPUtils;
 import com.meizu.cloud.pushsdk.PushManager;
-import com.umeng.commonsdk.UMConfigure;
-import com.umeng.message.PushAgent;
 
 import java.util.UUID;
 
@@ -83,12 +82,16 @@ public class InnotechPushManager {
 ////            LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + " HMSAgent.init");
 ////            HMSAgent.init(application);
 ////        }
-        //其他设备时，开启个推推送和友盟推送
+        //其他设备时，开启个推推送和socket长连接
         else {
             pushSDKName = otherSDKName;
             initGeTuiPush();
-            initUMengPush();
         }
+    }
+
+    public void initSocketPush() {
+        SPUtils.putInt(application.getApplicationContext(), SPUtils.PUSH_ICON, R.mipmap.ic_launcher);
+        application.getApplicationContext().startService(new Intent(application.getApplicationContext(), SocketClientService.class));
     }
 
     /**
@@ -99,22 +102,6 @@ public class InnotechPushManager {
         com.igexin.sdk.PushManager.getInstance().initialize(application.getApplicationContext(), PushService.class);
         // com.getui.demo.DemoIntentService 为第三⽅方⾃自定义的推送服务事件接收类
         com.igexin.sdk.PushManager.getInstance().registerPushIntentService(application.getApplicationContext(), PushIntentService.class);
-    }
-
-    /**
-     * 初始化并开启友盟推送
-     */
-    private void initUMengPush() {
-        LogUtils.e(application.getApplicationContext(), LogUtils.TAG_UMENG + " call initUMengPush");
-        String umAppKey = Utils.getMetaDataString(application, PushConstant.UMENG_APP_KEY);
-        String umMsgSec = Utils.getMetaDataString(application, PushConstant.UMENG_MESSAGE_SECRET);
-        LogUtils.e(application.getApplicationContext(), "友盟key：" + umAppKey + "，友盟消息密钥：" + umMsgSec);
-        UMConfigure.init(application, UMConfigure.DEVICE_TYPE_PHONE, umMsgSec);
-        PushAgent mPushAgent = PushAgent.getInstance(application);
-        UMengReceiver uMengReceiver = new UMengReceiver(application);
-        //注册推送服务，每次调用register方法都会回调该接口
-        mPushAgent.register(uMengReceiver);
-        mPushAgent.setMessageHandler(uMengReceiver);
     }
 
     public void setPushRevicer(PushReciver mPushReciver) {

@@ -30,26 +30,34 @@ public class InnotechPushMethod {
      *
      * @param context：Android平台上app的上下文，建议传入当前app的application context
      */
-    public static void updateUserInfo(Context context, RequestCallback mCallBack) {
-        if (context != null && tokenIsChange(context)) {
-            Integer appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
-            String appKey = Utils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
-            UserInfo userInfo = UserInfoUtils.getUserInfo(context, appId, appKey);
-            if (userInfo != null) {
-                UserInfoUtils.saveTokenToSP(context, userInfo.getDevice_token1(), userInfo.getDevice_token2());
-                try {
-                    String json = UserInfoUtils.objJson(context, userInfo);
-                    String sign = SignUtils.sign("POST", NetWorkUtils.PATH_UPDATEUSERINFO, json);
-                    NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_UPDATEUSERINFO, json, sign, mCallBack);
-                } catch (JSONException e) {
-                    LogUtils.e(context, "app上传用户信息参数转换json出错！");
-                    if (mCallBack != null) {
-                        mCallBack.onFail("app上传用户信息参数转换json出错！");
+    public static void updateUserInfo(Context context, final RequestCallback mCallBack) {
+        Integer appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
+        String appKey = Utils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
+        UserInfo userInfo = UserInfoUtils.getUserInfo(context, appId, appKey);
+        if (userInfo != null) {
+            UserInfoUtils.saveTokenToSP(context, userInfo.getDevice_token1(), userInfo.getDevice_token2());
+            try {
+                String json = UserInfoUtils.objJson(context, userInfo);
+                String sign = SignUtils.sign("POST", NetWorkUtils.PATH_UPDATEUSERINFO, json);
+                NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_UPDATEUSERINFO, json, sign, new RequestCallback() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        InnotechPushManager.getInstance().initSocketPush();
+                        mCallBack.onSuccess(msg);
                     }
+
+                    @Override
+                    public void onFail(String msg) {
+                        mCallBack.onFail(msg);
+                    }
+                });
+            } catch (JSONException e) {
+                LogUtils.e(context, "app上传用户信息参数转换json出错！");
+                if (mCallBack != null) {
+                    mCallBack.onFail("app上传用户信息参数转换json出错！");
                 }
             }
         }
-
     }
 
     private static boolean tokenIsChange(Context context) {

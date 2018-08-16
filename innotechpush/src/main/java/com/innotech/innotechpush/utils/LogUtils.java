@@ -15,6 +15,7 @@ public class LogUtils {
     public static String TAG_XIAOMI = "[MiPush] ";
     public static String TAG_MEIZU = "[MeiZuPush] ";
     public static String TAG_UMENG = "[UmengPush] ";
+    public static String TAG_INNOTECH = "[InnotechPush]";
 
     private static final String TAG = "Innotech_Push";
 
