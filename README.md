@@ -28,9 +28,7 @@ Android Studio是Google力推的Android开发环境，在IntelliJ IDEA基础上�
 
 个推：http://www.getui.com/cn/getui.html
 
-友盟：https://mobile.umeng.com/push
-
-备注：申请过程中有疑问可联系技术中心（石瑶）进行协助。
+备注：申请过程中有疑问可联系技术中心进行协助。
 
 #### 接入
 
@@ -60,16 +58,16 @@ Android Studio是Google力推的Android开发环境，在IntelliJ IDEA基础上�
             	 //寅诺配置
             	 INNOTECH_APP_ID : 88888888,
                 INNOTECH_APP_KEY : "88888888",
-   			INNOTECH_PUSH_DEBUG : true,//是否开启调试模式，建议开发阶段打开，查看日志调错
-   			//小米配置
+   			 INNOTECH_PUSH_DEBUG : true,//是否开启调试模式，建议开发阶段打开，查看日志调错
+   			 //小米配置
                 MI_APP_ID           : "2882303761517759216",
                 MI_APP_KEY          : "5221775952216",
-   			//魅族配置
+   			 //魅族配置
                 MEIZU_APP_ID        : "112950",
                 MEIZU_APP_KEY       : "509a337735ba497ebba21d981924c9f4",
    			//华为配置
                 HMS_APP_ID          : "100244129",
-   			//个推配置
+   			 //个推配置
                 GETUI_APP_ID        : "PH4qx2Le8w9Nz8pMyCPMZ7",
                 GETUI_APP_KEY       : "qy4AYz75roAJiQjzkPLfc3",
                 GETUI_APP_SECRET    : "tz6QPHBAOY8Scmcxo6y9P2"
@@ -87,20 +85,22 @@ Android Studio是Google力推的Android开发环境，在IntelliJ IDEA基础上�
 3. 在项目Application的onCreate方法中进行SDK初始化操作，如下：
 
    ```
-   public class MyApplication extends PushApplication {
-
+   public class MyApplication extends Application {
+   
        @Override
        public void onCreate() {
            super.onCreate();
            //推送SDK初始化
            InnotechPushManager.getInstance().initPushSDK(this);
+          	//设置推送小图标
+          	 SPIcon.putInt(getApplicationContext(), SPIcon.PUSH_ICON, R.mipmap.ic_launcher);
            //设置推送接收器
            InnotechPushManager.getInstance().setPushRevicer(new MyPushReceiver());
        }
    }
    ```
 
-4. manifests中使用Application
+4. manifests中使用Application，并添加配置信息。
 
    ```
    <application
@@ -171,12 +171,24 @@ Android Studio是Google力推的Android开发环境，在IntelliJ IDEA基础上�
    }
    ```
 
+#### 混淆
+
+在proguard-rules.pro文件中加入代码：
+
+```
+-keep class com.innotech.** {*;}
+```
 
 #### 功能
 
 1、设置别名：推送可通过别名进行推送。
 
 ```
+/**
+ * @param context：Android平台上app的上下文，建议传入当前app的application context
+ * @param alias：为指定用户设置别名
+ * @param callback：接口回掉
+ */
 InnotechPushMethod.setAlias(MainActivity.this, "test", new RequestCallback() {
     @Override
     public void onSuccess(String msg) {
@@ -199,7 +211,6 @@ InnotechPushMethod.setAlias(MainActivity.this, "test", new RequestCallback() {
        Innotech_Push: [GeTuiPush] onReceiveClientId -> clientid = 997ea4305ce2d6d0a7a6c352c0f70e8b
        Innotech_Push: [GeTuiPush] onReceiveOnlineState() -> b = true
 
-2. 进入各推送平台进行后台推送，小米/魅族/华为使用通知栏消息进行推送，个推和友盟使用透传消息进行推送。
 
 #### 疑问
 
