@@ -17,6 +17,8 @@ import com.innotech.socket_library.utils.SPUtils;
 import com.meizu.cloud.pushsdk.PushManager;
 
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * SDK核心类，SDK初始化用到
@@ -32,6 +34,10 @@ public class InnotechPushManager {
     //    public static String huaweiSDKName = "huawei";
     public static String meizuSDKName = "meizu";
     public static String otherSDKName = "union ";
+    /**
+     * 个推和集团长连接做幂等时需要加锁，防止两个回调相隔时间较近或同时到达。
+     */
+    private static Lock idempotentLock;
 
     public InnotechPushManager() {
 
@@ -138,4 +144,14 @@ public class InnotechPushManager {
 //        });
 //    }
 
+    /**
+     * 获得幂等锁
+     * @return
+     */
+    public static Lock getIdempotentLock(){
+        if(idempotentLock == null){
+            idempotentLock = new ReentrantLock();
+        }
+        return idempotentLock;
+    }
 }

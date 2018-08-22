@@ -26,25 +26,30 @@ public class SocketClientRevicer extends PushMessageReceiver {
                 if (!TextUtils.isEmpty(pushMessage.getTransmission())) {
                     JSONObject object = new JSONObject(pushMessage.getTransmission());
                     String idempotent = object.getString("idempotent");
-                    if (!TextUtils.isEmpty(idempotent)) {
-                        //消息池去重验证
-                        if (SPUtils.isPass(context, idempotent)) {
-                            //展示通知
-                            Utils.showNotification(context, createMessageByJson(pushMessage));
-                            //消息存入消息池中
-                            SPUtils.put(context, idempotent, System.currentTimeMillis());
-                            if (InnotechPushManager.getPushReciver() != null) {
-                                InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context, getInnotechMessage(pushMessage));
+                    InnotechPushManager.getIdempotentLock().lock();
+                    try {
+                        if (!TextUtils.isEmpty(idempotent)) {
+                            //消息池去重验证
+                            if (SPUtils.isPass(context, idempotent)) {
+                                //展示通知
+                                Utils.showNotification(context, createMessageByJson(pushMessage));
+                                //消息存入消息池中
+                                SPUtils.put(context, idempotent, System.currentTimeMillis());
+                                if (InnotechPushManager.getPushReciver() != null) {
+                                    InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context, getInnotechMessage(pushMessage));
+                                } else {
+                                    InnotechPushManager.innotechPushReciverIsNull(context);
+                                }
                             } else {
-                                InnotechPushManager.innotechPushReciverIsNull(context);
+                                LogUtils.e(context, LogUtils.TAG_INNOTECH + " 该消息为重复消息，过滤掉，不做处理" + pushMessage.getTransmission());
+                                //触发一次消息池的清理
+                                SPUtils.clearPoor(context);
                             }
                         } else {
-                            LogUtils.e(context, LogUtils.TAG_INNOTECH + " 该消息为重复消息，过滤掉，不做处理" + pushMessage.getTransmission());
-                            //触发一次消息池的清理
-                            SPUtils.clearPoor(context);
+                            LogUtils.e(context, LogUtils.TAG_INNOTECH + " 该消息中没有包含idempotent字段，不做处理" + pushMessage.getTransmission());
                         }
-                    } else {
-                        LogUtils.e(context, LogUtils.TAG_INNOTECH + " 该消息中没有包含idempotent字段，不做处理" + pushMessage.getTransmission());
+                    } finally {
+                        InnotechPushManager.getIdempotentLock().unlock();
                     }
                 }
             } catch (JSONException e) {

@@ -49,20 +49,25 @@ public class PushIntentService extends GTIntentService {
             LogUtils.i(context, "GeTui onReceiveMessageData() data:" + data + "  gtTransmitMessage.getPayloadId():" + gtTransmitMessage.getPayloadId());
             JSONObject object = new JSONObject(data);
             String idempotent = object.getString("idempotent");
-            if (!TextUtils.isEmpty(idempotent)) {
-                //消息池去重验证
-                if (SPUtils.isPass(context, idempotent)) {
-                    //展示通知
-                    Utils.showNotification(context, createMessageByJson(gtTransmitMessage));
-                    //消息存入消息池中
-                    SPUtils.put(context, idempotent, System.currentTimeMillis());
+            InnotechPushManager.getIdempotentLock().lock();
+            try {
+                if (!TextUtils.isEmpty(idempotent)) {
+                    //消息池去重验证
+                    if (SPUtils.isPass(context, idempotent)) {
+                        //展示通知
+                        Utils.showNotification(context, createMessageByJson(gtTransmitMessage));
+                        //消息存入消息池中
+                        SPUtils.put(context, idempotent, System.currentTimeMillis());
+                    } else {
+                        LogUtils.e(context, LogUtils.TAG_GETUI + " 该消息为重复消息，过滤掉，不做处理" + data);
+                        //触发一次消息池的清理
+                        SPUtils.clearPoor(context);
+                    }
                 } else {
-                    LogUtils.e(context, LogUtils.TAG_GETUI + " 该消息为重复消息，过滤掉，不做处理" + data);
-                    //触发一次消息池的清理
-                    SPUtils.clearPoor(context);
+                    LogUtils.e(context, LogUtils.TAG_GETUI + " 该消息中没有包含idempotent字段，不做处理" + data);
                 }
-            } else {
-                LogUtils.e(context, LogUtils.TAG_GETUI + " 该消息中没有包含idempotent字段，不做处理" + data);
+            } finally {
+                InnotechPushManager.getIdempotentLock().unlock();
             }
         } catch (JSONException e) {
             LogUtils.e(context, LogUtils.TAG_GETUI + " dealWithCustomMessage方法中json转换失败");
