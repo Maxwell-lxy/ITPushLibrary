@@ -19,7 +19,7 @@ public class PushConstant {
     /**
      * 推送版本号
      */
-    public static final String INNOTECH_PUSH_VERSION = "1.0.2";
+    public static final String INNOTECH_PUSH_VERSION = "1.3.6";
 
 
 }

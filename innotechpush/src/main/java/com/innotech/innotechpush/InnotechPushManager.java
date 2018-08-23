@@ -38,6 +38,10 @@ public class InnotechPushManager {
      * 个推和集团长连接做幂等时需要加锁，防止两个回调相隔时间较近或同时到达。
      */
     private static Lock idempotentLock;
+    /**
+     * 通知栏图标
+     */
+    public static int pushIcon = R.mipmap.ic_launcher;
 
     public InnotechPushManager() {
 

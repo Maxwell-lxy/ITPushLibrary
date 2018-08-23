@@ -3,6 +3,7 @@ package com.innotech.itpushlibrary;
 import android.app.Application;
 
 import com.innotech.innotechpush.InnotechPushManager;
+import com.innotech.innotechpush.utils.SPIcon;
 
 /**
  * Created by admin on 2018/4/11.
@@ -14,6 +15,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         InnotechPushManager.getInstance().initPushSDK(this);
+        InnotechPushManager.pushIcon = R.mipmap.ic_shortcut_account_box;
         InnotechPushManager.getInstance().setPushRevicer(new TestPushReciver());
     }
 }

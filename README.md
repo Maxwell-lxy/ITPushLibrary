@@ -93,7 +93,7 @@ Android Studio是Google力推的Android开发环境，在IntelliJ IDEA基础上�
            //推送SDK初始化
            InnotechPushManager.getInstance().initPushSDK(this);
           	//设置推送小图标
-          	 SPIcon.putInt(getApplicationContext(), SPIcon.PUSH_ICON, R.mipmap.ic_launcher);
+          	InnotechPushManager.pushIcon = R.mipmap.ic_launcher;
            //设置推送接收器
            InnotechPushManager.getInstance().setPushRevicer(new MyPushReceiver());
        }
