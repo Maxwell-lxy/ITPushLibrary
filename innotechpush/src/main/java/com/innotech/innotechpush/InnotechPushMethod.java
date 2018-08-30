@@ -5,8 +5,8 @@ import android.content.Context;
 import android.os.Handler;
 
 import com.innotech.innotechpush.bean.UserInfo;
+import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.config.PushConstant;
-import com.innotech.innotechpush.data.DataAnalysis;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NetWorkUtils;
 import com.innotech.innotechpush.utils.SignUtils;
@@ -31,13 +31,8 @@ public class InnotechPushMethod {
      * @param context：Android平台上app的上下文，建议传入当前app的application context
      */
     public static void updateUserInfo(Context context, final RequestCallback mCallBack) {
-        Integer appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
-        String appKey = Utils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
-        UserInfo userInfo = UserInfoUtils.getUserInfo(context, appId, appKey);
-        if (userInfo != null) {
-            UserInfoUtils.saveTokenToSP(context, userInfo.getDevice_token1(), userInfo.getDevice_token2());
             try {
-                String json = UserInfoUtils.objJson(context, userInfo);
+                String json = UserInfoModel.getInstance().toJson();
                 String sign = SignUtils.sign("POST", NetWorkUtils.PATH_UPDATEUSERINFO, json);
                 NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_UPDATEUSERINFO, json, sign, new RequestCallback() {
                     @Override
@@ -57,28 +52,7 @@ public class InnotechPushMethod {
                     mCallBack.onFail("app上传用户信息参数转换json出错！");
                 }
             }
-        }
-    }
-
-    private static boolean tokenIsChange(Context context) {
-        boolean result = false;
-        String oldToken = UserInfoSPUtils.getString(context, UserInfoSPUtils.KEY_TOKEN1, null);
-        String newToken = UserInfoUtils.deviceToken.getDevice_token1();
-        String oldToken2 = UserInfoSPUtils.getString(context, UserInfoSPUtils.KEY_TOKEN2, null);
-        String newToken2 = UserInfoUtils.deviceToken.getDevice_token2();
-        LogUtils.e(context, "oldToken:" + oldToken + " newToken:" + newToken);
-        LogUtils.e(context, "oldToken2:" + oldToken2 + " newToken2:" + newToken2);
-        try {
-            if (newToken != null && !newToken.equals(oldToken)) {
-                result = true;
-            }
-            if ((newToken2 != null && !newToken2.equals(oldToken2))) {
-                result = true;
-            }
-        } catch (NullPointerException ex) {
-            ex.printStackTrace();
-        }
-        return result;
+//        }
     }
 
     /**

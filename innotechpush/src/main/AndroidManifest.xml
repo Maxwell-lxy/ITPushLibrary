@@ -322,7 +322,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.intent.action.USER_PRESENT" />
-                <action android:name="com.innotech.sdk.action.refreshls" />
+                <action android:name="com.innotech.sdk.action.refreshls${applicationId}" />
                 <!-- 以下三项为可选的action声明，可⼤大⼤大提⾼高service存活率和消息到达速度 -->
                 <action android:name="android.intent.action.MEDIA_MOUNTED" />
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />

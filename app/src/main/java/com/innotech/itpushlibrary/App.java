@@ -14,7 +14,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        InnotechPushManager.getInstance().initPushSDK(this);
+        InnotechPushManager.getInstance().initPushSDK(this,"thisisopenid");
         InnotechPushManager.pushIcon = R.mipmap.ic_shortcut_account_box;
         InnotechPushManager.getInstance().setPushRevicer(new TestPushReciver());
     }

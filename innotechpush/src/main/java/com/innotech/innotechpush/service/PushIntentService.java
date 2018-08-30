@@ -9,6 +9,8 @@ import com.igexin.sdk.message.GTNotificationMessage;
 import com.igexin.sdk.message.GTTransmitMessage;
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.bean.InnotechMessage;
+import com.innotech.innotechpush.bean.UserInfoModel;
+import com.innotech.innotechpush.utils.BroadcastUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.SPUtils;
 import com.innotech.innotechpush.utils.UserInfoUtils;
@@ -35,9 +37,8 @@ public class PushIntentService extends GTIntentService {
     @Override
     public void onReceiveClientId(Context context, String clientid) {
         LogUtils.e(context, LogUtils.TAG_GETUI + "onReceiveClientId -> " + "clientid = " + clientid);
-        UserInfoUtils.geTuiIsOk = true;
-        UserInfoUtils.deviceToken.setDevice_token1(clientid);
-        UserInfoUtils.sendBroadcast(context);
+        UserInfoModel.getInstance().setDevice_token1(clientid);
+        BroadcastUtils.sendUpdateUserInfoBroadcast(context);
     }
 
     @Override

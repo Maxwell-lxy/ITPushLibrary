@@ -6,6 +6,8 @@ import android.text.TextUtils;
 
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.bean.InnotechMessage;
+import com.innotech.innotechpush.bean.UserInfoModel;
+import com.innotech.innotechpush.utils.BroadcastUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.UserInfoUtils;
 import com.meizu.cloud.pushsdk.MzPushMessageReceiver;
@@ -101,8 +103,8 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
         //调用新版订阅 PushManager.register(context,appId,appKey)回调
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegisterStatus registerStatus:" + registerStatus);
         if (registerStatus.getCode().equals(RegisterStatus.SUCCESS_CODE)) {
-            UserInfoUtils.deviceToken.setDevice_token1(registerStatus.getPushId());
-            UserInfoUtils.sendBroadcast(context);
+            UserInfoModel.getInstance().setDevice_token1(registerStatus.getPushId());
+            BroadcastUtils.sendUpdateUserInfoBroadcast(context);
         }
     }
 

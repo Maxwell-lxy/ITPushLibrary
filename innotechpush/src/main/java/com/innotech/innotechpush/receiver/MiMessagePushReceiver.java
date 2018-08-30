@@ -6,6 +6,8 @@ import android.text.TextUtils;
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.R;
 import com.innotech.innotechpush.bean.InnotechMessage;
+import com.innotech.innotechpush.bean.UserInfoModel;
+import com.innotech.innotechpush.utils.BroadcastUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.UserInfoUtils;
 import com.xiaomi.mipush.sdk.ErrorCode;
@@ -99,8 +101,8 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
             if (message.getResultCode() == ErrorCode.SUCCESS) {
                 mRegId = cmdArg1;
                 log = context.getString(R.string.register_success);
-                UserInfoUtils.deviceToken.setDevice_token1(mRegId);
-                UserInfoUtils.sendBroadcast(context);
+                UserInfoModel.getInstance().setDevice_token1(mRegId);
+                BroadcastUtils.sendUpdateUserInfoBroadcast(context);
             } else {
                 log = context.getString(R.string.register_fail);
             }

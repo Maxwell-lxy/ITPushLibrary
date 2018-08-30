@@ -20,7 +20,6 @@ import com.innotech.innotechpush.utils.UserInfoUtils;
 
 public class UserInfoReceiver extends BroadcastReceiver {
 
-    public static final String ACTION_UPDATEUSERINFO = "com.inno.push.action.UPDATEUSERINFO";
     RequestCallback mCallBack = new RequestCallback() {
         @Override
         public void onSuccess(String msg) {
@@ -49,14 +48,6 @@ public class UserInfoReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        LogUtils.e(context, "sdkname:" + InnotechPushManager.pushSDKName + " geTuiIsOk:" + UserInfoUtils.geTuiIsOk);
-        if (InnotechPushManager.pushSDKName != InnotechPushManager.otherSDKName) {
-            InnotechPushMethod.updateUserInfo(context, mCallBack);
-        } else {
-            if (UserInfoUtils.geTuiIsOk) {
-                InnotechPushMethod.updateUserInfo(context, mCallBack);
-                UserInfoUtils.geTuiIsOk = false;
-            }
-        }
+        InnotechPushMethod.updateUserInfo(context, mCallBack);
     }
 }

@@ -341,10 +341,6 @@ public class Utils {
         return true;
     }
 
-    public static String getOS() {
-        return Build.BRAND;
-    }
-
     public static String getIPAddress(Context context) {
         NetworkInfo info = ((ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();

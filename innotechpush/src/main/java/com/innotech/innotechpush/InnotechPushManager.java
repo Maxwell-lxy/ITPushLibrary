@@ -5,18 +5,17 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 
+import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.receiver.PushReciver;
 import com.innotech.innotechpush.sdk.MiSDK;
 import com.innotech.innotechpush.service.PushIntentService;
 import com.innotech.innotechpush.service.PushService;
 import com.innotech.innotechpush.utils.LogUtils;
-import com.innotech.innotechpush.utils.UserInfoUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.innotech.socket_library.SocketClientService;
 import com.innotech.socket_library.utils.SPUtils;
 import com.meizu.cloud.pushsdk.PushManager;
 
-import java.util.UUID;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -71,9 +70,10 @@ public class InnotechPushManager {
      *
      * @param application
      */
-    public void initPushSDK(Application application) {
+    public void initPushSDK(Application application, String openId) {
         this.application = application;
-        UserInfoUtils.UUID = UUID.randomUUID().toString();
+        UserInfoModel.getInstance().init(application.getApplicationContext());
+        UserInfoModel.getInstance().setOpen_id(openId);
         if (Utils.isXiaomiDevice() || Utils.isMIUI()) {
             pushSDKName = miSDKName;
             new MiSDK(application);
@@ -150,10 +150,11 @@ public class InnotechPushManager {
 
     /**
      * 获得幂等锁
+     *
      * @return
      */
-    public static Lock getIdempotentLock(){
-        if(idempotentLock == null){
+    public static Lock getIdempotentLock() {
+        if (idempotentLock == null) {
             idempotentLock = new ReentrantLock();
         }
         return idempotentLock;
