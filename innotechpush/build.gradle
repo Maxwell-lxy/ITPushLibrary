@@ -36,5 +36,5 @@ dependencies {
     //魅族推送
     implementation 'com.meizu.flyme.internet:push-internal:3.7.4@aar'
     //个推推送
-    implementation 'com.getui:sdk:2.12.3.0'
+    implementation 'com.getui:sdk:2.12.5.0'
 }
