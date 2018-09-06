@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
@@ -227,6 +228,8 @@ public class Utils {
                     .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
                     .setDefaults(Notification.DEFAULT_VIBRATE)
                     .setSmallIcon(InnotechPushManager.pushIcon)
+                    .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
+                            , InnotechPushManager.pushIcon))
                     .setStyle(new NotificationCompat.BigTextStyle()
                             .setBigContentTitle(msg.getTitle())
                             .bigText(msg.getNotiBigText()));
@@ -238,7 +241,9 @@ public class Utils {
                     .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
                     .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
                     .setDefaults(Notification.DEFAULT_VIBRATE)
-                    .setSmallIcon(InnotechPushManager.pushIcon);
+                    .setSmallIcon(InnotechPushManager.pushIcon)
+                    .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
+                            , InnotechPushManager.pushIcon));
         }
 
         Intent clickIntent = new Intent(context, NotificationClickReceiver.class); //点击通知之后要发送的广播

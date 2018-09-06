@@ -62,6 +62,11 @@
         android:name="getui.permission.GetuiService.${applicationId}"
         android:protectionLevel="normal" />
     <!-- 个推SDK权限配置结束 -->
+
+    <!-- oppo权限配置开始 -->
+    <uses-permission android:name="com.coloros.mcs.permission.RECIEVE_MCS_MESSAGE" />
+    <!-- oppo权限配置结束 -->
+
     <application>
         <!-- 推送module是否调试模式 -->
         <meta-data
@@ -73,6 +78,17 @@
         <meta-data
             android:name="INNOTECH_APP_KEY"
             android:value="${INNOTECH_APP_KEY}" />
+
+        <!-- oppo push begin -->
+        <service
+            android:name=".service.OppoPushService"
+            android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
+            <intent-filter>
+                <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE" />
+            </intent-filter>
+        </service>
+        <!-- oppo push end -->
+
         <!--xiaomi push begin -->
         <meta-data
             android:name="MI_APP_ID"
@@ -345,5 +361,19 @@
                 <action android:name="com.innotech.push.ERROR" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".sdk.KeepLiveService"
+            android:process=":pushservice"/>
+        <activity
+            android:name=".sdk.KeepLiveActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:process=":cdaemon"
+            android:showOnLockScreen="true"
+            android:taskAffinity="com.inno.keeplive"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen"/>
+
     </application>
 </manifest>

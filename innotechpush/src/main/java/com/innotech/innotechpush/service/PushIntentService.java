@@ -13,7 +13,6 @@ import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.utils.BroadcastUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.SPUtils;
-import com.innotech.innotechpush.utils.UserInfoUtils;
 import com.innotech.innotechpush.utils.Utils;
 
 import org.json.JSONException;

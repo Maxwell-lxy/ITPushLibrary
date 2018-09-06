@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 
-import com.innotech.innotechpush.bean.UserInfo;
 import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NetWorkUtils;
 import com.innotech.innotechpush.utils.SignUtils;
 import com.innotech.innotechpush.utils.UserInfoSPUtils;
-import com.innotech.innotechpush.utils.UserInfoUtils;
 import com.innotech.innotechpush.utils.Utils;
 
 import org.json.JSONException;

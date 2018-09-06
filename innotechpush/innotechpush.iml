@@ -110,5 +110,6 @@
     <orderEntry type="library" name="Gradle: com.android.support:support-core-ui-25.4.0" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-annotations:25.4.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-core-utils-25.4.0" level="project" />
+    <orderEntry type="library" name="Gradle: __local_aars__:/Users/admin/ITPushLibrary/innotechpush/libs/mcssdk-1.0.1.jar:unspecified@jar" level="project" />
   </component>
 </module>

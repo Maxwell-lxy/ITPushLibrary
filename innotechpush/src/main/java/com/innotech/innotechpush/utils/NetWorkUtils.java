@@ -19,9 +19,9 @@ import java.net.URL;
 
 public class NetWorkUtils {
     //正式环境
-    public static final String HOST = "gw.d.ywopt.com";
+//    public static final String HOST = "gw.d.ywopt.com";
     //测试环境
-//    public static final String HOST = "gw.t.ywopt.com";
+    public static final String HOST = "gw.t.ywopt.com";
     private static final String BASE_URL = "https://" + HOST + "/v1/pushaksk";
     public static final String URL_UPDATEUSERINFO = BASE_URL + "/updateuserinfo";
     public static final String URL_ALIAS = BASE_URL + "/userbindalias";
