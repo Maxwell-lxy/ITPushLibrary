@@ -2,6 +2,7 @@ package com.innotech.innotechpush.service;
 
 import android.content.Context;
 
+import com.coloros.mcssdk.PushService;
 import com.coloros.mcssdk.mode.AppMessage;
 import com.coloros.mcssdk.mode.CommandMessage;
 import com.coloros.mcssdk.mode.SptDataMessage;
