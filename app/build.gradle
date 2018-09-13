@@ -36,8 +36,8 @@ android {
                 GETUI_APP_KEY       : "PwG112qeeV5UiQrtVObz3A",
                 GETUI_APP_SECRET    : "rvsZ98fb3K6I9UcPTBHzF9",
 
-                OPPO_APP_KEY       : "19c54b85e1d0497bbab274e1a0d1fb8d",
-                OPPO_APP_SECRET    : "a5097b1200884171b7f06e95fa66c94e"
+                OPPO_APP_KEY       : "5vifLOB1A1s0s800scc4gwC4S",
+                OPPO_APP_SECRET    : "b4aB971Df1bD32eEB9882d2429898BB5"
 
         ]
     }
