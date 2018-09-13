@@ -3,9 +3,11 @@ package com.innotech.innotechpush.receiver;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.coloros.mcssdk.PushManager;
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.utils.LogUtils;
+import com.innotech.innotechpush.utils.NotificationUtils;
 import com.innotech.innotechpush.utils.SPUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.innotech.socket_library.PushMessageReceiver;
@@ -21,7 +23,8 @@ public class SocketClientRevicer extends PushMessageReceiver {
         super.onReceivePassThroughMessage(context, pushMessage);
         if (!(Utils.isXiaomiDevice() || Utils.isMIUI())
                 && !Utils.isMeizuDevice()
-                && !Utils.isHuaweiDevice()) {
+//                && !Utils.isHuaweiDevice()
+                && !PushManager.isSupportPush(context)) {
             try {
                 if (!TextUtils.isEmpty(pushMessage.getTransmission())) {
                     JSONObject object = new JSONObject(pushMessage.getTransmission());
@@ -32,7 +35,7 @@ public class SocketClientRevicer extends PushMessageReceiver {
                             //消息池去重验证
                             if (SPUtils.isPass(context, idempotent)) {
                                 //展示通知
-                                Utils.showNotification(context, createMessageByJson(pushMessage));
+                                NotificationUtils.sendNotificationByStyle(context, createMessageByJson(pushMessage));
                                 //消息存入消息池中
                                 SPUtils.put(context, idempotent, System.currentTimeMillis());
                                 if (InnotechPushManager.getPushReciver() != null) {
@@ -73,7 +76,8 @@ public class SocketClientRevicer extends PushMessageReceiver {
         super.onNotificationMessageArrived(context, pushMessage);
         if (!(Utils.isXiaomiDevice() || Utils.isMIUI())
                 && !Utils.isMeizuDevice()
-                && !Utils.isHuaweiDevice()) {
+//                && !Utils.isHuaweiDevice()
+                && !PushManager.isSupportPush(context)) {
             if (InnotechPushManager.getPushReciver() != null) {
                 InnotechPushManager.getPushReciver().onNotificationMessageArrived(context, getInnotechMessage(pushMessage));
             } else {
@@ -106,6 +110,8 @@ public class SocketClientRevicer extends PushMessageReceiver {
         mPushMessage.setContent(pushMessage.getContent());
         mPushMessage.setCustom(pushMessage.getTransmission());
         mPushMessage.setMessageId(pushMessage.getMsg_id());
+        mPushMessage.setStyle(pushMessage.getStyle());
+        mPushMessage.setUnfold(pushMessage.getUnfold());
         return mPushMessage;
     }
 }

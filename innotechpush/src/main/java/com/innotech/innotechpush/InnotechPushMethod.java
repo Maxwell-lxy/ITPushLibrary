@@ -15,6 +15,9 @@ import com.innotech.innotechpush.utils.Utils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * 提供
  */
@@ -30,6 +33,7 @@ public class InnotechPushMethod {
      */
     public static void updateUserInfo(Context context, final RequestCallback mCallBack) {
             try {
+                UserInfoModel.getInstance().setOpen_id(getTK(context));
                 String json = UserInfoModel.getInstance().toJson();
                 String sign = SignUtils.sign("POST", NetWorkUtils.PATH_UPDATEUSERINFO, json);
                 NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_UPDATEUSERINFO, json, sign, new RequestCallback() {
@@ -102,4 +106,27 @@ public class InnotechPushMethod {
     public static Handler getMyHandler() {
         return myHandler;
     }
+
+    private static String getTK(Context context) {
+        String tk = "";
+        try {
+            Class clazz = Class.forName("com.inno.innosdk.pb.InnoMain");
+            Method checkInfo = clazz.getMethod("checkInfo", Context.class);
+            Object object = checkInfo.invoke(clazz.newInstance(), context);
+            tk = (String) object;
+            LogUtils.e(context, "反作弊的TK值：" + tk);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return tk;
+    }
+
 }

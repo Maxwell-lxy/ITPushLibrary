@@ -78,38 +78,37 @@ public class InnotechPushManager {
      */
     public void initPushSDK(Application application) {
         this.application = application;
+        UserInfoModel.getInstance().init(application.getApplicationContext());
         String processName = getProcessName(application, android.os.Process.myPid());
         LogUtils.e(application, "当前进程名字：" + processName);
-        if (processName.endsWith(":pushservice")) {
-            UserInfoModel.getInstance().init(application.getApplicationContext());
-            UserInfoModel.getInstance().setOpen_id(getTK(application));
-            if (Utils.isXiaomiDevice() || Utils.isMIUI()) {
-                pushSDKName = miSDKName;
-                new MiSDK(application);
-            }
-            //魅族设备时，开启魅族推送
-            else if (Utils.isMeizuDevice()) {
-                pushSDKName = meizuSDKName;
-                String appId = Utils.getMetaDataString(application, "MEIZU_APP_ID").replace("innotech-", "");
-                String appKey = Utils.getMetaDataString(application, "MEIZU_APP_KEY");
-                LogUtils.e(application.getApplicationContext(), LogUtils.TAG_MEIZU + "Meizu  PushManager.register");
-                PushManager.register(application, appId, appKey);
-            }
-            //华为设备时，开启华为推送
+        if (Utils.isXiaomiDevice() || Utils.isMIUI()) {
+            pushSDKName = miSDKName;
+            new MiSDK(application);
+        }
+        //魅族设备时，开启魅族推送
+        else if (Utils.isMeizuDevice()) {
+            pushSDKName = meizuSDKName;
+            String appId = Utils.getMetaDataString(application, "MEIZU_APP_ID").replace("innotech-", "");
+            String appKey = Utils.getMetaDataString(application, "MEIZU_APP_KEY");
+            LogUtils.e(application.getApplicationContext(), LogUtils.TAG_MEIZU + "Meizu  PushManager.register");
+            PushManager.register(application, appId, appKey);
+        }
+        //华为设备时，开启华为推送
 //        else if (Utils.isHuaweiDevice()) {
 ////            pushSDKName = huaweiSDKName;
 ////            LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + " HMSAgent.init");
 ////            HMSAgent.init(application);
 ////        }
-            //oppo设备时，开启oppo推送
-            else if (com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext())) {
-                pushSDKName = oppoSDKName;
-                String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
-                String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
-                com.coloros.mcssdk.PushManager.getInstance().register(application.getApplicationContext(), appKey, appSecret, new OppoPushCallback(application));
-            }
-            //其他设备时，开启个推推送和socket长连接
-            else {
+        //oppo设备时，开启oppo推送
+        else if (com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext())) {
+            pushSDKName = oppoSDKName;
+            String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
+            String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
+            com.coloros.mcssdk.PushManager.getInstance().register(application.getApplicationContext(), appKey, appSecret, new OppoPushCallback(application));
+        }
+        //其他设备时，开启个推推送和socket长连接
+        else {
+            if (processName.endsWith(":pushservice")) {
                 pushSDKName = otherSDKName;
                 initGeTuiPush();
             }
@@ -175,27 +174,6 @@ public class InnotechPushManager {
             idempotentLock = new ReentrantLock();
         }
         return idempotentLock;
-    }
-
-    private String getTK(Context context) {
-        String tk = "";
-        try {
-            Class clazz = Class.forName("com.inno.innosdk.pb.InnoMain");
-            Method checkInfo = clazz.getMethod("checkInfo", Context.class);
-            Object object = checkInfo.invoke(clazz.newInstance(), context);
-            tk = (String) object;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return tk;
     }
 
     /**

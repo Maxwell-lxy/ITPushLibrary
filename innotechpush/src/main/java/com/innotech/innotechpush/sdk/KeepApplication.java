@@ -5,6 +5,8 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 
+import com.innotech.innotechpush.utils.Utils;
+
 public class KeepApplication extends Application {
 
     public boolean keepLive0;//音频播放
@@ -12,7 +14,7 @@ public class KeepApplication extends Application {
     public boolean combine; //组合策略,熄屏时不播放音频
 
     void initKeepAlive() {
-        keepLive0 = true && !Build.MANUFACTURER.equals("huawei");
+        keepLive0 = true && !Utils.isHuaweiDevice();
         keepLive1 = true;
         combine = false;
     }

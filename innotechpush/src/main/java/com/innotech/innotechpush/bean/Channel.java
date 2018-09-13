@@ -23,6 +23,11 @@ public class Channel {
     public static final String MZ = "meizu";
 
     /**
+     * oppo
+     */
+    public static final String OPPO = "oppo";
+
+    /**
      * 其他渠道
      */
     public static final String UNION = "union";

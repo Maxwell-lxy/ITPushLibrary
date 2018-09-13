@@ -14,8 +14,10 @@ public class InnotechMessage implements Serializable {
     private int pushType;
     private String data;
     private String custom;
-    private String notiBigText;
+    private String unfold;
     private String actionContent;
+    //0、默认展示样式 1、纯图展示
+    private int style;
 
     public InnotechMessage() {
     }
@@ -68,19 +70,27 @@ public class InnotechMessage implements Serializable {
         this.custom = custom;
     }
 
-    public String getNotiBigText() {
-        return notiBigText;
-    }
-
-    public void setNotiBigText(String notiBigText) {
-        this.notiBigText = notiBigText;
-    }
-
     public String getActionContent() {
         return actionContent;
     }
 
     public void setActionContent(String actionContent) {
         this.actionContent = actionContent;
+    }
+
+    public String getUnfold() {
+        return unfold;
+    }
+
+    public void setUnfold(String unfold) {
+        this.unfold = unfold;
+    }
+
+    public int getStyle() {
+        return style;
+    }
+
+    public void setStyle(int style) {
+        this.style = style;
     }
 }

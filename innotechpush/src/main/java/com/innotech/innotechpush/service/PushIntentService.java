@@ -12,6 +12,7 @@ import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.utils.BroadcastUtils;
 import com.innotech.innotechpush.utils.LogUtils;
+import com.innotech.innotechpush.utils.NotificationUtils;
 import com.innotech.innotechpush.utils.SPUtils;
 import com.innotech.innotechpush.utils.Utils;
 
@@ -55,7 +56,7 @@ public class PushIntentService extends GTIntentService {
                     //消息池去重验证
                     if (SPUtils.isPass(context, idempotent)) {
                         //展示通知
-                        Utils.showNotification(context, createMessageByJson(gtTransmitMessage));
+                        NotificationUtils.sendNotificationByStyle(context, createMessageByJson(gtTransmitMessage));
                         //消息存入消息池中
                         SPUtils.put(context, idempotent, System.currentTimeMillis());
                     } else {
@@ -131,6 +132,7 @@ public class PushIntentService extends GTIntentService {
         JSONObject object = null;
         try {
             object = new JSONObject(data);
+            int style = object.getInt("style");
             String title = object.getString("title");
             String content = object.getString("content");
             String extra = object.getString("extra");
@@ -141,10 +143,11 @@ public class PushIntentService extends GTIntentService {
                 JSONObject con_object = new JSONObject(action_content);
                 mPushMessage.setActionContent(con_object.getString("url"));
             }
+            mPushMessage.setStyle(style);
             mPushMessage.setTitle(title);
             mPushMessage.setContent(content);
             mPushMessage.setCustom(extra);
-            mPushMessage.setNotiBigText(unfold);
+            mPushMessage.setUnfold(unfold);
             mPushMessage.setMessageId(msg.getMessageId());
 
         } catch (JSONException e) {

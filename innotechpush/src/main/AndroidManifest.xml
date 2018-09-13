@@ -80,6 +80,12 @@
             android:value="${INNOTECH_APP_KEY}" />
 
         <!-- oppo push begin -->
+        <meta-data
+            android:name="OPPO_APP_KEY"
+            android:value="${OPPO_APP_KEY}" />
+        <meta-data
+            android:name="OPPO_APP_SECRET"
+            android:value="${OPPO_APP_SECRET}" />
         <service
             android:name=".service.OppoPushService"
             android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
