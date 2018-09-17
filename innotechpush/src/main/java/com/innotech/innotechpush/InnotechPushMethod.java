@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.text.TextUtils;
 
 import com.innotech.innotechpush.bean.UserInfoModel;
+import com.innotech.innotechpush.callback.RequestCallback;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NetWorkUtils;

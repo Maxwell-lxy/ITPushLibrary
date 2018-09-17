@@ -8,7 +8,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.innotech.innotechpush.InnotechPushMethod;
-import com.innotech.innotechpush.RequestCallback;
+import com.innotech.innotechpush.callback.RequestCallback;
 
 /**
  * app上传用户信息接口调用的接收器

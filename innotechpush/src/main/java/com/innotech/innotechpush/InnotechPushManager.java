@@ -9,18 +9,15 @@ import android.content.Intent;
 import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.receiver.PushReciver;
 import com.innotech.innotechpush.sdk.MiSDK;
+import com.innotech.innotechpush.sdk.SocketClientService;
 import com.innotech.innotechpush.service.OppoPushCallback;
 import com.innotech.innotechpush.service.PushIntentService;
 import com.innotech.innotechpush.service.PushService;
-import com.innotech.innotechpush.utils.FileUtils;
 import com.innotech.innotechpush.utils.LogUtils;
+import com.innotech.innotechpush.utils.SPUtils;
 import com.innotech.innotechpush.utils.Utils;
-import com.innotech.socket_library.SocketClientService;
-import com.innotech.socket_library.utils.SPUtils;
 import com.meizu.cloud.pushsdk.PushManager;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -116,7 +113,6 @@ public class InnotechPushManager {
     }
 
     public void initSocketPush() {
-        SPUtils.putInt(application.getApplicationContext(), SPUtils.PUSH_ICON, R.mipmap.ic_launcher);
         application.getApplicationContext().startService(new Intent(application.getApplicationContext(), SocketClientService.class));
     }
 

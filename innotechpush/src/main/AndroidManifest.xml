@@ -330,13 +330,13 @@
         </receiver>
 
         <service
-            android:name="com.innotech.socket_library.SocketClientService"
+            android:name=".sdk.SocketClientService"
             android:persistent="true"
             android:process=":pushservice" />
         <!--android:process=":innotechpush" />-->
 
         <receiver
-            android:name="com.innotech.socket_library.PushReceiver"
+            android:name=".sdk.PushReceiver"
             android:exported="true"
             android:process=":pushservice">
             <!--android:process=":innotechpush">-->

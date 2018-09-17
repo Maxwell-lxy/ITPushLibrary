@@ -7,6 +7,11 @@ package com.innotech.innotechpush.config;
 public class PushConstant {
 
     /**
+     * 是否开启debug
+     */
+    public static final String INNOTECH_PUSH_DEBUG = "INNOTECH_PUSH_DEBUG";
+
+    /**
      * 服务器app_id
      */
     public static final String INNOTECH_APP_ID = "INNOTECH_APP_ID";
@@ -24,7 +29,7 @@ public class PushConstant {
     /**
      * 推送版本号
      */
-    public static final String INNOTECH_PUSH_VERSION = "1.4.3";
+    public static final String INNOTECH_PUSH_VERSION = "1.4.4";
 
 
 }

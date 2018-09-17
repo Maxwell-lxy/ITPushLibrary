@@ -6,12 +6,12 @@ import android.text.TextUtils;
 import com.coloros.mcssdk.PushManager;
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.bean.InnotechMessage;
+import com.innotech.innotechpush.sdk.PushMessage;
+import com.innotech.innotechpush.sdk.PushMessageReceiver;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NotificationUtils;
 import com.innotech.innotechpush.utils.SPUtils;
 import com.innotech.innotechpush.utils.Utils;
-import com.innotech.socket_library.PushMessageReceiver;
-import com.innotech.socket_library.sdk.PushMessage;
 
 import org.json.JSONException;
 import org.json.JSONObject;

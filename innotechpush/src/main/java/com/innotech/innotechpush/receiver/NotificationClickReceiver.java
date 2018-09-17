@@ -5,13 +5,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.bean.InnotechMessage;
+import com.innotech.innotechpush.config.BroadcastConstant;
+import com.innotech.innotechpush.config.PushConstant;
+import com.innotech.innotechpush.sdk.PushMessage;
 import com.innotech.innotechpush.utils.AppUtils;
+import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.LogUtils;
-import com.innotech.socket_library.constants.BroadcastConstant;
-import com.innotech.socket_library.sdk.PushMessage;
 
 /**
  * 个推和友盟通过透传的方式展示的消息，点击后的回调
@@ -20,9 +23,10 @@ import com.innotech.socket_library.sdk.PushMessage;
 public class NotificationClickReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
+//        Log.e("allen","刚进来的地方");
         InnotechMessage myMsg = (InnotechMessage) intent.getSerializableExtra("InnotechMessage");
         if (InnotechPushManager.getPushReciver() != null) {
-            InnotechPushManager.getPushReciver().onNotificationMessageClicked(context, myMsg);
+//            InnotechPushManager.getPushReciver().onNotificationMessageClicked(context, myMsg);
             LogUtils.i(context, "AppUtils.appIsBackground(context):" + AppUtils.appIsBackground(context) + " myMsg.getActionContent():" + myMsg.getActionContent());
             if (null != myMsg.getActionContent() && myMsg.getActionContent().length() > 0) {
                 Uri uri = Uri.parse(myMsg.getActionContent());
@@ -43,8 +47,11 @@ public class NotificationClickReceiver extends BroadcastReceiver {
             InnotechPushManager.innotechPushReciverIsNull(context);
         }
 
+//        Log.e("allen","中间的地方");
         //通知被点击后发送一个回执的广播
         PushMessage message = new PushMessage();
+        Integer appId = CommonUtils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
+        message.setAppId(appId);
         message.setMsg_id(myMsg.getMessageId());
         message.setTitle(myMsg.getTitle());
         message.setContent(myMsg.getContent());
@@ -56,5 +63,6 @@ public class NotificationClickReceiver extends BroadcastReceiver {
         intent1.setAction(BroadcastConstant.MESSAGE_CLICK);
         intent1.putExtra("PushMessage", message);
         context.sendBroadcast(intent1);
+//        Log.e("allen","结束的地方");
     }
 }

@@ -1,9 +1,8 @@
 package com.innotech.innotechpush.utils;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.innotech.innotechpush.RequestCallback;
+import com.innotech.innotechpush.callback.RequestCallback;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -25,49 +24,11 @@ public class NetWorkUtils {
     private static final String BASE_URL = "https://" + HOST + "/v1/pushaksk";
     public static final String URL_UPDATEUSERINFO = BASE_URL + "/updateuserinfo";
     public static final String URL_ALIAS = BASE_URL + "/userbindalias";
+    public static final String URL_SOCKET_ADDR = BASE_URL + "/socketaddr";
     public static final String PATH_UPDATEUSERINFO = "/v1/pushaksk/updateuserinfo";
     public static final String PATH_ALIAS = "/v1/pushaksk/userbindalias";
+    public static final String PATH_SOCKET_ADDR = "/v1/pushaksk/socketaddr";
     private static int CONNECT_TIMEOUT = 5000;
-
-    public static void sendGetRequest(final String urlStr) {
-        //开启线程来发起网络请求
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                HttpURLConnection connection = null;
-                BufferedReader reader = null;
-                try {
-                    URL url = new URL(urlStr);
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                    connection.setConnectTimeout(8000);
-                    connection.setReadTimeout(8000);
-                    InputStream in = connection.getInputStream();
-                    //下面对获取到的输入流进行读取
-                    reader = new BufferedReader(new InputStreamReader(in));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-                    Log.i("push_net", "sendGetRequest() result:" + response.toString());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (connection != null) {
-                        connection.disconnect();
-                    }
-                }
-            }
-        }).start();
-    }
 
     public static void sendPostRequest(final Context context, final String urlStr, final String paramsStr, final String sign, final RequestCallback mCallBack) {
         //开启线程来发起网络请求

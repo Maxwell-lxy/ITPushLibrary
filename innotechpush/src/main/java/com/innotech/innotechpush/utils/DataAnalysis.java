@@ -1,4 +1,4 @@
-package com.innotech.innotechpush.data;
+package com.innotech.innotechpush.utils;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,13 +13,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- * 数据处理类
+ * Created by admin on 2018/5/18.
  */
 
 public class DataAnalysis<T> {
 
     /**
      * 处理返回值，并返回泛型对象。
+     *
      * @param response：返回值
      * @param className：泛型T的类名
      * @return
@@ -34,9 +35,13 @@ public class DataAnalysis<T> {
             baseResponse.setCode(code);
             baseResponse.setMsg(msg);
             if (!TextUtils.isEmpty(className)) {
-                Object obj = jsonToT(className, data);
-                if (obj != null) {
-                    baseResponse.setData((T) obj);
+                if (String.class.getName().equals(className)) {
+                    baseResponse.setData((T) data);
+                } else {
+                    Object obj = jsonToT(className, data);
+                    if (obj != null) {
+                        baseResponse.setData((T) obj);
+                    }
                 }
             }
         } catch (JSONException e) {
@@ -52,7 +57,7 @@ public class DataAnalysis<T> {
      * @param json
      * @return
      */
-    private Object jsonToT(String className, String json) {
+    public static Object jsonToT(String className, String json) {
         try {
             JSONObject jsonObject = new JSONObject(json);
             Class<?> clazz = Class.forName(className);
@@ -97,7 +102,7 @@ public class DataAnalysis<T> {
             }
             return obj;
         } catch (Exception e) {
-            Log.e("Innotech_Push", "反射转化对象时出现异常：" + e.getMessage());
+            Log.e(LogUtils.TAG_INNOTECH, "反射转化对象时出现异常：" + e.getMessage());
             return null;
         }
     }

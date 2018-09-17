@@ -54,6 +54,8 @@ public class NotificationUtils {
                             showNotification(context, message, bitmap);
                         }
                     }).execute(content);
+                } else {
+                    showNotification(context, message);
                 }
             } else {//普通通知
                 showNotification(context, message);

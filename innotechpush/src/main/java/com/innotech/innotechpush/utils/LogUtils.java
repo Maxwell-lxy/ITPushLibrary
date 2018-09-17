@@ -3,6 +3,8 @@ package com.innotech.innotechpush.utils;
 import android.content.Context;
 import android.util.Log;
 
+import com.innotech.innotechpush.config.PushConstant;
+
 /**
  * innotech push需使用该类提供的方法进行日志打印，
  * 方便动态的设置调试模式
@@ -20,7 +22,7 @@ public class LogUtils {
     private static final String TAG = "Innotech_Push";
 
     private static Boolean isDebug(Context context){
-        return Utils.getMetaDataBoolean(context,"INNOTECH_PUSH_DEBUG");
+        return CommonUtils.getMetaDataBoolean(context, PushConstant.INNOTECH_PUSH_DEBUG);
     }
 
     public static void i(Context context,String msg) {

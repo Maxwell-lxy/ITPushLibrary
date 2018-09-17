@@ -2,10 +2,9 @@ package com.innotech.innotechpush.utils;
 
 import android.content.Context;
 
-import com.innotech.innotechpush.RequestCallback;
 import com.innotech.innotechpush.bean.BaseResponse;
 import com.innotech.innotechpush.bean.Guid;
-import com.innotech.innotechpush.data.DataAnalysis;
+import com.innotech.innotechpush.callback.RequestCallback;
 
 /**
  * 处理接口返回值
@@ -44,6 +43,21 @@ public class SaveData {
                 if (mCallBack != null) {
                     mCallBack.onFail("绑定用户别名失败！");
                 }
+            }
+        }
+        //获取socket地址
+        else if (url.equals(NetWorkUtils.URL_SOCKET_ADDR)) {
+            BaseResponse<String> response = new DataAnalysis<String>().analysisData(json, String.class.getName());
+            if (response.getCode() == 0) {
+                if (mCallBack != null) {
+                    mCallBack.onSuccess(response.getData());
+                }
+                LogUtils.e(context, "获取socket地址成功！");
+            } else {
+                if (mCallBack != null) {
+                    mCallBack.onFail("获取socket地址失败！");
+                }
+                LogUtils.e(context, "获取socket地址失败！");
             }
         }
     }
