@@ -3,6 +3,7 @@ package com.innotech.innotechpush;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
+import android.text.TextUtils;
 
 import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.config.PushConstant;
@@ -32,29 +33,43 @@ public class InnotechPushMethod {
      * @param context：Android平台上app的上下文，建议传入当前app的application context
      */
     public static void updateUserInfo(Context context, final RequestCallback mCallBack) {
-            try {
+        try {
+            //channel为空时说明部分数据被系统回收掉了，需要重新初始化一下
+            if (TextUtils.isEmpty(UserInfoModel.getInstance().getChannel())) {
+                UserInfoModel.getInstance().init(context);
+            }
+            if (TextUtils.isEmpty(UserInfoModel.getInstance().getOpen_id())) {
                 UserInfoModel.getInstance().setOpen_id(getTK(context));
-                String json = UserInfoModel.getInstance().toJson();
-                String sign = SignUtils.sign("POST", NetWorkUtils.PATH_UPDATEUSERINFO, json);
-                NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_UPDATEUSERINFO, json, sign, new RequestCallback() {
-                    @Override
-                    public void onSuccess(String msg) {
-                        InnotechPushManager.getInstance().initSocketPush();
-                        mCallBack.onSuccess(msg);
+                //如果由于openid延迟获取不到，则延迟1s再获取一次。
+                if (TextUtils.isEmpty(UserInfoModel.getInstance().getOpen_id())) {
+                    try {
+                        Thread.sleep(1000);
+                        UserInfoModel.getInstance().setOpen_id(getTK(context));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-
-                    @Override
-                    public void onFail(String msg) {
-                        mCallBack.onFail(msg);
-                    }
-                });
-            } catch (JSONException e) {
-                LogUtils.e(context, "app上传用户信息参数转换json出错！");
-                if (mCallBack != null) {
-                    mCallBack.onFail("app上传用户信息参数转换json出错！");
                 }
             }
-//        }
+            String json = UserInfoModel.getInstance().toJson();
+            String sign = SignUtils.sign("POST", NetWorkUtils.PATH_UPDATEUSERINFO, json);
+            NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_UPDATEUSERINFO, json, sign, new RequestCallback() {
+                @Override
+                public void onSuccess(String msg) {
+                    InnotechPushManager.getInstance().initSocketPush();
+                    mCallBack.onSuccess(msg);
+                }
+
+                @Override
+                public void onFail(String msg) {
+                    mCallBack.onFail(msg);
+                }
+            });
+        } catch (JSONException e) {
+            LogUtils.e(context, "app上传用户信息参数转换json出错！");
+            if (mCallBack != null) {
+                mCallBack.onFail("app上传用户信息参数转换json出错！");
+            }
+        }
     }
 
     /**

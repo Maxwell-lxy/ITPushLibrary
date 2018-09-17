@@ -20,6 +20,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.innotech.innotechpush.InnotechPushManager;
@@ -95,6 +96,13 @@ public class Utils {
      */
     public static boolean isHuaweiDevice() {
         if (HUAWEI.equals(Build.BRAND) || HUAWEI.toUpperCase().equals(Build.MANUFACTURER)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isOPPO() {
+        if (Build.BRAND.equalsIgnoreCase("OPPO")) {
             return true;
         }
         return false;

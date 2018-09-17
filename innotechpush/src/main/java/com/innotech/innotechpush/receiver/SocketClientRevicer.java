@@ -24,7 +24,7 @@ public class SocketClientRevicer extends PushMessageReceiver {
         if (!(Utils.isXiaomiDevice() || Utils.isMIUI())
                 && !Utils.isMeizuDevice()
 //                && !Utils.isHuaweiDevice()
-                && !PushManager.isSupportPush(context)) {
+                && !(PushManager.isSupportPush(context) && Utils.isOPPO())) {
             try {
                 if (!TextUtils.isEmpty(pushMessage.getTransmission())) {
                     JSONObject object = new JSONObject(pushMessage.getTransmission());
@@ -77,7 +77,7 @@ public class SocketClientRevicer extends PushMessageReceiver {
         if (!(Utils.isXiaomiDevice() || Utils.isMIUI())
                 && !Utils.isMeizuDevice()
 //                && !Utils.isHuaweiDevice()
-                && !PushManager.isSupportPush(context)) {
+                && !(PushManager.isSupportPush(context) && Utils.isOPPO())) {
             if (InnotechPushManager.getPushReciver() != null) {
                 InnotechPushManager.getPushReciver().onNotificationMessageArrived(context, getInnotechMessage(pushMessage));
             } else {
