@@ -46,6 +46,7 @@ public class TestPushReciver extends PushReciver {
         String titleStr = mPushMessage.getTitle();
         String data = mPushMessage.getData();
         String custom = mPushMessage.getCustom();
+        LogUtils.d(context, "custom:" + custom);
         String dataInfo = " ==app== contentStr:" + contentStr + " titleStr:" + titleStr + " contentStr:" + contentStr + " data:" + data + " custom:" + custom;
         LogUtils.d(context, "metodName:" + metodName + dataInfo);
     }

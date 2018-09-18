@@ -97,8 +97,14 @@ public class SocketClientRevicer extends PushMessageReceiver {
             } else {
                 message.setPushType(1);
             }
-            if (!TextUtils.isEmpty(pushMessage.getTransmission())) {
-                message.setCustom(pushMessage.getTransmission());
+            if(!TextUtils.isEmpty(pushMessage.getTransmission())){
+                try {
+                    JSONObject tranObj = new JSONObject(pushMessage.getTransmission());
+                    String extra = tranObj.getString("extra");
+                    message.setCustom(extra);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return message;
@@ -108,7 +114,15 @@ public class SocketClientRevicer extends PushMessageReceiver {
         InnotechMessage mPushMessage = new InnotechMessage();
         mPushMessage.setTitle(pushMessage.getTitle());
         mPushMessage.setContent(pushMessage.getContent());
-        mPushMessage.setCustom(pushMessage.getTransmission());
+        if(!TextUtils.isEmpty(pushMessage.getTransmission())){
+            try {
+                JSONObject tranObj = new JSONObject(pushMessage.getTransmission());
+                String extra = tranObj.getString("extra");
+                mPushMessage.setCustom(extra);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         mPushMessage.setMessageId(pushMessage.getMsg_id());
         mPushMessage.setStyle(pushMessage.getStyle());
         mPushMessage.setUnfold(pushMessage.getUnfold());

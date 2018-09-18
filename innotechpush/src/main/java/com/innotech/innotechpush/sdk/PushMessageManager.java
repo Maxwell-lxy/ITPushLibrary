@@ -2,6 +2,7 @@ package com.innotech.innotechpush.sdk;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.TextUtils;
 
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.config.PushConstant;
@@ -9,6 +10,7 @@ import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.NotificationUtils;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by admin on 2018/5/17.
@@ -56,7 +58,15 @@ public class PushMessageManager {
         InnotechMessage mPushMessage = new InnotechMessage();
         mPushMessage.setTitle(pushMessage.getTitle());
         mPushMessage.setContent(pushMessage.getContent());
-        mPushMessage.setCustom(pushMessage.getTransmission());
+        if(!TextUtils.isEmpty(pushMessage.getTransmission())){
+            try {
+                JSONObject tranObj = new JSONObject(pushMessage.getTransmission());
+                String extra = tranObj.getString("extra");
+                mPushMessage.setCustom(extra);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         mPushMessage.setMessageId(pushMessage.getMsg_id());
         mPushMessage.setStyle(pushMessage.getStyle());
         mPushMessage.setUnfold(pushMessage.getUnfold());
