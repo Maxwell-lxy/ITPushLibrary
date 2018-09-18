@@ -98,13 +98,7 @@ public class SocketClientRevicer extends PushMessageReceiver {
                 message.setPushType(1);
             }
             if(!TextUtils.isEmpty(pushMessage.getTransmission())){
-                try {
-                    JSONObject tranObj = new JSONObject(pushMessage.getTransmission());
-                    String extra = tranObj.getString("extra");
-                    message.setCustom(extra);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                message.setCustom(pushMessage.getTransmission());
             }
         }
         return message;
