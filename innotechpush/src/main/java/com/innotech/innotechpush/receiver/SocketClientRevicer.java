@@ -24,7 +24,8 @@ public class SocketClientRevicer extends PushMessageReceiver {
         if (!(Utils.isXiaomiDevice() || Utils.isMIUI())
                 && !Utils.isMeizuDevice()
 //                && !Utils.isHuaweiDevice()
-                && !(PushManager.isSupportPush(context) && Utils.isOPPO())) {
+//                && !(PushManager.isSupportPush(context) && Utils.isOPPO())
+                ) {
             try {
                 if (!TextUtils.isEmpty(pushMessage.getTransmission())) {
                     JSONObject object = new JSONObject(pushMessage.getTransmission());
@@ -77,7 +78,8 @@ public class SocketClientRevicer extends PushMessageReceiver {
         if (!(Utils.isXiaomiDevice() || Utils.isMIUI())
                 && !Utils.isMeizuDevice()
 //                && !Utils.isHuaweiDevice()
-                && !(PushManager.isSupportPush(context) && Utils.isOPPO())) {
+//                && !(PushManager.isSupportPush(context) && Utils.isOPPO())
+                ) {
             if (InnotechPushManager.getPushReciver() != null) {
                 InnotechPushManager.getPushReciver().onNotificationMessageArrived(context, getInnotechMessage(pushMessage));
             } else {
@@ -97,7 +99,7 @@ public class SocketClientRevicer extends PushMessageReceiver {
             } else {
                 message.setPushType(1);
             }
-            if(!TextUtils.isEmpty(pushMessage.getTransmission())){
+            if (!TextUtils.isEmpty(pushMessage.getTransmission())) {
                 message.setCustom(pushMessage.getTransmission());
             }
         }
@@ -108,7 +110,7 @@ public class SocketClientRevicer extends PushMessageReceiver {
         InnotechMessage mPushMessage = new InnotechMessage();
         mPushMessage.setTitle(pushMessage.getTitle());
         mPushMessage.setContent(pushMessage.getContent());
-        if(!TextUtils.isEmpty(pushMessage.getTransmission())){
+        if (!TextUtils.isEmpty(pushMessage.getTransmission())) {
             try {
                 JSONObject tranObj = new JSONObject(pushMessage.getTransmission());
                 String extra = tranObj.getString("extra");

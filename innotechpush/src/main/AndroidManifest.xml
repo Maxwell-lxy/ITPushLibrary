@@ -64,7 +64,7 @@
     <!-- 个推SDK权限配置结束 -->
 
     <!-- oppo权限配置开始 -->
-    <uses-permission android:name="com.coloros.mcs.permission.RECIEVE_MCS_MESSAGE" />
+    <!--<uses-permission android:name="com.coloros.mcs.permission.RECIEVE_MCS_MESSAGE" />-->
     <!-- oppo权限配置结束 -->
 
     <application android:usesCleartextTraffic="true">
@@ -80,19 +80,19 @@
             android:value="${INNOTECH_APP_KEY}" />
 
         <!-- oppo push begin -->
-        <meta-data
-            android:name="OPPO_APP_KEY"
-            android:value="${OPPO_APP_KEY}" />
-        <meta-data
-            android:name="OPPO_APP_SECRET"
-            android:value="${OPPO_APP_SECRET}" />
-        <service
-            android:name=".service.OppoPushService"
-            android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
-            <intent-filter>
-                <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE" />
-            </intent-filter>
-        </service>
+        <!--<meta-data-->
+            <!--android:name="OPPO_APP_KEY"-->
+            <!--android:value="${OPPO_APP_KEY}" />-->
+        <!--<meta-data-->
+            <!--android:name="OPPO_APP_SECRET"-->
+            <!--android:value="${OPPO_APP_SECRET}" />-->
+        <!--<service-->
+            <!--android:name=".service.OppoPushService"-->
+            <!--android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE" />-->
+            <!--</intent-filter>-->
+        <!--</service>-->
         <!-- oppo push end -->
 
         <!--xiaomi push begin -->

@@ -69,9 +69,9 @@ public class UserInfoModel {
 //            this.channel = Channel.HW;
 //        }
         //oppo设备
-        else if (com.coloros.mcssdk.PushManager.isSupportPush(context) && Utils.isOPPO()) {
-            this.channel = Channel.OPPO;
-        }
+//        else if (com.coloros.mcssdk.PushManager.isSupportPush(context) && Utils.isOPPO()) {
+//            this.channel = Channel.OPPO;
+//        }
         //其他设备
         else {
             this.channel = Channel.UNION;

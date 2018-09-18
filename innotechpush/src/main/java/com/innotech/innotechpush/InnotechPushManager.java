@@ -79,7 +79,6 @@ public class InnotechPushManager {
         UserInfoModel.getInstance().init(application.getApplicationContext());
         String processName = getProcessName(application, android.os.Process.myPid());
         LogUtils.e(application, "当前进程名字：" + processName);
-        LogUtils.e(application, "是否支持oppo推送：" + com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext()));
         if (Utils.isXiaomiDevice() || Utils.isMIUI()) {
             pushSDKName = miSDKName;
             new MiSDK(application);
@@ -99,12 +98,12 @@ public class InnotechPushManager {
 ////            HMSAgent.init(application);
 ////        }
         //oppo设备时，开启oppo推送
-        else if (com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext()) && Utils.isOPPO()) {
-            pushSDKName = oppoSDKName;
-            String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
-            String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
-            com.coloros.mcssdk.PushManager.getInstance().register(application.getApplicationContext(), appKey, appSecret, new OppoPushCallback(application));
-        }
+//        else if (com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext()) && Utils.isOPPO()) {
+//            pushSDKName = oppoSDKName;
+//            String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
+//            String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
+//            com.coloros.mcssdk.PushManager.getInstance().register(application.getApplicationContext(), appKey, appSecret, new OppoPushCallback(application));
+//        }
         //其他设备时，开启个推推送和socket长连接
         else {
             pushSDKName = otherSDKName;
