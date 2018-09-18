@@ -23,31 +23,29 @@ import com.innotech.innotechpush.utils.LogUtils;
 public class NotificationClickReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-//        Log.e("allen","刚进来的地方");
         InnotechMessage myMsg = (InnotechMessage) intent.getSerializableExtra("InnotechMessage");
-        if (InnotechPushManager.getPushReciver() != null) {
-//            InnotechPushManager.getPushReciver().onNotificationMessageClicked(context, myMsg);
-            LogUtils.i(context, "AppUtils.appIsBackground(context):" + AppUtils.appIsBackground(context) + " myMsg.getActionContent():" + myMsg.getActionContent());
-            if (null != myMsg.getActionContent() && myMsg.getActionContent().length() > 0) {
-                Uri uri = Uri.parse(myMsg.getActionContent());
-                Intent intentUrl = new Intent(Intent.ACTION_VIEW, uri);
-                context.startActivity(intentUrl);
-            } else {
-                if (AppUtils.appIsBackground(context)) {
-                    //打开应用
-                    Intent launchIntent = context.getPackageManager().
-                            getLaunchIntentForPackage(context.getPackageName());
-                    launchIntent.setFlags(
-                            Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                    context.startActivity(launchIntent);
-                }
-            }
+//        if (InnotechPushManager.getPushReciver() != null) {
+////            InnotechPushManager.getPushReciver().onNotificationMessageClicked(context, myMsg);
+//            LogUtils.i(context, "AppUtils.appIsBackground(context):" + AppUtils.appIsBackground(context) + " myMsg.getActionContent():" + myMsg.getActionContent());
+//            if (null != myMsg.getActionContent() && myMsg.getActionContent().length() > 0) {
+//                Uri uri = Uri.parse(myMsg.getActionContent());
+//                Intent intentUrl = new Intent(Intent.ACTION_VIEW, uri);
+//                context.startActivity(intentUrl);
+//            } else {
+//                if (AppUtils.appIsBackground(context)) {
+//                    //打开应用
+//                    Intent launchIntent = context.getPackageManager().
+//                            getLaunchIntentForPackage(context.getPackageName());
+//                    launchIntent.setFlags(
+//                            Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
+//                    context.startActivity(launchIntent);
+//                }
+//            }
+//
+//        } else {
+//            InnotechPushManager.innotechPushReciverIsNull(context);
+//        }
 
-        } else {
-            InnotechPushManager.innotechPushReciverIsNull(context);
-        }
-
-//        Log.e("allen","中间的地方");
         //通知被点击后发送一个回执的广播
         PushMessage message = new PushMessage();
         Integer appId = CommonUtils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
@@ -63,6 +61,5 @@ public class NotificationClickReceiver extends BroadcastReceiver {
         intent1.setAction(BroadcastConstant.MESSAGE_CLICK);
         intent1.putExtra("PushMessage", message);
         context.sendBroadcast(intent1);
-//        Log.e("allen","结束的地方");
     }
 }
