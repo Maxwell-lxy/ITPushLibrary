@@ -9,9 +9,11 @@ import com.innotech.innotechpush.callback.SocketSendCallback;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.DataAnalysis;
+import com.innotech.innotechpush.utils.FileUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NetWorkUtils;
 import com.innotech.innotechpush.utils.SignUtils;
+import com.innotech.innotechpush.utils.TokenUtils;
 import com.innotech.innotechpush.utils.UserInfoSPUtils;
 
 import org.json.JSONArray;
@@ -63,7 +65,11 @@ public class SocketManager {
                     @Override
                     public void onSuccess(String hostAndPort) {
                         String[] array = hostAndPort.split(":");
-                        connectWithHostAndPort(array[0].trim(), Integer.parseInt(array[1].trim()));
+                        try {
+                            connectWithHostAndPort(array[0].trim(), Integer.parseInt(array[1].trim()));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
 
                     @Override
@@ -94,8 +100,7 @@ public class SocketManager {
             LogUtils.e(context, "INNOTECH_APP_ID或INNOTECH_APP_KEY配置有误");
             return;
         }
-        String guid = UserInfoSPUtils.getString(context, UserInfoSPUtils.KEY_GUID, "");
-//        String guid = "d295629a-a23c-52e3-8863-256ff04f331d";
+        String guid = TokenUtils.getGuid(context);
         if (TextUtils.isEmpty(guid)) {
             LogUtils.e(context, "guid不能为空");
             return;
@@ -112,7 +117,7 @@ public class SocketManager {
     /**
      * 建立长连接
      */
-    private void connectWithHostAndPort(final String host, final int port) {
+    private void connectWithHostAndPort(final String host, final int port) throws JSONException {
         if (!TextUtils.isEmpty(host) && port != 0) {
             final Integer appId = CommonUtils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
             final String appKey = CommonUtils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
@@ -120,7 +125,7 @@ public class SocketManager {
                 LogUtils.e(context, "INNOTECH_APP_ID或INNOTECH_APP_KEY配置有误");
                 return;
             }
-            final String guid = UserInfoSPUtils.getString(context, UserInfoSPUtils.KEY_GUID, "");
+            final String guid = TokenUtils.getGuid(context);
             if (TextUtils.isEmpty(guid)) {
                 LogUtils.e(context, "guid不能为空");
                 return;
@@ -134,7 +139,6 @@ public class SocketManager {
                         if (isConnecting()) {
                             //登录
                             loginCmd(guid, appId, appKey);
-//                            loginCmd("d295629a-a23c-52e3-8863-256ff04f331d", 1000, "YWJjZGRk");
                             readData();
                         }
                     } catch (SocketException e) {
@@ -192,6 +196,7 @@ public class SocketManager {
                                 JSONObject object = array.getJSONObject(i);
                                 PushMessage pushMessage = (PushMessage) DataAnalysis.jsonToT(PushMessage.class.getName(), object.toString());
                                 if (pushMessage != null) {
+                                    pushMessage.setOffLineMsg(true);
                                     PushMessageManager.getInstance(context).setNewMessage(pushMessage);
                                     list.add(pushMessage.getMsg_id());
                                 }
@@ -202,7 +207,7 @@ public class SocketManager {
                                         || CommonUtils.isMeizuDevice()) {
                                     ackCmd(list, 101);
                                 } else {
-                                    ackCmd(list, 1);
+                                    ackCmd(list, 1001);
                                 }
                             }
                         }

@@ -6,6 +6,9 @@ import com.innotech.innotechpush.bean.BaseResponse;
 import com.innotech.innotechpush.bean.Guid;
 import com.innotech.innotechpush.callback.RequestCallback;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * 处理接口返回值
  */
@@ -17,7 +20,12 @@ public class SaveData {
         if (url.equals(NetWorkUtils.URL_UPDATEUSERINFO)) {
             BaseResponse<Guid> response = new DataAnalysis<Guid>().analysisData(json, Guid.class.getName());
             if (response.getCode() == 0) {
-                UserInfoSPUtils.putString(context, UserInfoSPUtils.KEY_GUID, response.getData().getGuid());
+                try {
+                    TokenUtils.saveGuid(context, response.getData().getGuid());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+//                UserInfoSPUtils.putString(context, UserInfoSPUtils.KEY_GUID, response.getData().getGuid());
                 if (mCallBack != null) {
                     mCallBack.onSuccess(response.getData().getGuid());
                 }

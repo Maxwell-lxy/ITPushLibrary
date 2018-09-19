@@ -21,6 +21,8 @@ public class PushMessage implements Serializable {
     private int pass_through;
     //0、默认展示样式 1、纯图展示
     private int style;
+    //离线消息
+    private boolean isOffLineMsg;
 
     public String getMsg_id() {
         return msg_id;
@@ -92,5 +94,13 @@ public class PushMessage implements Serializable {
 
     public void setAppId(int appId) {
         this.appId = appId;
+    }
+
+    public boolean isOffLineMsg() {
+        return isOffLineMsg;
+    }
+
+    public void setOffLineMsg(boolean offLineMsg) {
+        isOffLineMsg = offLineMsg;
     }
 }

@@ -2,14 +2,18 @@ package com.innotech.innotechpush.bean;
 
 import android.content.Context;
 import android.os.Build;
+import android.text.TextUtils;
 
 import com.innotech.innotechpush.config.PushConstant;
+import com.innotech.innotechpush.utils.FileUtils;
+import com.innotech.innotechpush.utils.TokenUtils;
 import com.innotech.innotechpush.utils.UserInfoSPUtils;
 import com.innotech.innotechpush.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.UUID;
 
 public class UserInfoModel {
@@ -78,7 +82,14 @@ public class UserInfoModel {
         }
         this.ip = Utils.getIPAddress(context);
         this.open_notice = Utils.isNotificationEnabled(context);
-        this.guid = UserInfoSPUtils.getString(context, UserInfoSPUtils.KEY_GUID, null);
+        try {
+            String guid = TokenUtils.getGuid(context);
+            if (!TextUtils.isEmpty(guid)) {
+                this.guid = guid;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         this.idempotent = UUID.randomUUID().toString();
         this.version = PushConstant.INNOTECH_PUSH_VERSION;
     }

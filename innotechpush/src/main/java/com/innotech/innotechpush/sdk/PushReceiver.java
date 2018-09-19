@@ -50,7 +50,11 @@ public class PushReceiver extends BroadcastReceiver {
             if (message != null) {
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(message.getMsg_id());
-                SocketManager.getInstance(context).ackCmd(list, 3);
+                if (message.isOffLineMsg()) {
+                    SocketManager.getInstance(context).ackCmd(list, 1003);
+                } else {
+                    SocketManager.getInstance(context).ackCmd(list, 3);
+                }
             }
         } else if (BroadcastConstant.RECEIVE_MESSAGE.equals(action)) {
             //目前的逻辑
@@ -60,7 +64,9 @@ public class PushReceiver extends BroadcastReceiver {
             if (CommonUtils.isNotificationEnabled(context) && message.getAppId() == appId) {
                 ArrayList<String> list = new ArrayList<String>();
                 list.add(message.getMsg_id());
-                if (CommonUtils.isXiaomiDevice()
+                if (message.isOffLineMsg()) {
+                    SocketManager.getInstance(context).ackCmd(list, 1002);
+                } else if (CommonUtils.isXiaomiDevice()
                         || CommonUtils.isMIUI()
                         || CommonUtils.isMeizuDevice()) {
                     SocketManager.getInstance(context).ackCmd(list, 102);
