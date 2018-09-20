@@ -31,5 +31,11 @@ public class PushConstant {
      */
     public static final String INNOTECH_PUSH_VERSION = "1.4.8";
 
+    /**
+     * 默认开启华为
+     * 如果不需要开启华为则需要设为false
+     */
+    public static boolean hasHuawei = true;
+
 
 }

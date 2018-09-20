@@ -1,11 +1,8 @@
 package com.innotech.itpushlibrary;
 
-import android.app.Application;
-
 import com.inno.innosdk.pb.InnoMain;
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.sdk.KeepApplication;
-import com.innotech.innotechpush.utils.SPIcon;
 
 import java.util.Random;
 

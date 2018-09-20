@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 
 import com.innotech.innotechpush.config.BroadcastConstant;
+import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
+import com.innotech.innotechpush.db.ClientLog;
 import com.innotech.innotechpush.utils.AlarmManagerUtils;
 import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.LogUtils;
@@ -31,6 +33,7 @@ public class PushReceiver extends BroadcastReceiver {
         } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
             int netWorkState = NetUtil.getNetWorkState(context);
             LogUtils.e(context, "netWorkState：" + netWorkState);
+            new ClientLog(context, LogCode.LOG_DATA_COMMON, "netWorkState：" + netWorkState).save();
             if (netWorkState != -1) {
                 SocketManager.getInstance(context).reConnect();
             }
@@ -55,6 +58,7 @@ public class PushReceiver extends BroadcastReceiver {
                 } else {
                     SocketManager.getInstance(context).ackCmd(list, 3);
                 }
+                new ClientLog(context, LogCode.LOG_DATA_NOTIFY, "通知被点击：" + message.toString()).save();
             }
         } else if (BroadcastConstant.RECEIVE_MESSAGE.equals(action)) {
             //目前的逻辑
@@ -73,6 +77,7 @@ public class PushReceiver extends BroadcastReceiver {
                 } else {
                     SocketManager.getInstance(context).ackCmd(list, 2);
                 }
+                new ClientLog(context, LogCode.LOG_DATA_NOTIFY, "显示通知：" + message.toString()).save();
             }
         }
     }

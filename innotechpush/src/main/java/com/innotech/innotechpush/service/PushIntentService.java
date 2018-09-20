@@ -10,6 +10,8 @@ import com.igexin.sdk.message.GTTransmitMessage;
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.bean.UserInfoModel;
+import com.innotech.innotechpush.config.LogCode;
+import com.innotech.innotechpush.db.ClientLog;
 import com.innotech.innotechpush.utils.BroadcastUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NotificationUtils;
@@ -32,6 +34,7 @@ public class PushIntentService extends GTIntentService {
     @Override
     public void onReceiveServicePid(Context context, int i) {
         LogUtils.e(context, LogUtils.TAG_GETUI + "onReceiveServicePid -> " + "ServicePid = " + i);
+        new ClientLog(context, LogCode.LOG_INIT, "onReceiveServicePid -> " + "ServicePid = " + i).save();
     }
 
     @Override
@@ -39,6 +42,7 @@ public class PushIntentService extends GTIntentService {
         LogUtils.e(context, LogUtils.TAG_GETUI + "onReceiveClientId -> " + "clientid = " + clientid);
         UserInfoModel.getInstance().setDevice_token1(clientid);
         BroadcastUtils.sendUpdateUserInfoBroadcast(context);
+        new ClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_GETUI + "onReceiveClientId -> " + "clientid = " + clientid).save();
     }
 
     @Override
@@ -47,7 +51,8 @@ public class PushIntentService extends GTIntentService {
             byte[] payload = gtTransmitMessage.getPayload();
             String data = new String(payload);
 
-            LogUtils.i(context, "GeTui onReceiveMessageData() data:" + data + "  gtTransmitMessage.getPayloadId():" + gtTransmitMessage.getPayloadId());
+            LogUtils.e(context, "GeTui onReceiveMessageData() data:" + data + "  gtTransmitMessage.getPayloadId():" + gtTransmitMessage.getPayloadId());
+            new ClientLog(context, LogCode.LOG_DATA_NOTIFY, "GeTui onReceiveMessageData() data:" + data + "  gtTransmitMessage.getPayloadId():" + gtTransmitMessage.getPayloadId()).save();
             JSONObject object = new JSONObject(data);
             String idempotent = object.getString("idempotent");
             InnotechPushManager.getIdempotentLock().lock();
@@ -61,17 +66,20 @@ public class PushIntentService extends GTIntentService {
                         SPUtils.put(context, idempotent, System.currentTimeMillis());
                     } else {
                         LogUtils.e(context, LogUtils.TAG_GETUI + " 该消息为重复消息，过滤掉，不做处理" + data);
+                        new ClientLog(context, LogCode.LOG_DATA_COMMON, LogUtils.TAG_GETUI + " 该消息中没有包含idempotent字段，不做处理" + data).save();
                         //触发一次消息池的清理
                         SPUtils.clearPoor(context);
                     }
                 } else {
                     LogUtils.e(context, LogUtils.TAG_GETUI + " 该消息中没有包含idempotent字段，不做处理" + data);
+                    new ClientLog(context, LogCode.LOG_DATA_COMMON, LogUtils.TAG_GETUI + " 该消息中没有包含idempotent字段，不做处理" + data).save();
                 }
             } finally {
                 InnotechPushManager.getIdempotentLock().unlock();
             }
         } catch (JSONException e) {
             LogUtils.e(context, LogUtils.TAG_GETUI + " dealWithCustomMessage方法中json转换失败");
+            new ClientLog(context, LogCode.LOG_EX_JSON, LogUtils.TAG_GETUI + " dealWithCustomMessage方法中json转换失败").save();
         }
         if (InnotechPushManager.getPushReciver() != null) {
             InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context, createMessageByJson(gtTransmitMessage));
@@ -83,11 +91,13 @@ public class PushIntentService extends GTIntentService {
     @Override
     public void onReceiveOnlineState(Context context, boolean b) {
         LogUtils.e(context, LogUtils.TAG_GETUI + "onReceiveOnlineState() -> " + "b = " + b);
+        new ClientLog(context, LogCode.LOG_INIT, "onReceiveOnlineState() -> " + "b = " + b).save();
     }
 
     @Override
     public void onReceiveCommandResult(Context context, GTCmdMessage gtCmdMessage) {
         LogUtils.e(context, LogUtils.TAG_GETUI + "onReceiveCommandResult() -> ");
+        new ClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_GETUI + "onReceiveCommandResult() -> ").save();
     }
 
     @Override
@@ -98,6 +108,7 @@ public class PushIntentService extends GTIntentService {
         } else {
             InnotechPushManager.innotechPushReciverIsNull(context);
         }
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_GETUI + "onNotificationMessageArrived() -> ").save();
     }
 
     @Override
@@ -108,6 +119,7 @@ public class PushIntentService extends GTIntentService {
         } else {
             InnotechPushManager.innotechPushReciverIsNull(context);
         }
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_GETUI + "onNotificationMessageClicked() -> ").save();
     }
 
     private InnotechMessage getCreateMessge(GTNotificationMessage gtNotificationMessage) {

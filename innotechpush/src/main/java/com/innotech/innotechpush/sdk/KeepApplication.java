@@ -3,7 +3,6 @@ package com.innotech.innotechpush.sdk;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
-import android.os.Build;
 
 import com.innotech.innotechpush.utils.Utils;
 

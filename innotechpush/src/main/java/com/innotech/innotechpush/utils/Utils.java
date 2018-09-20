@@ -283,7 +283,7 @@ public class Utils {
         try {
             imei = telephonyManager.getDeviceId();
         } catch (SecurityException ex) {
-            ex.printStackTrace();
+            LogUtils.e(context,"没有权限，获取不到imei");
         }
         return imei;
     }

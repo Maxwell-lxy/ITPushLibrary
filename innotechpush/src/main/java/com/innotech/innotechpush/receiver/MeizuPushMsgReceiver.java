@@ -7,6 +7,8 @@ import android.text.TextUtils;
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.bean.UserInfoModel;
+import com.innotech.innotechpush.config.LogCode;
+import com.innotech.innotechpush.db.ClientLog;
 import com.innotech.innotechpush.utils.BroadcastUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.meizu.cloud.pushsdk.MzPushMessageReceiver;
@@ -32,6 +34,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
         //调用 PushManager.register(context）方法后，会在此回调注册状态
         //应用在接受返回的 pushid
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegister pushid:" + pushid);
+        new ClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegister pushid:" + pushid).save();
     }
 
     /**
@@ -45,6 +48,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
     public void onMessage(Context context, String message) {
         //接收服务器推送的透传消息
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onMessage message:" + message);
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onMessage message:" + message).save();
         if (InnotechPushManager.getPushReciver() != null) {
             InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context, getCreateMessge(message));
         } else {
@@ -64,6 +68,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
     @Override
     public void onMessage(Context context, Intent intent) {
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onMessage intent:" + intent);
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onMessage intent:" + intent).save();
     }
 
     @Override
@@ -71,6 +76,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
     public void onUnRegister(Context context, boolean b) {
         //调用 PushManager.unRegister(context）方法后，会在此回调反注册状态
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onUnRegister b:" + b);
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onUnRegister b:" + b).save();
     }
 
     //设置通知栏小图标
@@ -99,6 +105,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
             registerStatus) {
         //调用新版订阅 PushManager.register(context,appId,appKey)回调
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegisterStatus registerStatus:" + registerStatus);
+        new ClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegisterStatus registerStatus:" + registerStatus).save();
         if (registerStatus.getCode().equals(RegisterStatus.SUCCESS_CODE)) {
             UserInfoModel.getInstance().setDevice_token1(registerStatus.getPushId());
             BroadcastUtils.sendUpdateUserInfoBroadcast(context);
@@ -116,6 +123,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
             unRegisterStatus) {
         //新版反订阅回调
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onUnRegisterStatus unRegisterStatus:" + unRegisterStatus);
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onUnRegisterStatus unRegisterStatus:" + unRegisterStatus).save();
     }
 
     @Override
@@ -123,6 +131,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
             subTagsStatus) {
         //标签回调
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onSubTagsStatus subTagsStatus:" + subTagsStatus);
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onSubTagsStatus subTagsStatus:" + subTagsStatus).save();
     }
 
     @Override
@@ -130,6 +139,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
             subAliasStatus) {
         //别名回调
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onSubAliasStatus subAliasStatus:" + subAliasStatus);
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onSubAliasStatus subAliasStatus:" + subAliasStatus).save();
     }
 
     @Override
@@ -137,6 +147,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
             mzPushMessage) {
         //通知栏消息到达回调，flyme6 基于 android6.0 以上不再回调
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onNotificationArrived mzPushMessage:" + mzPushMessage);
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onNotificationArrived mzPushMessage:" + mzPushMessage).save();
         if (InnotechPushManager.getPushReciver() != null) {
             InnotechPushManager.getPushReciver().onNotificationMessageArrived(context, getCreateMessge(mzPushMessage));
         } else {
@@ -149,6 +160,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
             mzPushMessage) {
         //通知栏消息点击回调
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onNotificationClicked mzPushMessage:" + mzPushMessage);
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onNotificationClicked mzPushMessage:" + mzPushMessage).save();
         if (InnotechPushManager.getPushReciver() != null) {
             InnotechPushManager.getPushReciver().onNotificationMessageClicked(context, getCreateMessge(mzPushMessage));
         } else {
@@ -161,6 +173,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
             mzPushMessage) {
         //通知栏消息删除回调；flyme6 基于 android6.0 以上不再回调
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onNotificationDeleted mzPushMessage:" + mzPushMessage);
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onNotificationDeleted mzPushMessage:" + mzPushMessage).save();
     }
 
     private InnotechMessage getCreateMessge(MzPushMessage mzPushMessage) {

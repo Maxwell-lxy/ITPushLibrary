@@ -6,7 +6,13 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 
+import com.huawei.android.hms.agent.HMSAgent;
+import com.huawei.android.hms.agent.common.handler.ConnectHandler;
+import com.huawei.android.hms.agent.push.handler.GetTokenHandler;
 import com.innotech.innotechpush.bean.UserInfoModel;
+import com.innotech.innotechpush.config.LogCode;
+import com.innotech.innotechpush.config.PushConstant;
+import com.innotech.innotechpush.db.ClientLog;
 import com.innotech.innotechpush.receiver.PushReciver;
 import com.innotech.innotechpush.sdk.MiSDK;
 import com.innotech.innotechpush.sdk.SocketClientService;
@@ -17,6 +23,7 @@ import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.SPUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.meizu.cloud.pushsdk.PushManager;
+import com.orm.SugarContext;
 
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -31,12 +38,6 @@ public class InnotechPushManager {
     private static InnotechPushManager mInnotechPushManager = null;
     private Application application;
     private static PushReciver mPushReciver;
-    public static String pushSDKName = null;
-    public static String miSDKName = "mi";
-    //    public static String huaweiSDKName = "huawei";
-    public static String meizuSDKName = "meizu";
-    public static String oppoSDKName = "oppo";
-    public static String otherSDKName = "union ";
     /**
      * 个推和集团长连接做幂等时需要加锁，防止两个回调相隔时间较近或同时到达。
      */
@@ -76,27 +77,29 @@ public class InnotechPushManager {
      */
     public void initPushSDK(Application application) {
         this.application = application;
+        SugarContext.init(application);
         UserInfoModel.getInstance().init(application.getApplicationContext());
         String processName = getProcessName(application, android.os.Process.myPid());
         LogUtils.e(application, "当前进程名字：" + processName);
         if (Utils.isXiaomiDevice() || Utils.isMIUI()) {
-            pushSDKName = miSDKName;
-            new MiSDK(application);
+            new MiSDK(application.getApplicationContext());
         }
         //魅族设备时，开启魅族推送
         else if (Utils.isMeizuDevice()) {
-            pushSDKName = meizuSDKName;
             String appId = Utils.getMetaDataString(application, "MEIZU_APP_ID").replace("innotech-", "");
             String appKey = Utils.getMetaDataString(application, "MEIZU_APP_KEY");
             LogUtils.e(application.getApplicationContext(), LogUtils.TAG_MEIZU + "Meizu  PushManager.register");
             PushManager.register(application, appId, appKey);
+            ClientLog log = new ClientLog(application.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_MEIZU + "Meizu  PushManager.register");
+            log.save();
         }
         //华为设备时，开启华为推送
-//        else if (Utils.isHuaweiDevice()) {
-////            pushSDKName = huaweiSDKName;
-////            LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + " HMSAgent.init");
-////            HMSAgent.init(application);
-////        }
+        else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {
+            LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + " HMSAgent.init");
+            HMSAgent.init(application);
+            ClientLog log = new ClientLog(application.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_HUAWEI + " HMSAgent.init");
+            log.save();
+        }
         //oppo设备时，开启oppo推送
 //        else if (com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext()) && Utils.isOPPO()) {
 //            pushSDKName = oppoSDKName;
@@ -106,7 +109,6 @@ public class InnotechPushManager {
 //        }
         //其他设备时，开启个推推送和socket长连接
         else {
-            pushSDKName = otherSDKName;
             initGeTuiPush();
         }
     }
@@ -123,6 +125,8 @@ public class InnotechPushManager {
         com.igexin.sdk.PushManager.getInstance().initialize(application.getApplicationContext(), PushService.class);
         // com.getui.demo.DemoIntentService 为第三⽅方⾃自定义的推送服务事件接收类
         com.igexin.sdk.PushManager.getInstance().registerPushIntentService(application.getApplicationContext(), PushIntentService.class);
+        ClientLog log = new ClientLog(application.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_GETUI + "call initGeTuiPush()");
+        log.save();
     }
 
     public void setPushRevicer(PushReciver mPushReciver) {
@@ -135,29 +139,35 @@ public class InnotechPushManager {
 
     public static void innotechPushReciverIsNull(Context context) {
         LogUtils.e(context, "InnotechPushReciver is null!");
+        ClientLog log = new ClientLog(context, LogCode.LOG_INIT, "InnotechPushReciver is null!");
+        log.save();
     }
 
-//    private void huaWeiConnect(final Activity activity) {
-//        HMSAgent.connect(activity, new ConnectHandler() {
-//            @Override
-//            public void onConnect(int rst) {
-//                LogUtils.e(activity.getApplicationContext(), LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
-//                getToken();
-//            }
-//        });
-//    }
+    private void huaWeiConnect(final Activity activity) {
+        HMSAgent.connect(activity, new ConnectHandler() {
+            @Override
+            public void onConnect(int rst) {
+                LogUtils.e(activity.getApplicationContext(), LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
+                ClientLog log = new ClientLog(application.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
+                log.save();
+                getToken();
+            }
+        });
+    }
 
     /**
      * 获取token
      */
-//    public void getToken() {
-//        HMSAgent.Push.getToken(new GetTokenHandler() {
-//            @Override
-//            public void onResult(int rtnCode) {
-//                LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + "get token: end" + rtnCode);
-//            }
-//        });
-//    }
+    public void getToken() {
+        HMSAgent.Push.getToken(new GetTokenHandler() {
+            @Override
+            public void onResult(int rtnCode) {
+                LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + "get token: end" + rtnCode);
+                ClientLog log = new ClientLog(application.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_HUAWEI + "get token: end" + rtnCode);
+                log.save();
+            }
+        });
+    }
 
     /**
      * 获得幂等锁

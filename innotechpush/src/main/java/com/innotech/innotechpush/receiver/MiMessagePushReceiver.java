@@ -7,6 +7,9 @@ import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.R;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.bean.UserInfoModel;
+import com.innotech.innotechpush.config.LogCode;
+import com.innotech.innotechpush.db.ClientLog;
+import com.innotech.innotechpush.sdk.MiSDK;
 import com.innotech.innotechpush.utils.BroadcastUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.xiaomi.mipush.sdk.ErrorCode;
@@ -77,12 +80,19 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
                 log = context.getString(R.string.register_success);
             } else {
                 log = context.getString(R.string.register_fail);
+                try {
+                    Thread.sleep(1000);
+                    new MiSDK(context);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             log = miPushCommandMessage.getReason();
         }
 
         LogUtils.e(context, LogUtils.TAG_XIAOMI + "metodName:onReceiveRegisterResult" + " log:" + log);
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_XIAOMI + "metodName:onReceiveRegisterResult" + " log:" + log).save();
     }
 
     @Override
@@ -156,6 +166,7 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
             log = message.getReason();
         }
         LogUtils.e(context, LogUtils.TAG_XIAOMI + "metodName:onCommandResult" + " log:" + log + " mRegId:" + mRegId);
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_XIAOMI + "metodName:onCommandResult" + " log:" + log + " mRegId:" + mRegId).save();
     }
 
 
@@ -170,6 +181,7 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
         }
         String dataInfo = "==jar== contentStr:" + contentStr + " titleStr:" + titleStr + " descriptionStr:" + descriptionStr;
         LogUtils.e(context, LogUtils.TAG_XIAOMI + "metodName:" + metodName + " mTopic:" + mTopic + " mAlias:" + mAlias + dataInfo);
+        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_XIAOMI + "metodName:" + metodName + " mTopic:" + mTopic + " mAlias:" + mAlias + dataInfo).save();
     }
 
     private InnotechMessage getCreateMessge(MiPushMessage miPushMessage) {

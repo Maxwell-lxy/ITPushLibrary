@@ -3,6 +3,8 @@ package com.innotech.itpushlibrary;
 import android.app.Activity;
 import android.os.Bundle;
 
+import com.innotech.innotechpush.InnotechPushMethod;
+
 public class MainActivity extends Activity {
     private static final int REQUEST_PERMISSION = 0;
 
@@ -10,6 +12,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        InnotechPushMethod.launcher(this);
 
 //        PackageManager pkgManager = getPackageManager();
 //

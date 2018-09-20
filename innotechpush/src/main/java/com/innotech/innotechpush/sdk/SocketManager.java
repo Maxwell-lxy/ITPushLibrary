@@ -4,9 +4,12 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.innotech.innotechpush.InnotechPushMethod;
 import com.innotech.innotechpush.callback.RequestCallback;
 import com.innotech.innotechpush.callback.SocketSendCallback;
+import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
+import com.innotech.innotechpush.db.ClientLog;
 import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.DataAnalysis;
 import com.innotech.innotechpush.utils.FileUtils;
@@ -75,6 +78,7 @@ public class SocketManager {
                     @Override
                     public void onFail(String msg) {
                         LogUtils.e(context, msg);
+                        new ClientLog(context, LogCode.LOG_DATA_API, "获取长连接地址失败").save();
                         try {
                             Thread.sleep(5000);
                             reConnect();
@@ -86,6 +90,7 @@ public class SocketManager {
             } catch (JSONException e) {
                 e.printStackTrace();
                 LogUtils.e(context, "获取socket信息json参数有误");
+                new ClientLog(context, LogCode.LOG_EX_JSON, "获取socket信息json参数有误").save();
             }
         }
     }
@@ -98,11 +103,13 @@ public class SocketManager {
         String appKey = CommonUtils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
         if (appId == null || TextUtils.isEmpty(appKey)) {
             LogUtils.e(context, "INNOTECH_APP_ID或INNOTECH_APP_KEY配置有误");
+            new ClientLog(context, LogCode.LOG_INIT, "INNOTECH_APP_ID或INNOTECH_APP_KEY配置有误").save();
             return;
         }
         String guid = TokenUtils.getGuid(context);
         if (TextUtils.isEmpty(guid)) {
             LogUtils.e(context, "guid不能为空");
+            new ClientLog(context, LogCode.LOG_INIT, "guid不能为空").save();
             return;
         }
         JSONObject object = new JSONObject();
@@ -123,11 +130,13 @@ public class SocketManager {
             final String appKey = CommonUtils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
             if (appId == null || TextUtils.isEmpty(appKey)) {
                 LogUtils.e(context, "INNOTECH_APP_ID或INNOTECH_APP_KEY配置有误");
+                new ClientLog(context, LogCode.LOG_INIT, "INNOTECH_APP_ID或INNOTECH_APP_KEY配置有误").save();
                 return;
             }
             final String guid = TokenUtils.getGuid(context);
             if (TextUtils.isEmpty(guid)) {
                 LogUtils.e(context, "guid不能为空");
+                new ClientLog(context, LogCode.LOG_INIT, "guid不能为空").save();
                 return;
             }
             thread = new Thread(new Runnable() {
@@ -136,6 +145,7 @@ public class SocketManager {
                     try {
                         mSocket = new Socket(host, port);
                         LogUtils.e(context, "与服务器(" + host + ":" + port + ")连接成功");
+                        new ClientLog(context, LogCode.LOG_INIT, "与服务器(" + host + ":" + port + ")连接成功").save();
                         if (isConnecting()) {
                             //登录
                             loginCmd(guid, appId, appKey);
@@ -187,6 +197,7 @@ public class SocketManager {
             switch (command) {
                 case 1://登录成功（LoginRespCmd）
                     LogUtils.e(context, "登录成功");
+                    new ClientLog(context, LogCode.LOG_INIT, "登录成功").save();
                     try {
                         String jsonA = getJsonByData(is, len);
                         if (!TextUtils.isEmpty(jsonA) && !"null".equals(jsonA)) {
@@ -217,6 +228,7 @@ public class SocketManager {
                     break;
                 case 4://服务器推送消息（ForwardCmd）
                     LogUtils.e(context, "收到服务器推送消息");
+                    new ClientLog(context, LogCode.LOG_DATA_COMMON, "收到服务器推送消息").save();
                     //处理推送消息
                     String jsonO = getJsonByData(is, len);
                     if (!TextUtils.isEmpty(jsonO) && !"null".equals(jsonO)) {
@@ -283,8 +295,10 @@ public class SocketManager {
                         }
                         SocketManager.getInstance(context).initSocket();
                         LogUtils.e(context, "正在重连...");
+                        new ClientLog(context, LogCode.LOG_DATA_COMMON, "正在重连...").save();
                     } catch (IOException e) {
                         LogUtils.e(context, "socket close异常...");
+                        new ClientLog(context, LogCode.LOG_EX_IO, "socket close异常...").save();
                         e.printStackTrace();
                     }
                 }
@@ -303,9 +317,11 @@ public class SocketManager {
             object.put("app_key", appKey);
             sendData(object.toString(), 0);
             LogUtils.e(context, "发送登录指令：" + object.toString());
+            new ClientLog(context, LogCode.LOG_DATA_COMMON, "发送登录指令：" + object.toString()).save();
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.e(context, "发送登录指令时，出现异常。");
+            new ClientLog(context, LogCode.LOG_EX_JSON, "发送登录指令时，出现异常。").save();
         }
     }
 
@@ -315,6 +331,7 @@ public class SocketManager {
     public void sendHeartData() {
         sendData("", 9);
         LogUtils.e(context, "发送心跳指令");
+        new ClientLog(context, LogCode.LOG_DATA_COMMON, "发送心跳指令").save();
     }
 
     /**
@@ -333,9 +350,15 @@ public class SocketManager {
             object.put("type", type);
             sendData(object.toString(), 6);
             LogUtils.e(context, "发送ack指令：" + object.toString());
+            //客户端回执
+            JSONArray paramArray = new JSONArray();
+            paramArray.put(object);
+            InnotechPushMethod.clientMsgNotify(context, paramArray, 0);
+            new ClientLog(context, LogCode.LOG_DATA_COMMON, "发送ack指令：" + object.toString()).save();
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.e(context, "发送ack指令时，出现异常。");
+            new ClientLog(context, LogCode.LOG_EX_JSON, "发送ack指令时，出现异常。").save();
         }
     }
 
@@ -349,6 +372,7 @@ public class SocketManager {
     public void sendData(final String json, final int cmd, final SocketSendCallback callback) {
         if (isConnecting()) {
             LogUtils.e(context, "socket状态为：连接中...");
+            new ClientLog(context, LogCode.LOG_DATA_COMMON, "socket状态为：连接中...").save();
             sendRunnable = new Runnable() {
                 @Override
                 public void run() {
@@ -376,6 +400,7 @@ public class SocketManager {
                             reConnect();
                         }
                         e.printStackTrace();
+                        new ClientLog(context, LogCode.LOG_EX_IO, "socket发送信息失败...").save();
                     }
                 }
             };
@@ -388,6 +413,7 @@ public class SocketManager {
             } else {
                 reConnect();
             }
+            new ClientLog(context, LogCode.LOG_DATA_COMMON, "socket状态为：已断开连接...").save();
         }
     }
 

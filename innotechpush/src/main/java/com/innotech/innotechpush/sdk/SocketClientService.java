@@ -7,7 +7,14 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.innotech.innotechpush.InnotechPushMethod;
+import com.innotech.innotechpush.callback.RequestCallback;
+import com.innotech.innotechpush.db.ClientLog;
 import com.innotech.innotechpush.utils.AlarmManagerUtils;
+
+import org.json.JSONArray;
+
+import java.util.List;
 
 public class SocketClientService extends Service {
 
@@ -19,6 +26,30 @@ public class SocketClientService extends Service {
         super.onCreate();
         Log.e(TAG, "socket服务开始启动");
         SocketManager.getInstance(this.getApplicationContext()).initSocket();
+        //上报日志
+        final List<ClientLog> logs = ClientLog.listAll(ClientLog.class);
+        String guid = "";
+        String imei = "";
+        JSONArray array = new JSONArray();
+        for (ClientLog log : logs) {
+            array.put(log.getLogStr());
+            guid = log.getGuid();
+            imei = log.getImei();
+        }
+        InnotechPushMethod.clientlog(this.getApplicationContext(), array.toString(), guid, imei, new RequestCallback() {
+
+            @Override
+            public void onSuccess(String msg) {
+                for (ClientLog log : logs) {
+                    log.delete();
+                }
+            }
+
+            @Override
+            public void onFail(String msg) {
+
+            }
+        });
     }
 
     @Nullable

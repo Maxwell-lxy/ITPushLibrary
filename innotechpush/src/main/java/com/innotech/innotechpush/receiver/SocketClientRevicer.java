@@ -6,6 +6,8 @@ import android.text.TextUtils;
 import com.coloros.mcssdk.PushManager;
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.bean.InnotechMessage;
+import com.innotech.innotechpush.config.LogCode;
+import com.innotech.innotechpush.db.ClientLog;
 import com.innotech.innotechpush.sdk.PushMessage;
 import com.innotech.innotechpush.sdk.PushMessageReceiver;
 import com.innotech.innotechpush.utils.LogUtils;
@@ -46,11 +48,13 @@ public class SocketClientRevicer extends PushMessageReceiver {
                                 }
                             } else {
                                 LogUtils.e(context, LogUtils.TAG_INNOTECH + " 该消息为重复消息，过滤掉，不做处理" + pushMessage.getTransmission());
+                                new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_INNOTECH + " 该消息为重复消息，过滤掉，不做处理" + pushMessage.getTransmission()).save();
                                 //触发一次消息池的清理
                                 SPUtils.clearPoor(context);
                             }
                         } else {
                             LogUtils.e(context, LogUtils.TAG_INNOTECH + " 该消息中没有包含idempotent字段，不做处理" + pushMessage.getTransmission());
+                            new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_INNOTECH + " 该消息中没有包含idempotent字段，不做处理" + pushMessage.getTransmission()).save();
                         }
                     } finally {
                         InnotechPushManager.getIdempotentLock().unlock();
@@ -58,6 +62,7 @@ public class SocketClientRevicer extends PushMessageReceiver {
                 }
             } catch (JSONException e) {
                 LogUtils.e(context, LogUtils.TAG_INNOTECH + " dealWithCustomMessage方法中json转换失败");
+                new ClientLog(context, LogCode.LOG_EX_JSON, LogUtils.TAG_INNOTECH + " dealWithCustomMessage方法中json转换失败").save();
             }
         }
     }
