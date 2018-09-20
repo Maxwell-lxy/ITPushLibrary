@@ -7,6 +7,7 @@ import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.R;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.bean.UserInfoModel;
+import com.innotech.innotechpush.sdk.MiSDK;
 import com.innotech.innotechpush.utils.BroadcastUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.xiaomi.mipush.sdk.ErrorCode;
@@ -77,6 +78,12 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
                 log = context.getString(R.string.register_success);
             } else {
                 log = context.getString(R.string.register_fail);
+                try {
+                    Thread.sleep(1000);
+                    new MiSDK(context);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             log = miPushCommandMessage.getReason();

@@ -20,16 +20,16 @@ import java.util.List;
 
 public class MiSDK {
 
-    public MiSDK(Application application) {
+    public MiSDK(Context context) {
         // 注册push服务，注册成功后会向DemoMessageReceiver发送广播
         // 可以从DemoMessageReceiver的onCommandResult方法中MiPushCommandMessage对象参数中获取注册信息
-        LogUtils.e(application.getApplicationContext(), LogUtils.TAG_XIAOMI + "call MiSDK()");
-        if (shouldInit(application)) {
+        LogUtils.e(context, LogUtils.TAG_XIAOMI + "call MiSDK()");
+        if (shouldInit(context)) {
 
-            String appId = Utils.getMetaDataString(application, "MI_APP_ID").replace("innotech-", "");
-            String appKey = Utils.getMetaDataString(application, "MI_APP_KEY").replace("innotech-", "");
-            MiPushClient.registerPush(application, appId, appKey);
-            LogUtils.e(application.getApplicationContext(), LogUtils.TAG_XIAOMI + "MiPushClient.registerPush appId:" + appId + " appKey:" + appKey);
+            String appId = Utils.getMetaDataString(context, "MI_APP_ID").replace("innotech-", "");
+            String appKey = Utils.getMetaDataString(context, "MI_APP_KEY").replace("innotech-", "");
+            MiPushClient.registerPush(context, appId, appKey);
+            LogUtils.e(context, LogUtils.TAG_XIAOMI + "MiPushClient.registerPush appId:" + appId + " appKey:" + appKey);
         }
         LoggerInterface newLogger = new LoggerInterface() {
 
@@ -48,14 +48,14 @@ public class MiSDK {
                 Log.d(LogUtils.TAG_XIAOMI, content);
             }
         };
-        Logger.setLogger(application, newLogger);
+        Logger.setLogger(context, newLogger);
 
     }
 
-    private boolean shouldInit(Application application) {
-        ActivityManager am = ((ActivityManager) application.getSystemService(Context.ACTIVITY_SERVICE));
+    private boolean shouldInit(Context context) {
+        ActivityManager am = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE));
         List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
-        String mainProcessName = application.getPackageName();
+        String mainProcessName = context.getPackageName();
         int myPid = Process.myPid();
         for (ActivityManager.RunningAppProcessInfo info : processInfos) {
             if (info.pid == myPid && mainProcessName.equals(info.processName)) {
