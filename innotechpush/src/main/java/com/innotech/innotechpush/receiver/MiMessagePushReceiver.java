@@ -79,7 +79,7 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
             } else {
                 log = context.getString(R.string.register_fail);
                 try {
-                    Thread.sleep(1000);
+                    Thread.sleep(5500);
                     new MiSDK(context);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
