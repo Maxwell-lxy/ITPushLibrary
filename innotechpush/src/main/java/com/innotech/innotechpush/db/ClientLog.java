@@ -2,6 +2,7 @@ package com.innotech.innotechpush.db;
 
 import android.content.Context;
 
+import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.utils.TokenUtils;
 import com.innotech.innotechpush.utils.Utils;
@@ -30,7 +31,9 @@ public class ClientLog extends SugarRecord {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        this.imei = Utils.getIMEI(context);
+        if (UserInfoModel.getInstance().getDevice_info() != null) {
+            this.imei = UserInfoModel.getInstance().getDevice_info().getImei();
+        }
         this.appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
     }
 

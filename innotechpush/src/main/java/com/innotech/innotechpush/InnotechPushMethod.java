@@ -170,7 +170,7 @@ public class InnotechPushMethod {
     /**
      * 客户端API - 客户端日志接口
      */
-    public static void clientlog(final Context context, String log,String guid,String imei, final RequestCallback callback) {
+    public synchronized static void clientlog(final Context context, String log, String guid, String imei, final RequestCallback callback) {
         try {
             int appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
             JSONObject paramsObj = new JSONObject();

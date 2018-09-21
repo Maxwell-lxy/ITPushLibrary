@@ -139,8 +139,6 @@ public class InnotechPushManager {
 
     public static void innotechPushReciverIsNull(Context context) {
         LogUtils.e(context, "InnotechPushReciver is null!");
-        ClientLog log = new ClientLog(context, LogCode.LOG_INIT, "InnotechPushReciver is null!");
-        log.save();
     }
 
     private void huaWeiConnect(final Activity activity) {
