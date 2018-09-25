@@ -66,7 +66,7 @@ public class InnotechPushManager {
      */
     public void setLauncherActivity(Activity activity) {
         if (Utils.isHuaweiDevice()) {
-//            huaWeiConnect(activity);
+            huaWeiConnect(activity);
         }
     }
 
@@ -90,15 +90,11 @@ public class InnotechPushManager {
             String appKey = Utils.getMetaDataString(application, "MEIZU_APP_KEY");
             LogUtils.e(application.getApplicationContext(), LogUtils.TAG_MEIZU + "Meizu  PushManager.register");
             PushManager.register(application, appId, appKey);
-            ClientLog log = new ClientLog(application.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_MEIZU + "Meizu  PushManager.register");
-            log.save();
         }
         //华为设备时，开启华为推送
         else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {
             LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + " HMSAgent.init");
             HMSAgent.init(application);
-            ClientLog log = new ClientLog(application.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_HUAWEI + " HMSAgent.init");
-            log.save();
         }
         //oppo设备时，开启oppo推送
 //        else if (com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext()) && Utils.isOPPO()) {
@@ -125,8 +121,6 @@ public class InnotechPushManager {
         com.igexin.sdk.PushManager.getInstance().initialize(application.getApplicationContext(), PushService.class);
         // com.getui.demo.DemoIntentService 为第三⽅方⾃自定义的推送服务事件接收类
         com.igexin.sdk.PushManager.getInstance().registerPushIntentService(application.getApplicationContext(), PushIntentService.class);
-        ClientLog log = new ClientLog(application.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_GETUI + "call initGeTuiPush()");
-        log.save();
     }
 
     public void setPushRevicer(PushReciver mPushReciver) {
@@ -148,21 +142,12 @@ public class InnotechPushManager {
                 LogUtils.e(activity.getApplicationContext(), LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
                 ClientLog log = new ClientLog(application.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
                 log.save();
-                getToken();
-            }
-        });
-    }
-
-    /**
-     * 获取token
-     */
-    public void getToken() {
-        HMSAgent.Push.getToken(new GetTokenHandler() {
-            @Override
-            public void onResult(int rtnCode) {
-                LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + "get token: end" + rtnCode);
-                ClientLog log = new ClientLog(application.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_HUAWEI + "get token: end" + rtnCode);
-                log.save();
+                HMSAgent.Push.getToken(new GetTokenHandler() {
+                    @Override
+                    public void onResult(int rtnCode) {
+                        LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + "get token: end" + rtnCode);
+                    }
+                });
             }
         });
     }

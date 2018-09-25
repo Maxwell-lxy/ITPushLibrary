@@ -22,14 +22,9 @@ public class PushConstant {
     public static final String INNOTECH_APP_KEY = "INNOTECH_APP_KEY";
 
     /**
-     * 推送日志内容
-     */
-    public static final String LOG_FILE = "inno_logs";
-
-    /**
      * 推送版本号
      */
-    public static final String INNOTECH_PUSH_VERSION = "1.4.8";
+    public static final String INNOTECH_PUSH_VERSION = "1.5.1";
 
     /**
      * 默认开启华为

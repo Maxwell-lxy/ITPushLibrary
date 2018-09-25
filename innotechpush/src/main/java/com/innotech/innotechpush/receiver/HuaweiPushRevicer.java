@@ -57,7 +57,6 @@ public class HuaweiPushRevicer extends PushReceiver {
             int notifyId = extras.getInt(BOUND_KEY.pushNotifyId, 0);
             LogUtils.e(context, LogUtils.TAG_HUAWEI + "收到通知栏消息点击事件,notifyId:" + notifyId);
             LogUtils.e(context, LogUtils.TAG_HUAWEI + " extras:" + extras);
-            new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_HUAWEI + "收到通知栏消息点击事件,notifyId:" + notifyId + " extras:" + extras).save();
             if (0 != notifyId) {
                 NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
                 manager.cancel(notifyId);

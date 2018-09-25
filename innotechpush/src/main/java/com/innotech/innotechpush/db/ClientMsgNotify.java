@@ -8,6 +8,7 @@ public class ClientMsgNotify extends SugarRecord {
     public ClientMsgNotify() {
     }
 
+
     public ClientMsgNotify(String notifyData) {
         this.notifyData = notifyData;
     }

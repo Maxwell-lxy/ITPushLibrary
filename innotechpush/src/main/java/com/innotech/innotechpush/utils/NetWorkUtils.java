@@ -34,7 +34,7 @@ public class NetWorkUtils {
     public static final String PATH_CLIENT_LOG = "/v1/pushaksk/clientlog";
     private static int CONNECT_TIMEOUT = 5000;
 
-    public static void sendPostRequest(final Context context, final String urlStr, final String paramsStr, final String sign, final RequestCallback mCallBack) {
+    public synchronized static void sendPostRequest(final Context context, final String urlStr, final String paramsStr, final String sign, final RequestCallback mCallBack) {
         //开启线程来发起网络请求
         new Thread(new Runnable() {
             @Override

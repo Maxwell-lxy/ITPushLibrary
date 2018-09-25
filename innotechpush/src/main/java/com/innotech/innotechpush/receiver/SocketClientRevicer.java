@@ -48,13 +48,11 @@ public class SocketClientRevicer extends PushMessageReceiver {
                                 }
                             } else {
                                 LogUtils.e(context, LogUtils.TAG_INNOTECH + " 该消息为重复消息，过滤掉，不做处理" + pushMessage.getTransmission());
-                                new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_INNOTECH + " 该消息为重复消息，过滤掉，不做处理" + pushMessage.getTransmission()).save();
                                 //触发一次消息池的清理
                                 SPUtils.clearPoor(context);
                             }
                         } else {
                             LogUtils.e(context, LogUtils.TAG_INNOTECH + " 该消息中没有包含idempotent字段，不做处理" + pushMessage.getTransmission());
-                            new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_INNOTECH + " 该消息中没有包含idempotent字段，不做处理" + pushMessage.getTransmission()).save();
                         }
                     } finally {
                         InnotechPushManager.getIdempotentLock().unlock();

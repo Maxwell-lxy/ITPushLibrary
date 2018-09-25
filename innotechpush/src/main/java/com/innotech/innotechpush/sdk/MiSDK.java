@@ -25,7 +25,6 @@ public class MiSDK {
         // 注册push服务，注册成功后会向DemoMessageReceiver发送广播
         // 可以从DemoMessageReceiver的onCommandResult方法中MiPushCommandMessage对象参数中获取注册信息
         LogUtils.e(context, LogUtils.TAG_XIAOMI + "call MiSDK()");
-        new ClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_XIAOMI + "call MiSDK()").save();
         if (shouldInit(context)) {
 
             String appId = Utils.getMetaDataString(context, "MI_APP_ID").replace("innotech-", "");

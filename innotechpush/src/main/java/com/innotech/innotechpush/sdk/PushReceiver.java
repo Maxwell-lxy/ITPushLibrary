@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 
+import com.innotech.innotechpush.InnotechPushMethod;
 import com.innotech.innotechpush.config.BroadcastConstant;
 import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
@@ -33,7 +34,6 @@ public class PushReceiver extends BroadcastReceiver {
         } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
             int netWorkState = NetUtil.getNetWorkState(context);
             LogUtils.e(context, "netWorkState：" + netWorkState);
-            new ClientLog(context, LogCode.LOG_DATA_COMMON, "netWorkState：" + netWorkState).save();
             if (netWorkState != -1) {
                 SocketManager.getInstance(context).reConnect();
             }
@@ -44,6 +44,10 @@ public class PushReceiver extends BroadcastReceiver {
             }
             //发送心跳包
             SocketManager.getInstance(context).sendHeartData();
+            //上传本地回执
+            InnotechPushMethod.uploadClientMsgNotify(context);
+            //上报日志
+            InnotechPushMethod.uploadLogs(context);
             //定时检查service存活，发送长连接心跳包
             AlarmManagerUtils.setHeartAlarm(context);
         } else if (BroadcastConstant.MESSAGE_CLICK.equals(action)) {
@@ -58,7 +62,7 @@ public class PushReceiver extends BroadcastReceiver {
                 } else {
                     SocketManager.getInstance(context).ackCmd(list, 3);
                 }
-                new ClientLog(context, LogCode.LOG_DATA_NOTIFY, "通知被点击：" + message.toString()).save();
+                new ClientLog(context, LogCode.LOG_DATA_NOTIFY, "通知被点击：" + message.getMsg_id()).save();
             }
         } else if (BroadcastConstant.RECEIVE_MESSAGE.equals(action)) {
             //目前的逻辑
@@ -77,7 +81,7 @@ public class PushReceiver extends BroadcastReceiver {
                 } else {
                     SocketManager.getInstance(context).ackCmd(list, 2);
                 }
-                new ClientLog(context, LogCode.LOG_DATA_NOTIFY, "显示通知：" + message.toString()).save();
+                new ClientLog(context, LogCode.LOG_DATA_NOTIFY, "显示通知：" + message.getMsg_id()).save();
             }
         }
     }

@@ -10,6 +10,8 @@ import com.innotech.innotechpush.callback.RequestCallback;
 import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.db.ClientLog;
+import com.innotech.innotechpush.db.ClientMsgNotify;
+import com.innotech.innotechpush.sdk.SocketClientService;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NetWorkUtils;
 import com.innotech.innotechpush.utils.SignUtils;
@@ -23,6 +25,8 @@ import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 提供
@@ -90,10 +94,10 @@ public class InnotechPushMethod {
         try {
             Integer appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
             aliasObj.put("app_id", appId);
-            String guid = UserInfoSPUtils.getString(context, UserInfoSPUtils.KEY_GUID, "default");
+            String guid = TokenUtils.getGuid(context);
             aliasObj.put("guid", guid);
             aliasObj.put("alias", alias);
-            if (guid.equals("default")) {
+            if (TextUtils.isEmpty(guid)) {
                 if (callback != null) {
                     callback.onFail("guid is default.Please reobtain the valid guid!");
                     return;
@@ -130,10 +134,10 @@ public class InnotechPushMethod {
             object.put("id_types", array);
             object.put("guid", guid);
             object.put("try_time", tryTime);
-            object.put("imei", imei);
+            object.put("imei", imei == null ? "" : imei);
             object.put("open_id", openId);
             object.put("app_id", appId);
-            JSONObject paramsObj = new JSONObject();
+            final JSONObject paramsObj = new JSONObject();
             paramsObj.put("notify_data", object);
             String params = paramsObj.toString();
             String sign = SignUtils.sign("POST", NetWorkUtils.PATH_CLIENT_MSG_NOTIFY, params);
@@ -141,29 +145,116 @@ public class InnotechPushMethod {
                 @Override
                 public void onSuccess(String msg) {
                     LogUtils.e(context, "客户端消息回执成功");
-                    ClientLog log = new ClientLog(context, LogCode.LOG_DATA_API, "客户端消息回执成功");
-                    log.save();
                 }
 
                 @Override
                 public void onFail(String msg) {
                     if (tryTime < 3) {
                         LogUtils.e(context, "客户端消息回执尝试再次请求");
-                        ClientLog log = new ClientLog(context, LogCode.LOG_DATA_API, "客户端消息回执尝试再次请求");
-                        log.save();
                         clientMsgNotify(context, array, tryTime + 1);
                     } else {
                         LogUtils.e(context, "客户端消息回执失败");
-                        //todo 写入本地数据库
-
-                        ClientLog log = new ClientLog(context, LogCode.LOG_DATA_API, "客户端消息回执失败");
-                        log.save();
+                        //写入本地数据库
+                        new ClientMsgNotify(paramsObj.toString()).save();
                     }
                 }
             });
         } catch (JSONException e) {
             LogUtils.e(context, "客户端消息回执参数转换json出错！");
             new ClientLog(context, LogCode.LOG_EX_JSON, "客户端消息回执参数转换json出错").save();
+        }
+    }
+
+    /**
+     * 上报回执
+     *
+     * @param context
+     */
+    public synchronized static void uploadClientMsgNotify(final Context context) {
+        try {
+            final List<ClientMsgNotify> notifies = ClientMsgNotify.find(ClientMsgNotify.class, null, null, null, "ID", "10");
+            JSONArray msgIdsArrayForType1 = new JSONArray();
+            JSONArray msgIdsArrayForType2 = new JSONArray();
+            JSONArray msgIdsArrayForType3 = new JSONArray();
+            String guid = "";
+            String imei = "";
+            String openId = "";
+            int appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
+            if (notifies != null && notifies.size() > 0) {
+                for (ClientMsgNotify notify : notifies) {
+                    if (!TextUtils.isEmpty(notify.getNotifyData())) {
+                        JSONObject notifyData = new JSONObject(notify.getNotifyData());
+                        JSONObject notifyObj = notifyData.getJSONObject("notify_data");
+                        guid = notifyObj.getString("guid");
+                        imei = notifyObj.getString("imei");
+                        openId = notifyObj.getString("open_id");
+                        JSONArray idTypeArray = notifyObj.getJSONArray("id_types");
+                        for (int i = 0; i < idTypeArray.length(); i++) {
+                            JSONObject obj = idTypeArray.getJSONObject(i);
+                            int type = obj.getInt("type");
+                            JSONArray msgIdsArray = obj.getJSONArray("msg_ids");
+                            switch (type) {
+                                case 1:
+                                    for (int j = 0; j < msgIdsArray.length(); j++) {
+                                        msgIdsArrayForType1.put(msgIdsArray.getString(j));
+                                    }
+                                    break;
+                                case 2:
+                                    for (int j = 0; j < msgIdsArray.length(); j++) {
+                                        msgIdsArrayForType2.put(msgIdsArray.getString(j));
+                                    }
+                                    break;
+                                case 3:
+                                    for (int j = 0; j < msgIdsArray.length(); j++) {
+                                        msgIdsArrayForType3.put(msgIdsArray.getString(j));
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                JSONObject idTypesObj1 = new JSONObject();
+                idTypesObj1.put("msg_ids", msgIdsArrayForType1);
+                idTypesObj1.put("type", 1);
+                JSONObject idTypesObj2 = new JSONObject();
+                idTypesObj2.put("msg_ids", msgIdsArrayForType2);
+                idTypesObj2.put("type", 2);
+                JSONObject idTypesObj3 = new JSONObject();
+                idTypesObj3.put("msg_ids", msgIdsArrayForType3);
+                idTypesObj3.put("type", 3);
+                JSONArray idTypesArray = new JSONArray();
+                idTypesArray.put(idTypesObj1);
+                idTypesArray.put(idTypesObj2);
+                idTypesArray.put(idTypesObj3);
+                JSONObject object = new JSONObject();
+                object.put("id_types", idTypesArray);
+                object.put("guid", guid);
+                object.put("try_time", 3);
+                object.put("imei", imei);
+                object.put("open_id", openId);
+                object.put("app_id", appId);
+                final JSONObject paramsObj = new JSONObject();
+                paramsObj.put("notify_data", object);
+                String params = paramsObj.toString();
+                String sign = SignUtils.sign("POST", NetWorkUtils.PATH_CLIENT_MSG_NOTIFY, params);
+                NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_CLIENT_MSG_NOTIFY, params, sign, new RequestCallback() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        LogUtils.e(context, "客户端消息回执成功");
+                        for (ClientMsgNotify notify : notifies) {
+                            notify.delete();
+                        }
+                    }
+
+                    @Override
+                    public void onFail(String msg) {
+                        LogUtils.e(context, "客户端消息回执失败");
+                    }
+                });
+            }
+        } catch (JSONException e) {
+            LogUtils.e(context, "客户端消息回执参数转换json出错！" + e.getMessage());
         }
     }
 
@@ -195,8 +286,46 @@ public class InnotechPushMethod {
             });
         } catch (JSONException e) {
             LogUtils.e(context, "客户端日志失败");
-            new ClientLog(context, LogCode.LOG_EX_JSON, "客户端日志失败").save();
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * 上报日志
+     * 启动service和心跳时进行上报
+     *
+     * @param context
+     */
+    public synchronized static void uploadLogs(final Context context) {
+        try {
+            final List<ClientLog> logs = ClientLog.find(ClientLog.class, null, null, null, "ID", "20");
+            String guid = "";
+            String imei = "";
+            JSONArray array = new JSONArray();
+            LogUtils.e(context, "logs的长度" + logs.size());
+            if (logs != null && logs.size() > 0) {
+                for (ClientLog log : logs) {
+                    array.put(log.getLogStr());
+                    guid = log.getGuid();
+                    imei = log.getImei();
+                }
+                InnotechPushMethod.clientlog(context, array.toString(), guid, imei, new RequestCallback() {
+
+                    @Override
+                    public void onSuccess(String msg) {
+                        for (ClientLog log : logs) {
+                            log.delete();
+                        }
+                    }
+
+                    @Override
+                    public void onFail(String msg) {
+                        LogUtils.e(context, "日志上报失败");
+                    }
+                });
+            }
+        } catch (Exception e) {
+            LogUtils.e(context, "日志上报报错");
         }
     }
 
@@ -220,7 +349,6 @@ public class InnotechPushMethod {
             Object object = checkInfo.invoke(clazz.newInstance(), context);
             tk = (String) object;
             LogUtils.e(context, "反作弊的TK值：" + tk);
-            new ClientLog(context, LogCode.LOG_DATA_COMMON, "反作弊的TK值：" + tk).save();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {

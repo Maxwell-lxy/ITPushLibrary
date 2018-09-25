@@ -12,4 +12,5 @@ public class LogCode {
     //异常
     public static final int LOG_EX_JSON = 401;
     public static final int LOG_EX_IO = 402;
+    public static final int LOG_EX_SOCKET = 403;
 }

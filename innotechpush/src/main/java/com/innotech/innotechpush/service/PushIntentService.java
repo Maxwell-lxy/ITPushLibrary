@@ -52,7 +52,6 @@ public class PushIntentService extends GTIntentService {
             String data = new String(payload);
 
             LogUtils.e(context, "GeTui onReceiveMessageData() data:" + data + "  gtTransmitMessage.getPayloadId():" + gtTransmitMessage.getPayloadId());
-            new ClientLog(context, LogCode.LOG_DATA_NOTIFY, "GeTui onReceiveMessageData() data:" + data + "  gtTransmitMessage.getPayloadId():" + gtTransmitMessage.getPayloadId()).save();
             JSONObject object = new JSONObject(data);
             String idempotent = object.getString("idempotent");
             InnotechPushManager.getIdempotentLock().lock();
@@ -66,20 +65,18 @@ public class PushIntentService extends GTIntentService {
                         SPUtils.put(context, idempotent, System.currentTimeMillis());
                     } else {
                         LogUtils.e(context, LogUtils.TAG_GETUI + " 该消息为重复消息，过滤掉，不做处理" + data);
-                        new ClientLog(context, LogCode.LOG_DATA_COMMON, LogUtils.TAG_GETUI + " 该消息中没有包含idempotent字段，不做处理" + data).save();
                         //触发一次消息池的清理
                         SPUtils.clearPoor(context);
                     }
                 } else {
                     LogUtils.e(context, LogUtils.TAG_GETUI + " 该消息中没有包含idempotent字段，不做处理" + data);
-                    new ClientLog(context, LogCode.LOG_DATA_COMMON, LogUtils.TAG_GETUI + " 该消息中没有包含idempotent字段，不做处理" + data).save();
                 }
             } finally {
                 InnotechPushManager.getIdempotentLock().unlock();
             }
         } catch (JSONException e) {
             LogUtils.e(context, LogUtils.TAG_GETUI + " dealWithCustomMessage方法中json转换失败");
-            new ClientLog(context, LogCode.LOG_EX_JSON, LogUtils.TAG_GETUI + " dealWithCustomMessage方法中json转换失败").save();
+            new ClientLog(context, LogCode.LOG_EX_JSON, LogUtils.TAG_GETUI + " dealWithCustomMessage方法中json转换失败" + e.getMessage()).save();
         }
         if (InnotechPushManager.getPushReciver() != null) {
             InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context, createMessageByJson(gtTransmitMessage));
@@ -108,7 +105,6 @@ public class PushIntentService extends GTIntentService {
         } else {
             InnotechPushManager.innotechPushReciverIsNull(context);
         }
-        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_GETUI + "onNotificationMessageArrived() -> ").save();
     }
 
     @Override
@@ -119,7 +115,6 @@ public class PushIntentService extends GTIntentService {
         } else {
             InnotechPushManager.innotechPushReciverIsNull(context);
         }
-        new ClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_GETUI + "onNotificationMessageClicked() -> ").save();
     }
 
     private InnotechMessage getCreateMessge(GTNotificationMessage gtNotificationMessage) {
