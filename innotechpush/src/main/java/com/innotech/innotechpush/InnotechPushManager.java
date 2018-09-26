@@ -140,7 +140,7 @@ public class InnotechPushManager {
             @Override
             public void onConnect(int rst) {
                 LogUtils.e(activity.getApplicationContext(), LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
-                ClientLog log = new ClientLog(application.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
+                ClientLog log = new ClientLog(activity.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
                 log.save();
                 HMSAgent.Push.getToken(new GetTokenHandler() {
                     @Override
@@ -185,4 +185,8 @@ public class InnotechPushManager {
         return null;
     }
 
+    //
+    public void terminate() {
+        SugarContext.terminate();
+    }
 }

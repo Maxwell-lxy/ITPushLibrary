@@ -24,7 +24,7 @@ public class PushConstant {
     /**
      * 推送版本号
      */
-    public static final String INNOTECH_PUSH_VERSION = "1.5.3";
+    public static final String INNOTECH_PUSH_VERSION = "1.5.4";
 
     /**
      * 默认开启华为

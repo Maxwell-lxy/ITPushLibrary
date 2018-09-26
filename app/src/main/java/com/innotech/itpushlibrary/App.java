@@ -44,4 +44,10 @@ public class App extends KeepApplication {
             }
         });
     }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        InnotechPushManager.getInstance().terminate();
+    }
 }

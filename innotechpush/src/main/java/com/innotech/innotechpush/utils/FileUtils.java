@@ -22,7 +22,7 @@ public class FileUtils {
             fos.write(bytes);//将byte数组写入文件
             fos.close();//关闭文件输出流
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(context, "写file_token异常");
         }
     }
 
@@ -38,7 +38,7 @@ public class FileUtils {
             //将byte数组转换成指定格式的字符串
             result = new String(buffer, "UTF-8");
         } catch (Exception e) {
-            e.printStackTrace();
+            LogUtils.e(context, "读取file_token文件异常");
         }
         return result;
     }
