@@ -123,9 +123,5 @@
     <orderEntry type="library" name="Gradle: __local_aars__:/Users/admin/ITPushLibrary/app/libs/innosdk.jar:unspecified@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: net.sf.kxml:kxml2:2.3.0@jar" level="project" />
     <orderEntry type="module" module-name="innotechpush" />
-    <orderEntry type="module" module-name="innotechpush" />
-    <orderEntry type="module" module-name="innotechpush" />
-    <orderEntry type="module" module-name="innotechpush" />
-    <orderEntry type="module" module-name="innotechpush" />
   </component>
 </module>

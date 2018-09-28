@@ -26,6 +26,7 @@ public class ClientLog extends SugarRecord {
             JSONObject object = new JSONObject();
             object.put("code", code);
             object.put("message", logStr);
+            object.put("time",System.currentTimeMillis());
             this.logStr = object.toString();
             this.guid = TokenUtils.getGuid(context);
         } catch (JSONException e) {

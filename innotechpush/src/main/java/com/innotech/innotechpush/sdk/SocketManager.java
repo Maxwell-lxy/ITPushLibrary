@@ -2,6 +2,7 @@ package com.innotech.innotechpush.sdk;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.innotech.innotechpush.InnotechPushMethod;
 import com.innotech.innotechpush.callback.RequestCallback;
@@ -9,6 +10,7 @@ import com.innotech.innotechpush.callback.SocketSendCallback;
 import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.db.ClientLog;
+import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.DataAnalysis;
 import com.innotech.innotechpush.utils.LogUtils;
@@ -80,13 +82,13 @@ public class SocketManager {
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-                        new ClientLog(context, LogCode.LOG_DATA_API, "获取长连接地址失败：" + msg).save();
+                        DbUtils.addClientLog(context, LogCode.LOG_DATA_API, "获取长连接地址失败：" + msg);
                     }
                 });
             } catch (JSONException e) {
                 e.printStackTrace();
                 LogUtils.e(context, "获取socket信息json参数有误");
-                new ClientLog(context, LogCode.LOG_EX_JSON, "获取socket信息json参数有误").save();
+                DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "获取socket信息json参数有误");
             }
         }
     }
@@ -104,7 +106,7 @@ public class SocketManager {
         String guid = TokenUtils.getGuid(context);
         if (TextUtils.isEmpty(guid)) {
             LogUtils.e(context, "guid不能为空");
-            new ClientLog(context, LogCode.LOG_INIT, "getSocketAddr方法，guid为空").save();
+            DbUtils.addClientLog(context, LogCode.LOG_INIT, "getSocketAddr方法，guid为空");
             return;
         }
         JSONObject object = new JSONObject();
@@ -130,7 +132,7 @@ public class SocketManager {
             final String guid = TokenUtils.getGuid(context);
             if (TextUtils.isEmpty(guid)) {
                 LogUtils.e(context, "guid不能为空");
-                new ClientLog(context, LogCode.LOG_INIT, "connectWithHostAndPort方法，guid为空").save();
+                DbUtils.addClientLog(context, LogCode.LOG_INIT, "connectWithHostAndPort方法，guid为空");
                 return;
             }
             thread = new Thread(new Runnable() {
@@ -153,7 +155,7 @@ public class SocketManager {
                         } catch (InterruptedException e1) {
                             e.printStackTrace();
                         }
-                        new ClientLog(context, LogCode.LOG_EX_SOCKET, "SocketException异常：" + e.getMessage()).save();
+                        DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "SocketException异常：" + e.getMessage());
                     } catch (UnknownHostException e) {
                         e.printStackTrace();
                         LogUtils.e(context, "UnknownHostException异常：" + e.getMessage());
@@ -163,7 +165,7 @@ public class SocketManager {
                         } catch (InterruptedException e1) {
                             e.printStackTrace();
                         }
-                        new ClientLog(context, LogCode.LOG_EX_SOCKET, "UnknownHostException异常：" + e.getMessage()).save();
+                        DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "UnknownHostException异常：" + e.getMessage());
                     } catch (IOException e) {
                         e.printStackTrace();
                         LogUtils.e(context, "IOException异常：" + e.getMessage());
@@ -173,7 +175,7 @@ public class SocketManager {
                         } catch (InterruptedException e1) {
                             e.printStackTrace();
                         }
-                        new ClientLog(context, LogCode.LOG_EX_SOCKET, "IOException异常：" + e.getMessage()).save();
+                        DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "IOException异常：" + e.getMessage());
                     }
                 }
             });
@@ -189,6 +191,9 @@ public class SocketManager {
         byte[] lenB = new byte[16];
         while (is.read(lenB) != -1) {
             int len = getLenByData(lenB);
+            LogUtils.e(context, "len：" + len);
+            long requestId = getRequestIDByData(lenB);
+            LogUtils.e(context, "requestId：" + requestId);
             int command = getCommandByData(lenB);
             switch (command) {
                 case 1://登录成功（LoginRespCmd）
@@ -238,7 +243,7 @@ public class SocketManager {
                             } else {
                                 ackCmd(list, 1);
                             }
-                            new ClientLog(context, LogCode.LOG_DATA_COMMON, "收到服务器推送消息：" + pushMessage.getMsg_id()).save();
+                            DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "收到服务器推送消息：" + pushMessage.getMsg_id());
                         }
                     }
                     break;
@@ -290,10 +295,10 @@ public class SocketManager {
                         }
                         SocketManager.getInstance(context).initSocket();
                         LogUtils.e(context, "正在重连...");
-                        new ClientLog(context, LogCode.LOG_DATA_COMMON, "正在重连...").save();
+                        DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "正在重连...");
                     } catch (IOException e) {
                         LogUtils.e(context, "socket close异常...");
-                        new ClientLog(context, LogCode.LOG_EX_IO, "socket close异常..." + e.getMessage()).save();
+                        DbUtils.addClientLog(context, LogCode.LOG_EX_IO, "socket close异常..." + e.getMessage());
                         e.printStackTrace();
                     }
                 }
@@ -315,7 +320,7 @@ public class SocketManager {
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.e(context, "发送登录指令时，出现异常。");
-            new ClientLog(context, LogCode.LOG_EX_JSON, "发送登录指令时，出现异常。" + guid + ";" + appID + ";" + appKey).save();
+            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "发送登录指令时，出现异常。" + guid + ";" + appID + ";" + appKey);
         }
     }
 
@@ -350,7 +355,7 @@ public class SocketManager {
         } catch (JSONException e) {
             e.printStackTrace();
             LogUtils.e(context, "发送ack指令时，出现异常。");
-            new ClientLog(context, LogCode.LOG_EX_JSON, "发送ack指令时，出现异常。" + msgList.toString()).save();
+            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "发送ack指令时，出现异常。" + msgList.toString());
         }
     }
 
@@ -372,6 +377,7 @@ public class SocketManager {
                         //4字节剩余包长度
                         byte[] len = CommonUtils.big_intToByte(!TextUtils.isEmpty(json) ? json.length() + 12 : 12, 4);
                         byte[] requestsID = getRequestID();
+                        LogUtils.e(context, "发送信息的requestsID：" + CommonUtils.longFrom8Bytes(requestsID, 0, false));
                         byte[] command = CommonUtils.big_intToByte(cmd, 4);
                         byte[] jsonb = json.getBytes();
                         byte[] data = new byte[len.length + requestsID.length + command.length + jsonb.length];
@@ -391,7 +397,7 @@ public class SocketManager {
                             reConnect();
                         }
                         e.printStackTrace();
-                        new ClientLog(context, LogCode.LOG_EX_IO, "socket发送信息失败..." + e.getMessage()).save();
+                        DbUtils.addClientLog(context, LogCode.LOG_EX_IO, "socket发送信息失败..." + e.getMessage());
                     }
                 }
             };
@@ -404,7 +410,7 @@ public class SocketManager {
             } else {
                 reConnect();
             }
-            new ClientLog(context, LogCode.LOG_DATA_COMMON, "socket状态为：已断开连接...").save();
+            DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "socket状态为：已断开连接...");
         }
     }
 
@@ -436,12 +442,12 @@ public class SocketManager {
      * 获取服务端回包的信息
      * 8字节requestID
      */
-    private byte[] getRequestIDByData(char[] data) {
+    private long getRequestIDByData(byte[] data) {
         byte[] bytes = new byte[8];
         for (int i = 0; i < 8; i++) {
-            bytes[i] = (byte) data[i + 4];
+            bytes[i] = data[i + 4];
         }
-        return bytes;
+        return CommonUtils.longFrom8Bytes(bytes, 0, false);
     }
 
     /**
@@ -462,17 +468,41 @@ public class SocketManager {
      * json数据
      */
     private String getJsonByData(InputStream is, int len) {
+        boolean isRead = true;
         String json = null;
         byte[] lenJ = new byte[len - 12];
+        LogUtils.e(context, "getJsonByData：" + lenJ.length);
         try {
-            if (is.read(lenJ) != -1) {
-                json = new String(lenJ);
-                LogUtils.e(context, "收到的数据：" + json);
+            while (isRead) {
+                int readLen = is.read(lenJ);
+                if (readLen == -1 || readLen == len - 12) {
+                    isRead = false;
+                }
             }
+            json = new String(lenJ);
+            printtest(json);
+//            if (is.read(lenJ) != -1) {
+//                json = new String(lenJ);
+//                LogUtils.e(context, "getJsonByData1：" + json.getBytes().length);
+////                LogUtils.e(context, "收到的数据：" + json);
+//                printtest(json);
+//            }
         } catch (IOException e) {
             e.printStackTrace();
         }
         return json;
+    }
+
+    private void printtest(String xml) {
+        if (xml.length() > 4000) {
+            for (int i = 0; i < xml.length(); i += 4000) {
+                if (i + 4000 < xml.length())
+                    Log.e("getJsonByData" + i, xml.substring(i, i + 4000));
+                else
+                    Log.e("getJsonByData" + i, xml.substring(i, xml.length()));
+            }
+        } else
+            Log.i("getJsonByData", xml);
     }
 
 }

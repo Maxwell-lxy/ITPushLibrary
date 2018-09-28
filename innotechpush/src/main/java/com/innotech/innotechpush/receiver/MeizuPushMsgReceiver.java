@@ -9,6 +9,7 @@ import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.db.ClientLog;
+import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.utils.BroadcastUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.meizu.cloud.pushsdk.MzPushMessageReceiver;
@@ -34,7 +35,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
         //调用 PushManager.register(context）方法后，会在此回调注册状态
         //应用在接受返回的 pushid
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegister pushid:" + pushid);
-        new ClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegister pushid:" + pushid).save();
+        DbUtils.addClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegister pushid:" + pushid);
     }
 
     /**
@@ -102,7 +103,7 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
             registerStatus) {
         //调用新版订阅 PushManager.register(context,appId,appKey)回调
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegisterStatus registerStatus:" + registerStatus);
-        new ClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegisterStatus registerStatus:" + registerStatus).save();
+        DbUtils.addClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegisterStatus registerStatus:" + registerStatus);
         if (registerStatus.getCode().equals(RegisterStatus.SUCCESS_CODE)) {
             UserInfoModel.getInstance().setDevice_token1(registerStatus.getPushId());
             BroadcastUtils.sendUpdateUserInfoBroadcast(context);

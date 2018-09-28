@@ -8,6 +8,7 @@ import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.db.ClientLog;
+import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.sdk.PushMessage;
 import com.innotech.innotechpush.sdk.PushMessageReceiver;
 import com.innotech.innotechpush.utils.LogUtils;
@@ -60,7 +61,7 @@ public class SocketClientRevicer extends PushMessageReceiver {
                 }
             } catch (JSONException e) {
                 LogUtils.e(context, LogUtils.TAG_INNOTECH + " dealWithCustomMessage方法中json转换失败");
-                new ClientLog(context, LogCode.LOG_EX_JSON, LogUtils.TAG_INNOTECH + " dealWithCustomMessage方法中json转换失败").save();
+                DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, LogUtils.TAG_INNOTECH + " dealWithCustomMessage方法中json转换失败");
             }
         }
     }

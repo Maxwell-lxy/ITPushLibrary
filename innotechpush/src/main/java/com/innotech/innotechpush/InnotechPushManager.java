@@ -1,26 +1,19 @@
 package com.innotech.innotechpush;
 
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 
-import com.huawei.android.hms.agent.HMSAgent;
-import com.huawei.android.hms.agent.common.handler.ConnectHandler;
-import com.huawei.android.hms.agent.push.handler.GetTokenHandler;
 import com.innotech.innotechpush.bean.UserInfoModel;
-import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
-import com.innotech.innotechpush.db.ClientLog;
 import com.innotech.innotechpush.receiver.PushReciver;
+import com.innotech.innotechpush.sdk.HuaweiSDK;
 import com.innotech.innotechpush.sdk.MiSDK;
 import com.innotech.innotechpush.sdk.SocketClientService;
-import com.innotech.innotechpush.service.OppoPushCallback;
 import com.innotech.innotechpush.service.PushIntentService;
 import com.innotech.innotechpush.service.PushService;
 import com.innotech.innotechpush.utils.LogUtils;
-import com.innotech.innotechpush.utils.SPUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.meizu.cloud.pushsdk.PushManager;
 import com.orm.SugarContext;
@@ -59,18 +52,6 @@ public class InnotechPushManager {
     }
 
     /**
-     * for HuaWei push SDK
-     * 要在activity中调用才能与华为建立连接
-     *
-     * @param activity
-     */
-    public void setLauncherActivity(Activity activity) {
-        if (Utils.isHuaweiDevice()) {
-            huaWeiConnect(activity);
-        }
-    }
-
-    /**
      * 初始化推送SDK
      *
      * @param application
@@ -93,8 +74,7 @@ public class InnotechPushManager {
         }
         //华为设备时，开启华为推送
         else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {
-            LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + " HMSAgent.init");
-            HMSAgent.init(application);
+            new HuaweiSDK(application);
         }
         //oppo设备时，开启oppo推送
 //        else if (com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext()) && Utils.isOPPO()) {
@@ -133,23 +113,6 @@ public class InnotechPushManager {
 
     public static void innotechPushReciverIsNull(Context context) {
         LogUtils.e(context, "InnotechPushReciver is null!");
-    }
-
-    private void huaWeiConnect(final Activity activity) {
-        HMSAgent.connect(activity, new ConnectHandler() {
-            @Override
-            public void onConnect(int rst) {
-                LogUtils.e(activity.getApplicationContext(), LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
-                ClientLog log = new ClientLog(activity.getApplicationContext(), LogCode.LOG_INIT, LogUtils.TAG_HUAWEI + "HMS connect end:" + rst);
-                log.save();
-                HMSAgent.Push.getToken(new GetTokenHandler() {
-                    @Override
-                    public void onResult(int rtnCode) {
-                        LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + "get token: end" + rtnCode);
-                    }
-                });
-            }
-        });
     }
 
     /**

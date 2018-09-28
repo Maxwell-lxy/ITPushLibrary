@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.db.ClientLog;
+import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.xiaomi.channel.commonutils.logger.LoggerInterface;
@@ -31,7 +32,7 @@ public class MiSDK {
             String appKey = Utils.getMetaDataString(context, "MI_APP_KEY").replace("innotech-", "");
             MiPushClient.registerPush(context, appId, appKey);
             LogUtils.e(context, LogUtils.TAG_XIAOMI + "MiPushClient.registerPush appId:" + appId + " appKey:" + appKey);
-            new ClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_XIAOMI + "MiPushClient.registerPush appId:" + appId + " appKey:" + appKey).save();
+            DbUtils.addClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_XIAOMI + "MiPushClient.registerPush appId:" + appId + " appKey:" + appKey);
         }
         LoggerInterface newLogger = new LoggerInterface() {
 
@@ -43,13 +44,13 @@ public class MiSDK {
             @Override
             public void log(String content, Throwable t) {
                 Log.d(LogUtils.TAG_XIAOMI, content, t);
-                new ClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_XIAOMI + content).save();
+                DbUtils.addClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_XIAOMI + content);
             }
 
             @Override
             public void log(String content) {
                 Log.d(LogUtils.TAG_XIAOMI, content);
-                new ClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_XIAOMI + content).save();
+                DbUtils.addClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_XIAOMI + content);
             }
         };
         Logger.setLogger(context, newLogger);

@@ -11,6 +11,8 @@ import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.db.ClientLog;
 import com.innotech.innotechpush.db.ClientMsgNotify;
+import com.innotech.innotechpush.db.DbUtils;
+import com.innotech.innotechpush.sdk.HuaweiSDK;
 import com.innotech.innotechpush.sdk.SocketClientService;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NetWorkUtils;
@@ -75,7 +77,7 @@ public class InnotechPushMethod {
             });
         } catch (JSONException e) {
             LogUtils.e(context, "app上传用户信息参数转换json出错！");
-            new ClientLog(context, LogCode.LOG_EX_JSON, "app上传用户信息参数转换json出错！").save();
+            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "app上传用户信息参数转换json出错！");
             if (mCallBack != null) {
                 mCallBack.onFail("app上传用户信息参数转换json出错！");
             }
@@ -114,7 +116,7 @@ public class InnotechPushMethod {
             NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_ALIAS, params, sign, callback);
         } catch (JSONException e) {
             LogUtils.e(context, "设置别名参数转换json出错！");
-            new ClientLog(context, LogCode.LOG_EX_JSON, "设置别名参数转换json出错！").save();
+            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "设置别名参数转换json出错！");
             if (callback != null) {
                 callback.onFail("设置别名参数转换json出错！");
             }
@@ -155,13 +157,13 @@ public class InnotechPushMethod {
                     } else {
                         LogUtils.e(context, "客户端消息回执失败");
                         //写入本地数据库
-                        new ClientMsgNotify(paramsObj.toString()).save();
+                        DbUtils.addClientMsgNotify(context, paramsObj.toString());
                     }
                 }
             });
         } catch (JSONException e) {
             LogUtils.e(context, "客户端消息回执参数转换json出错！");
-            new ClientLog(context, LogCode.LOG_EX_JSON, "客户端消息回执参数转换json出错").save();
+            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "客户端消息回执参数转换json出错");
         }
     }
 
@@ -255,6 +257,8 @@ public class InnotechPushMethod {
             }
         } catch (JSONException e) {
             LogUtils.e(context, "客户端消息回执参数转换json出错！" + e.getMessage());
+        } catch (Exception e) {
+            LogUtils.e(context, "客户端消息回执异常！" + e.getMessage());
         }
     }
 
@@ -285,6 +289,9 @@ public class InnotechPushMethod {
                 }
             });
         } catch (JSONException e) {
+            LogUtils.e(context, "客户端日志失败");
+            e.printStackTrace();
+        } catch (Exception e) {
             LogUtils.e(context, "客户端日志失败");
             e.printStackTrace();
         }
@@ -330,7 +337,9 @@ public class InnotechPushMethod {
     }
 
     public static void launcher(Activity activity) {
-        InnotechPushManager.getInstance().setLauncherActivity(activity);
+        if (Utils.isHuaweiDevice()) {
+            HuaweiSDK.huaWeiConnect(activity);
+        }
     }
 
     public static void setHandler(Handler handler) {

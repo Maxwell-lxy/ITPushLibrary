@@ -9,7 +9,7 @@ import com.innotech.innotechpush.InnotechPushMethod;
 import com.innotech.innotechpush.config.BroadcastConstant;
 import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
-import com.innotech.innotechpush.db.ClientLog;
+import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.utils.AlarmManagerUtils;
 import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.LogUtils;
@@ -62,7 +62,7 @@ public class PushReceiver extends BroadcastReceiver {
                 } else {
                     SocketManager.getInstance(context).ackCmd(list, 3);
                 }
-                new ClientLog(context, LogCode.LOG_DATA_NOTIFY, "通知被点击：" + message.getMsg_id()).save();
+                DbUtils.addClientLog(context, LogCode.LOG_DATA_NOTIFY, "通知被点击：" + message.getMsg_id());
             }
         } else if (BroadcastConstant.RECEIVE_MESSAGE.equals(action)) {
             //目前的逻辑
@@ -81,7 +81,7 @@ public class PushReceiver extends BroadcastReceiver {
                 } else {
                     SocketManager.getInstance(context).ackCmd(list, 2);
                 }
-                new ClientLog(context, LogCode.LOG_DATA_NOTIFY, "显示通知：" + message.getMsg_id()).save();
+                DbUtils.addClientLog(context, LogCode.LOG_DATA_NOTIFY, "显示通知：" + message.getMsg_id());
             }
         }
     }
