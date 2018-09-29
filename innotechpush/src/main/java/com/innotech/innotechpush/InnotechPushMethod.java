@@ -11,6 +11,7 @@ import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NetWorkUtils;
 import com.innotech.innotechpush.utils.SignUtils;
+import com.innotech.innotechpush.utils.TokenUtils;
 import com.innotech.innotechpush.utils.UserInfoSPUtils;
 import com.innotech.innotechpush.utils.Utils;
 
@@ -85,7 +86,7 @@ public class InnotechPushMethod {
         try {
             Integer appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
             aliasObj.put("app_id", appId);
-            String guid = UserInfoSPUtils.getString(context, UserInfoSPUtils.KEY_GUID, "default");
+            String guid = TokenUtils.getGuid(context);
             aliasObj.put("guid", guid);
             aliasObj.put("alias", alias);
             if (guid.equals("default")) {
