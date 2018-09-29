@@ -1,6 +1,7 @@
 package com.innotech.innotechpush.db;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.innotech.innotechpush.utils.LogUtils;
 
@@ -34,6 +35,22 @@ public class DbUtils {
             notify.save();
         } catch (Exception e) {
             LogUtils.e(context, "db添加回执记录异常");
+        }
+    }
+
+    /**
+     * db添加长连接回执
+     *
+     * @param context
+     * @param json
+     * @param cmd
+     */
+    public static void addSocketAck(Context context, String json, int cmd) {
+        try {
+            SocketAck socketAck = new SocketAck(json, cmd);
+            socketAck.save();
+        } catch (Exception e) {
+            LogUtils.e(context, "db添加长连接回执异常");
         }
     }
 }

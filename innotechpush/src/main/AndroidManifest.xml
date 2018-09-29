@@ -339,12 +339,6 @@
 
         <receiver android:name=".receiver.NotificationClickReceiver" />
 
-        <receiver android:name=".receiver.UserInfoReceiver">
-            <intent-filter>
-                <action android:name="com.inno.push.action.UPDATEUSERINFO" />
-            </intent-filter>
-        </receiver>
-
         <service
             android:name=".sdk.SocketClientService"
             android:persistent="true"

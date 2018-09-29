@@ -7,13 +7,16 @@ import android.text.TextUtils;
 
 import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.callback.RequestCallback;
+import com.innotech.innotechpush.callback.SocketSendCallback;
 import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.db.ClientLog;
 import com.innotech.innotechpush.db.ClientMsgNotify;
 import com.innotech.innotechpush.db.DbUtils;
+import com.innotech.innotechpush.db.SocketAck;
 import com.innotech.innotechpush.sdk.HuaweiSDK;
 import com.innotech.innotechpush.sdk.SocketClientService;
+import com.innotech.innotechpush.sdk.SocketManager;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NetWorkUtils;
 import com.innotech.innotechpush.utils.SignUtils;
@@ -333,6 +336,29 @@ public class InnotechPushMethod {
             }
         } catch (Exception e) {
             LogUtils.e(context, "日志上报报错");
+        }
+    }
+
+    /**
+     * 长连接回执之前丢失的回执
+     */
+    public static void uploadSocketAck(Context context) {
+        try {
+            List<SocketAck> acks = SocketAck.find(SocketAck.class, "cmd = ?", "6");
+            if (acks != null && acks.size() > 0) {
+                for (final SocketAck ack : acks) {
+                    SocketManager.getInstance(context).sendData(ack.getJson(), ack.getCmd(), new SocketSendCallback() {
+                        @Override
+                        public void onResult(boolean result) {
+                            if (result) {
+                                ack.delete();
+                            }
+                        }
+                    });
+                }
+            }
+        } catch (Exception e) {
+            LogUtils.e(context, "长连接回执之前丢失的回执失败");
         }
     }
 

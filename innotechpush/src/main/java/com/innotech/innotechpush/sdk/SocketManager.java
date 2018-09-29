@@ -191,9 +191,9 @@ public class SocketManager {
         byte[] lenB = new byte[16];
         while (is.read(lenB) != -1) {
             int len = getLenByData(lenB);
-            LogUtils.e(context, "len：" + len);
+//            LogUtils.e(context, "len：" + len);
             long requestId = getRequestIDByData(lenB);
-            LogUtils.e(context, "requestId：" + requestId);
+//            LogUtils.e(context, "requestId：" + requestId);
             int command = getCommandByData(lenB);
             switch (command) {
                 case 1://登录成功（LoginRespCmd）
@@ -222,6 +222,8 @@ public class SocketManager {
                                 }
                             }
                         }
+                        //长连接回执之前丢失的回执
+                        InnotechPushMethod.uploadSocketAck(context);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -377,7 +379,6 @@ public class SocketManager {
                         //4字节剩余包长度
                         byte[] len = CommonUtils.big_intToByte(!TextUtils.isEmpty(json) ? json.length() + 12 : 12, 4);
                         byte[] requestsID = getRequestID();
-                        LogUtils.e(context, "发送信息的requestsID：" + CommonUtils.longFrom8Bytes(requestsID, 0, false));
                         byte[] command = CommonUtils.big_intToByte(cmd, 4);
                         byte[] jsonb = json.getBytes();
                         byte[] data = new byte[len.length + requestsID.length + command.length + jsonb.length];
@@ -391,6 +392,10 @@ public class SocketManager {
                         }
                     } catch (IOException e) {
                         LogUtils.e(context, "socket发送信息失败..." + e.getMessage());
+                        //存放本次发送的回执
+                        if (cmd == 6) {
+                            DbUtils.addSocketAck(context, json, cmd);
+                        }
                         if (callback != null) {
                             callback.onResult(false);
                         } else {
@@ -405,6 +410,10 @@ public class SocketManager {
             sendThread.start();
         } else {
             LogUtils.e(context, "socket状态为：已断开连接...");
+            //存放本次发送的回执
+            if (cmd == 6) {
+                DbUtils.addSocketAck(context, json, cmd);
+            }
             if (callback != null) {
                 callback.onResult(false);
             } else {
