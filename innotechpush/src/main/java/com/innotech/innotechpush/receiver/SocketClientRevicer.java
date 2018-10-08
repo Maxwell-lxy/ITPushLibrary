@@ -24,45 +24,39 @@ public class SocketClientRevicer extends PushMessageReceiver {
     @Override
     public void onReceivePassThroughMessage(Context context, PushMessage pushMessage) {
         super.onReceivePassThroughMessage(context, pushMessage);
-        if (!(Utils.isXiaomiDevice() || Utils.isMIUI())
-                && !Utils.isMeizuDevice()
-//                && !Utils.isHuaweiDevice()
-//                && !(PushManager.isSupportPush(context) && Utils.isOPPO())
-                ) {
-            try {
-                if (!TextUtils.isEmpty(pushMessage.getTransmission())) {
-                    JSONObject object = new JSONObject(pushMessage.getTransmission());
-                    String idempotent = object.getString("idempotent");
-                    InnotechPushManager.getIdempotentLock().lock();
-                    try {
-                        if (!TextUtils.isEmpty(idempotent)) {
-                            //消息池去重验证
-                            if (SPUtils.isPass(context, idempotent)) {
-                                //展示通知
-                                NotificationUtils.sendNotificationByStyle(context, createMessageByJson(pushMessage));
-                                //消息存入消息池中
-                                SPUtils.put(context, idempotent, System.currentTimeMillis());
-                                if (InnotechPushManager.getPushReciver() != null) {
-                                    InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context, getInnotechMessage(pushMessage));
-                                } else {
-                                    InnotechPushManager.innotechPushReciverIsNull(context);
-                                }
+        try {
+            if (!TextUtils.isEmpty(pushMessage.getTransmission())) {
+                JSONObject object = new JSONObject(pushMessage.getTransmission());
+                String idempotent = object.getString("idempotent");
+                InnotechPushManager.getIdempotentLock().lock();
+                try {
+                    if (!TextUtils.isEmpty(idempotent)) {
+                        //消息池去重验证
+                        if (SPUtils.isPass(context, idempotent)) {
+                            //展示通知
+                            NotificationUtils.sendNotificationByStyle(context, createMessageByJson(pushMessage));
+                            //消息存入消息池中
+                            SPUtils.put(context, idempotent, System.currentTimeMillis());
+                            if (InnotechPushManager.getPushReciver() != null) {
+                                InnotechPushManager.getPushReciver().onNotificationMessageArrived(context, getInnotechMessage(pushMessage));
                             } else {
-                                LogUtils.e(context, LogUtils.TAG_INNOTECH + " 该消息为重复消息，过滤掉，不做处理" + pushMessage.getTransmission());
-                                //触发一次消息池的清理
-                                SPUtils.clearPoor(context);
+                                InnotechPushManager.innotechPushReciverIsNull(context);
                             }
                         } else {
-                            LogUtils.e(context, LogUtils.TAG_INNOTECH + " 该消息中没有包含idempotent字段，不做处理" + pushMessage.getTransmission());
+                            LogUtils.e(context, LogUtils.TAG_INNOTECH + " 该消息为重复消息，过滤掉，不做处理" + pushMessage.getTransmission());
+                            //触发一次消息池的清理
+                            SPUtils.clearPoor(context);
                         }
-                    } finally {
-                        InnotechPushManager.getIdempotentLock().unlock();
+                    } else {
+                        LogUtils.e(context, LogUtils.TAG_INNOTECH + " 该消息中没有包含idempotent字段，不做处理" + pushMessage.getTransmission());
                     }
+                } finally {
+                    InnotechPushManager.getIdempotentLock().unlock();
                 }
-            } catch (JSONException e) {
-                LogUtils.e(context, LogUtils.TAG_INNOTECH + " dealWithCustomMessage方法中json转换失败");
-                DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, LogUtils.TAG_INNOTECH + " dealWithCustomMessage方法中json转换失败");
             }
+        } catch (JSONException e) {
+            LogUtils.e(context, LogUtils.TAG_INNOTECH + " dealWithCustomMessage方法中json转换失败");
+            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, LogUtils.TAG_INNOTECH + " dealWithCustomMessage方法中json转换失败");
         }
     }
 
@@ -79,16 +73,10 @@ public class SocketClientRevicer extends PushMessageReceiver {
     @Override
     public void onNotificationMessageArrived(Context context, PushMessage pushMessage) {
         super.onNotificationMessageArrived(context, pushMessage);
-        if (!(Utils.isXiaomiDevice() || Utils.isMIUI())
-                && !Utils.isMeizuDevice()
-//                && !Utils.isHuaweiDevice()
-//                && !(PushManager.isSupportPush(context) && Utils.isOPPO())
-                ) {
-            if (InnotechPushManager.getPushReciver() != null) {
-                InnotechPushManager.getPushReciver().onNotificationMessageArrived(context, getInnotechMessage(pushMessage));
-            } else {
-                InnotechPushManager.innotechPushReciverIsNull(context);
-            }
+        if (InnotechPushManager.getPushReciver() != null) {
+            InnotechPushManager.getPushReciver().onNotificationMessageArrived(context, getInnotechMessage(pushMessage));
+        } else {
+            InnotechPushManager.innotechPushReciverIsNull(context);
         }
     }
 

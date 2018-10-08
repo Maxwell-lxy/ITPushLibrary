@@ -64,6 +64,11 @@ public class PushIntentService extends GTIntentService {
                         NotificationUtils.sendNotificationByStyle(context, createMessageByJson(gtTransmitMessage));
                         //消息存入消息池中
                         SPUtils.put(context, idempotent, System.currentTimeMillis());
+                        if (InnotechPushManager.getPushReciver() != null) {
+                            InnotechPushManager.getPushReciver().onNotificationMessageArrived(context, createMessageByJson(gtTransmitMessage));
+                        } else {
+                            InnotechPushManager.innotechPushReciverIsNull(context);
+                        }
                     } else {
                         LogUtils.e(context, LogUtils.TAG_GETUI + " 该消息为重复消息，过滤掉，不做处理" + data);
                         //触发一次消息池的清理
@@ -78,11 +83,6 @@ public class PushIntentService extends GTIntentService {
         } catch (JSONException e) {
             LogUtils.e(context, LogUtils.TAG_GETUI + " dealWithCustomMessage方法中json转换失败");
             DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, LogUtils.TAG_GETUI + " dealWithCustomMessage方法中json转换失败" + e.getMessage());
-        }
-        if (InnotechPushManager.getPushReciver() != null) {
-            InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context, createMessageByJson(gtTransmitMessage));
-        } else {
-            InnotechPushManager.innotechPushReciverIsNull(context);
         }
     }
 

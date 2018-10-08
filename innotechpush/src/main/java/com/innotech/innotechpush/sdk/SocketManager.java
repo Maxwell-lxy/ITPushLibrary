@@ -489,15 +489,10 @@ public class SocketManager {
                 }
             }
             json = new String(lenJ);
-            printtest(json);
-//            if (is.read(lenJ) != -1) {
-//                json = new String(lenJ);
-//                LogUtils.e(context, "getJsonByData1：" + json.getBytes().length);
-////                LogUtils.e(context, "收到的数据：" + json);
-//                printtest(json);
-//            }
+//            printtest(json);
         } catch (IOException e) {
             e.printStackTrace();
+            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "获取服务端回包的信息解析失败，len" + len);
         }
         return json;
     }
