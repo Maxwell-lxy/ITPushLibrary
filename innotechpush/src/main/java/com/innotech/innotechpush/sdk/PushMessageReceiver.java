@@ -8,6 +8,7 @@ import android.util.Log;
 import com.innotech.innotechpush.config.BroadcastConstant;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.utils.CommonUtils;
+import com.innotech.innotechpush.utils.LogUtils;
 
 public abstract class PushMessageReceiver extends BroadcastReceiver {
 
@@ -15,8 +16,8 @@ public abstract class PushMessageReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Integer appId = CommonUtils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
         PushMessage message = (PushMessage) intent.getSerializableExtra("PushMessage");
-        Log.e("allen","PushMessageReceiver的onReceive方法"+message.getAppId()+":"+appId);
-        if(message.getAppId() == appId) {
+        LogUtils.e(context, "PushMessageReceiver的onReceive方法" + message.getAppId() + ":" + appId);
+        if (message.getAppId() == appId) {
             if (intent.getAction().equals(BroadcastConstant.RECEIVE_MESSAGE)) {
                 if (message.getPass_through() != 1) {
                     onNotificationMessageArrived(context, message);

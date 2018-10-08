@@ -354,29 +354,29 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.intent.action.USER_PRESENT" />
-                <action android:name="com.innotech.sdk.action.refreshls${applicationId}" />
+                <!--<action android:name="com.innotech.sdk.action.refreshls${applicationId}" />-->
                 <!-- 以下三项为可选的action声明，可⼤大⼤大提⾼高service存活率和消息到达速度 -->
                 <action android:name="android.intent.action.MEDIA_MOUNTED" />
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-                <action android:name="com.innotech.push.RECEIVE_MESSAGE" />
-                <action android:name="com.innotech.push.MESSAGE_CLICK" />
+                <!--<action android:name="com.innotech.push.RECEIVE_MESSAGE" />-->
+                <!--<action android:name="com.innotech.push.MESSAGE_CLICK" />-->
             </intent-filter>
         </receiver>
 
-        <receiver
-            android:name=".receiver.SocketClientRevicer"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.innotech.push.RECEIVE_MESSAGE" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.innotech.push.MESSAGE_CLICK" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="com.innotech.push.ERROR" />
-            </intent-filter>
-        </receiver>
+        <!--<receiver-->
+            <!--android:name=".receiver.SocketClientRevicer"-->
+            <!--android:exported="true">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.innotech.push.RECEIVE_MESSAGE" />-->
+            <!--</intent-filter>-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.innotech.push.MESSAGE_CLICK" />-->
+            <!--</intent-filter>-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.innotech.push.ERROR" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
 
         <service
             android:name=".sdk.KeepLiveService"

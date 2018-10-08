@@ -1,9 +1,20 @@
 package com.innotech.itpushlibrary;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 
+import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.InnotechPushMethod;
+import com.innotech.innotechpush.receiver.NotificationClickReceiver;
+import com.innotech.innotechpush.utils.NotificationUtils;
 
 public class MainActivity extends Activity {
     private static final int REQUEST_PERMISSION = 0;
@@ -15,45 +26,41 @@ public class MainActivity extends Activity {
 
         InnotechPushMethod.launcher(this);
 
-//        PackageManager pkgManager = getPackageManager();
-//
-//        // 读写 sd card 权限非常重要, android6.0默认禁止的, 建议初始化之前就弹窗让用户赋予该权限
-//        boolean sdCardWritePermission =
-//                pkgManager.checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, getPackageName()) == PackageManager.PERMISSION_GRANTED;
-//
-//        // read phone state用于获取 imei 设备信息
-//        boolean phoneSatePermission =
-//                pkgManager.checkPermission(Manifest.permission.READ_PHONE_STATE, getPackageName()) == PackageManager.PERMISSION_GRANTED;
-//
-//        if (Build.VERSION.SDK_INT >= 23 && !sdCardWritePermission || !phoneSatePermission) {
-//            requestPermission();
-//        } else {
-//            com.igexin.sdk.PushManager.getInstance().initialize(this.getApplicationContext(), userPushService);
-//        }
-//
-//        // 注册 intentService 后 PushDemoReceiver 无效, sdk 会使用 DemoIntentService 传递数据,
-//        // AndroidManifest 对应保留一个即可(如果注册 DemoIntentService, 可以去掉 PushDemoReceiver, 如果注册了
-//        // IntentService, 必须在 AndroidManifest 中声明)
-//        PushManager.getInstance().registerPushIntentService(this.getApplicationContext(), DemoIntentService.class);
-//
-//    }
-//
-//    private void requestPermission() {
-//        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE},
-//                REQUEST_PERMISSION);
-//    }
-//
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-//        if (requestCode == REQUEST_PERMISSION) {
-//            if ((grantResults.length == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED
-//                    && grantResults[1] == PackageManager.PERMISSION_GRANTED)) {
-//                PushManager.getInstance().initialize(this.getApplicationContext(), userPushService);
-//            } else {
-//                PushManager.getInstance().initialize(this.getApplicationContext(), userPushService);
-//            }
-//        } else {
-//            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+//        Intent clickIntent = new Intent(this, NotificationClickReceiver.class); //点击通知之后要发送的广播
+//        int id = (int) ((Math.random() * 9 + 1) * 1000);
+//        PendingIntent contentIntent = PendingIntent.getBroadcast(this, id, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+//        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this,"channel_1");
+//        mBuilder.setContentTitle("fdasfdsa")//设置通知栏标题
+//                .setContentText("fdasfdsa")
+//                .setAutoCancel(true)
+//                .setTicker("fdasfdsa") //通知首次出现在通知栏，带上升动画效果的
+//                .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+//                .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
+//                .setDefaults(Notification.DEFAULT_VIBRATE)
+//                .setSmallIcon(InnotechPushManager.pushIcon)
+//                .setLargeIcon(BitmapFactory.decodeResource(this.getResources()
+//                        , InnotechPushManager.pushIcon));
+//        mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
+//        notificationManager.notify(id, mBuilder.build());
+
+//        if (Build.VERSION.SDK_INT >= 26) {
+//            NotificationChannel channel = new NotificationChannel(NotificationUtils.notification_channel_id, NotificationUtils.notification_channel_name, NotificationManager.IMPORTANCE_HIGH);
+//            notificationManager.createNotificationChannel(channel);
+//            Notification.Builder mBuilder = new Notification.Builder(this, NotificationUtils.notification_channel_id);
+//            mBuilder.setContentTitle("tesfs")//设置通知栏标题
+//                    .setContentText("tesfds")
+//                    .setAutoCancel(true)
+//                    .setTicker("tesfs") //通知首次出现在通知栏，带上升动画效果的
+//                    .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+//                    .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
+//                    .setDefaults(Notification.DEFAULT_VIBRATE)
+//                    .setSmallIcon(InnotechPushManager.pushIcon)
+//                    .setLargeIcon(BitmapFactory.decodeResource(this.getResources()
+//                            , InnotechPushManager.pushIcon));
+//            mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
+//            notificationManager.notify(id, mBuilder.build());
 //        }
     }
 }

@@ -480,7 +480,7 @@ public class SocketManager {
         boolean isRead = true;
         String json = null;
         byte[] lenJ = new byte[len - 12];
-        LogUtils.e(context, "getJsonByData：" + lenJ.length);
+//        LogUtils.e(context, "getJsonByData：" + lenJ.length);
         try {
             while (isRead) {
                 int readLen = is.read(lenJ);

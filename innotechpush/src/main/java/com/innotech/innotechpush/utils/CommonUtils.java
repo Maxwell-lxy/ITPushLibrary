@@ -334,19 +334,57 @@ public class CommonUtils {
     /**
      * 将字节数组转为long<br>
      * 如果input为null,或offset指定的剩余数组长度不足8字节则抛出异常
+     *
      * @param input
-     * @param offset 起始偏移量
+     * @param offset       起始偏移量
      * @param littleEndian 输入数组是否小端模式
      * @return
      */
-    public static long longFrom8Bytes(byte[] input, int offset, boolean littleEndian){
-        long value=0;
+    public static long longFrom8Bytes(byte[] input, int offset, boolean littleEndian) {
+        long value = 0;
         // 循环读取每个字节通过移位运算完成long的8个字节拼装
-        for(int  count=0;count<8;++count){
-            int shift=(littleEndian?count:(7-count))<<3;
-            value |=((long)0xff<< shift) & ((long)input[offset+count] << shift);
+        for (int count = 0; count < 8; ++count) {
+            int shift = (littleEndian ? count : (7 - count)) << 3;
+            value |= ((long) 0xff << shift) & ((long) input[offset + count] << shift);
         }
         return value;
     }
 
+    /**
+     * 是否主进程
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isMainProcess(Context context) {
+        ActivityManager am = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE));
+        List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
+        String mainProcessName = context.getPackageName();
+        int myPid = android.os.Process.myPid();
+        for (ActivityManager.RunningAppProcessInfo info : processInfos) {
+            if (info.pid == myPid && mainProcessName.equals(info.processName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 是否推送进程
+     *
+     * @param context
+     * @return
+     */
+    public static boolean isPushProcess(Context context) {
+        ActivityManager am = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE));
+        List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
+        String pushProcessName = ":pushservice";
+        int myPid = android.os.Process.myPid();
+        for (ActivityManager.RunningAppProcessInfo info : processInfos) {
+            if (info.pid == myPid && info.processName.endsWith(pushProcessName)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

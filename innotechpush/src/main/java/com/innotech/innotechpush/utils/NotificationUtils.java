@@ -1,6 +1,7 @@
 package com.innotech.innotechpush.utils;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -29,6 +30,9 @@ import org.json.JSONObject;
 import java.util.LinkedList;
 
 public class NotificationUtils {
+
+    public static final String notification_channel_id = "channel_innotech";
+    public static final String notification_channel_name = "系统通知";
 
     /**
      * 根据通知信息显示不同样式的通知
@@ -78,24 +82,42 @@ public class NotificationUtils {
      */
     public static void showNotification(Context context, InnotechMessage msg) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
-        mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
-                .setContentText(msg.getContent())
-                .setAutoCancel(true)
-                .setTicker(msg.getTitle()) //通知首次出现在通知栏，带上升动画效果的
-                .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
-                .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
-                .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setSmallIcon(InnotechPushManager.pushIcon)
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
-                        , InnotechPushManager.pushIcon));
-
         Intent clickIntent = new Intent(context, NotificationClickReceiver.class); //点击通知之后要发送的广播
         clickIntent.putExtra("InnotechMessage", msg);
         int id = (int) ((Math.random() * 9 + 1) * 1000);
         PendingIntent contentIntent = PendingIntent.getBroadcast(context.getApplicationContext(), id, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
-        notificationManager.notify(id, mBuilder.build());
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(NotificationUtils.notification_channel_id, NotificationUtils.notification_channel_name, NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(channel);
+            Notification.Builder mBuilder = new Notification.Builder(context, NotificationUtils.notification_channel_id);
+            mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
+                    .setContentText(msg.getContent())
+                    .setAutoCancel(true)
+                    .setTicker(msg.getTitle()) //通知首次出现在通知栏，带上升动画效果的
+                    .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+                    .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
+                    .setDefaults(Notification.DEFAULT_VIBRATE)
+                    .setSmallIcon(InnotechPushManager.pushIcon)
+                    .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
+                            , InnotechPushManager.pushIcon));
+            mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
+            notificationManager.notify(id, mBuilder.build());
+        } else {
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+            mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
+                    .setContentText(msg.getContent())
+                    .setAutoCancel(true)
+                    .setTicker(msg.getTitle()) //通知首次出现在通知栏，带上升动画效果的
+                    .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+                    .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
+                    .setDefaults(Notification.DEFAULT_VIBRATE)
+                    .setSmallIcon(InnotechPushManager.pushIcon)
+                    .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
+                            , InnotechPushManager.pushIcon));
+            mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
+            notificationManager.notify(id, mBuilder.build());
+        }
     }
 
     /**
@@ -107,27 +129,50 @@ public class NotificationUtils {
      */
     public static void showNotification(Context context, InnotechMessage msg, String bigText) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
-        mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
-                .setContentText(msg.getContent())
-                .setAutoCancel(true)
-                .setTicker(msg.getTitle()) //通知首次出现在通知栏，带上升动画效果的
-                .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
-                .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
-                .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
-                        , InnotechPushManager.pushIcon))
-                .setSmallIcon(InnotechPushManager.pushIcon)
-                .setStyle(new NotificationCompat.BigTextStyle()
-                        .setBigContentTitle(msg.getTitle())
-                        .setSummaryText(msg.getContent())
-                        .bigText(bigText));
         Intent clickIntent = new Intent(context, NotificationClickReceiver.class); //点击通知之后要发送的广播
         clickIntent.putExtra("InnotechMessage", msg);
         int id = (int) ((Math.random() * 9 + 1) * 1000);
         PendingIntent contentIntent = PendingIntent.getBroadcast(context.getApplicationContext(), id, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
-        notificationManager.notify(id, mBuilder.build());
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(NotificationUtils.notification_channel_id, NotificationUtils.notification_channel_name, NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(channel);
+            Notification.Builder mBuilder = new Notification.Builder(context, NotificationUtils.notification_channel_id);
+            mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
+                    .setContentText(msg.getContent())
+                    .setAutoCancel(true)
+                    .setTicker(msg.getTitle()) //通知首次出现在通知栏，带上升动画效果的
+                    .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+                    .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
+                    .setDefaults(Notification.DEFAULT_VIBRATE)
+                    .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
+                            , InnotechPushManager.pushIcon))
+                    .setSmallIcon(InnotechPushManager.pushIcon)
+                    .setStyle(new Notification.BigTextStyle()
+                            .setBigContentTitle(msg.getTitle())
+                            .setSummaryText(msg.getContent())
+                            .bigText(bigText));
+            mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
+            notificationManager.notify(id, mBuilder.build());
+        } else {
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+            mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
+                    .setContentText(msg.getContent())
+                    .setAutoCancel(true)
+                    .setTicker(msg.getTitle()) //通知首次出现在通知栏，带上升动画效果的
+                    .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+                    .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
+                    .setDefaults(Notification.DEFAULT_VIBRATE)
+                    .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
+                            , InnotechPushManager.pushIcon))
+                    .setSmallIcon(InnotechPushManager.pushIcon)
+                    .setStyle(new NotificationCompat.BigTextStyle()
+                            .setBigContentTitle(msg.getTitle())
+                            .setSummaryText(msg.getContent())
+                            .bigText(bigText));
+            mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
+            notificationManager.notify(id, mBuilder.build());
+        }
     }
 
     /**
@@ -139,27 +184,50 @@ public class NotificationUtils {
      */
     public static void showNotification(Context context, InnotechMessage msg, Bitmap bitmap) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
-        mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
-                .setContentText(msg.getContent())
-                .setAutoCancel(true)
-                .setTicker(msg.getTitle()) //通知首次出现在通知栏，带上升动画效果的
-                .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
-                .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
-                .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
-                        , InnotechPushManager.pushIcon))
-                .setSmallIcon(InnotechPushManager.pushIcon)
-                .setStyle(new NotificationCompat.BigPictureStyle()
-                        .setBigContentTitle(msg.getTitle())
-                        .setSummaryText(msg.getContent())
-                        .bigPicture(bitmap));
         Intent clickIntent = new Intent(context, NotificationClickReceiver.class); //点击通知之后要发送的广播
         clickIntent.putExtra("InnotechMessage", msg);
         int id = (int) ((Math.random() * 9 + 1) * 1000);
         PendingIntent contentIntent = PendingIntent.getBroadcast(context.getApplicationContext(), id, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
-        notificationManager.notify(id, mBuilder.build());
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(NotificationUtils.notification_channel_id, NotificationUtils.notification_channel_name, NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(channel);
+            Notification.Builder mBuilder = new Notification.Builder(context, NotificationUtils.notification_channel_id);
+            mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
+                    .setContentText(msg.getContent())
+                    .setAutoCancel(true)
+                    .setTicker(msg.getTitle()) //通知首次出现在通知栏，带上升动画效果的
+                    .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+                    .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
+                    .setDefaults(Notification.DEFAULT_VIBRATE)
+                    .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
+                            , InnotechPushManager.pushIcon))
+                    .setSmallIcon(InnotechPushManager.pushIcon)
+                    .setStyle(new Notification.BigPictureStyle()
+                            .setBigContentTitle(msg.getTitle())
+                            .setSummaryText(msg.getContent())
+                            .bigPicture(bitmap));
+            mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
+            notificationManager.notify(id, mBuilder.build());
+        } else {
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+            mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
+                    .setContentText(msg.getContent())
+                    .setAutoCancel(true)
+                    .setTicker(msg.getTitle()) //通知首次出现在通知栏，带上升动画效果的
+                    .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+                    .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
+                    .setDefaults(Notification.DEFAULT_VIBRATE)
+                    .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
+                            , InnotechPushManager.pushIcon))
+                    .setSmallIcon(InnotechPushManager.pushIcon)
+                    .setStyle(new NotificationCompat.BigPictureStyle()
+                            .setBigContentTitle(msg.getTitle())
+                            .setSummaryText(msg.getContent())
+                            .bigPicture(bitmap));
+            mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
+            notificationManager.notify(id, mBuilder.build());
+        }
     }
 
     /**
@@ -171,25 +239,41 @@ public class NotificationUtils {
      */
     public static void showOnlyImageNotification(Context context, InnotechMessage msg, Bitmap bitmap) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
-        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.inno_notification);
-        remoteViews.setImageViewResource(R.id.iv_img, R.mipmap.ic_launcher);
-        remoteViews.setImageViewBitmap(R.id.iv_img, bitmap);
-        mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
-                .setContentText(msg.getContent())
-                .setAutoCancel(true)
-                .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
-                .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
-                .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setSmallIcon(InnotechPushManager.pushIcon)
-                .setContent(remoteViews);
-
         Intent clickIntent = new Intent(context, NotificationClickReceiver.class); //点击通知之后要发送的广播
         clickIntent.putExtra("InnotechMessage", msg);
         int id = (int) ((Math.random() * 9 + 1) * 1000);
         PendingIntent contentIntent = PendingIntent.getBroadcast(context.getApplicationContext(), id, clickIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
-        notificationManager.notify(id, mBuilder.build());
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.inno_notification);
+        remoteViews.setImageViewResource(R.id.iv_img, R.mipmap.ic_launcher);
+        remoteViews.setImageViewBitmap(R.id.iv_img, bitmap);
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(NotificationUtils.notification_channel_id, NotificationUtils.notification_channel_name, NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(channel);
+            Notification.Builder mBuilder = new Notification.Builder(context, NotificationUtils.notification_channel_id);
+            mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
+                    .setContentText(msg.getContent())
+                    .setAutoCancel(true)
+                    .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+                    .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
+                    .setDefaults(Notification.DEFAULT_VIBRATE)
+                    .setSmallIcon(InnotechPushManager.pushIcon)
+                    .setContent(remoteViews);
+            mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
+            notificationManager.notify(id, mBuilder.build());
+        } else {
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+            mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
+                    .setContentText(msg.getContent())
+                    .setAutoCancel(true)
+                    .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
+                    .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
+                    .setDefaults(Notification.DEFAULT_VIBRATE)
+                    .setSmallIcon(InnotechPushManager.pushIcon)
+                    .setContent(remoteViews);
+            mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
+            notificationManager.notify(id, mBuilder.build());
+        }
     }
 
     public static void sendCustomNotification(Context context, InnotechMessage msg) {

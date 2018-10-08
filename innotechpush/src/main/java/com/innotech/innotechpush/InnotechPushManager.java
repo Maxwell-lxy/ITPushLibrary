@@ -4,15 +4,21 @@ import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 
 import com.innotech.innotechpush.bean.UserInfoModel;
+import com.innotech.innotechpush.config.BroadcastConstant;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.receiver.PushReciver;
+import com.innotech.innotechpush.receiver.SocketClientRevicer;
 import com.innotech.innotechpush.sdk.HuaweiSDK;
 import com.innotech.innotechpush.sdk.MiSDK;
+import com.innotech.innotechpush.sdk.PushMessageReceiver;
+import com.innotech.innotechpush.sdk.PushReceiver;
 import com.innotech.innotechpush.sdk.SocketClientService;
 import com.innotech.innotechpush.service.PushIntentService;
 import com.innotech.innotechpush.service.PushService;
+import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.meizu.cloud.pushsdk.PushManager;
@@ -62,6 +68,13 @@ public class InnotechPushManager {
         UserInfoModel.getInstance().init(application.getApplicationContext());
         String processName = getProcessName(application, android.os.Process.myPid());
         LogUtils.e(application, "当前进程名字：" + processName);
+
+        if (CommonUtils.isMainProcess(application.getApplicationContext())) {
+            registerMainReceiver(application.getApplicationContext());
+        } else if (CommonUtils.isPushProcess(application.getApplicationContext())) {
+            registerPushReceiver(application.getApplicationContext());
+        }
+
         if (Utils.isXiaomiDevice() || Utils.isMIUI()) {
             new MiSDK(application.getApplicationContext());
         }
@@ -151,5 +164,23 @@ public class InnotechPushManager {
     //
     public void terminate() {
         SugarContext.terminate();
+    }
+
+    //动态注册广播
+    public void registerPushReceiver(Context context) {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BroadcastConstant.RECEIVE_MESSAGE);
+        filter.addAction(BroadcastConstant.MESSAGE_CLICK);
+        filter.addAction(BroadcastConstant.ACTION_FRESH_PUSH + context.getPackageName());
+        context.registerReceiver(new PushReceiver(), filter);
+    }
+
+    //
+    public void registerMainReceiver(Context context) {
+        IntentFilter filter1 = new IntentFilter();
+        filter1.addAction(BroadcastConstant.RECEIVE_MESSAGE);
+        filter1.addAction(BroadcastConstant.MESSAGE_CLICK);
+        filter1.addAction(BroadcastConstant.ERROR);
+        context.registerReceiver(new SocketClientRevicer(), filter1);
     }
 }

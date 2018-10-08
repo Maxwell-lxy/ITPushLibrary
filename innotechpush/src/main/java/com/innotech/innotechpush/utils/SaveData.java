@@ -72,13 +72,11 @@ public class SaveData {
         else if (url.equals(NetWorkUtils.URL_CLIENT_MSG_NOTIFY)) {
             BaseResponse response = new DataAnalysis().analysisData(json, null);
             if (response.getCode() == 0) {
-                LogUtils.e(context, "客户端消息回执成功！");
                 if (mCallBack != null) {
                     mCallBack.onSuccess("客户端消息回执成功！");
                 }
 
             } else {
-                LogUtils.e(context, "客户端消息回执失败！");
                 if (mCallBack != null) {
                     mCallBack.onFail("客户端消息回执失败！");
                 }
