@@ -14,6 +14,7 @@ import com.innotech.innotechpush.utils.AlarmManagerUtils;
 import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NetUtil;
+import com.innotech.innotechpush.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -76,7 +77,8 @@ public class PushReceiver extends BroadcastReceiver {
                     SocketManager.getInstance(context).ackCmd(list, 1002);
                 } else if (CommonUtils.isXiaomiDevice()
                         || CommonUtils.isMIUI()
-                        || CommonUtils.isMeizuDevice()) {
+                        || CommonUtils.isMeizuDevice()
+                        || (Utils.isHuaweiDevice() && PushConstant.hasHuawei)) {
                     SocketManager.getInstance(context).ackCmd(list, 102);
                 } else {
                     SocketManager.getInstance(context).ackCmd(list, 2);

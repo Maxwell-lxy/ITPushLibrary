@@ -17,6 +17,7 @@ import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NetWorkUtils;
 import com.innotech.innotechpush.utils.SignUtils;
 import com.innotech.innotechpush.utils.TokenUtils;
+import com.innotech.innotechpush.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -215,7 +216,8 @@ public class SocketManager {
                             if (list.size() > 0) {
                                 if (CommonUtils.isXiaomiDevice()
                                         || CommonUtils.isMIUI()
-                                        || CommonUtils.isMeizuDevice()) {
+                                        || CommonUtils.isMeizuDevice()
+                                        || (Utils.isHuaweiDevice() && PushConstant.hasHuawei)) {
                                     ackCmd(list, 101);
                                 } else {
                                     ackCmd(list, 1001);
@@ -240,7 +242,8 @@ public class SocketManager {
                             list.add(pushMessage.getMsg_id());
                             if (CommonUtils.isXiaomiDevice()
                                     || CommonUtils.isMIUI()
-                                    || CommonUtils.isMeizuDevice()) {
+                                    || CommonUtils.isMeizuDevice()
+                                    || (Utils.isHuaweiDevice() && PushConstant.hasHuawei)) {
                                 ackCmd(list, 101);
                             } else {
                                 ackCmd(list, 1);
