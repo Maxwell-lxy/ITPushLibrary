@@ -65,7 +65,6 @@ public class SaveData {
                 if (mCallBack != null) {
                     mCallBack.onFail("获取socket地址失败！");
                 }
-                LogUtils.e(context, "获取socket地址失败！");
             }
         }
         //客户端消息回执接口
@@ -86,13 +85,11 @@ public class SaveData {
         else if (url.equals(NetWorkUtils.URL_CLIENT_LOG)) {
             BaseResponse response = new DataAnalysis().analysisData(json, null);
             if (response.getCode() == 0) {
-                LogUtils.e(context, "客户端日志成功！");
                 if (mCallBack != null) {
                     mCallBack.onSuccess("客户端日志成功！");
                 }
 
             } else {
-                LogUtils.e(context, "客户端日志失败！");
                 if (mCallBack != null) {
                     mCallBack.onFail("客户端日志失败！");
                 }

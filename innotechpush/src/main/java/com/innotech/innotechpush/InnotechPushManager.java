@@ -12,6 +12,7 @@ import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.receiver.PushReciver;
 import com.innotech.innotechpush.receiver.SocketClientRevicer;
 import com.innotech.innotechpush.sdk.HuaweiSDK;
+import com.innotech.innotechpush.sdk.MeizuSDK;
 import com.innotech.innotechpush.sdk.MiSDK;
 import com.innotech.innotechpush.sdk.PushMessageReceiver;
 import com.innotech.innotechpush.sdk.PushReceiver;
@@ -76,34 +77,23 @@ public class InnotechPushManager {
         SugarContext.init(application);
         UserInfoModel.getInstance().init(application.getApplicationContext());
 
-        if (Utils.isXiaomiDevice() || Utils.isMIUI()) {
-            if (CommonUtils.isMainProcess(application.getApplicationContext())) {
+        if (CommonUtils.isMainProcess(application.getApplicationContext())) {
+            if (Utils.isXiaomiDevice() || Utils.isMIUI()) {
                 new MiSDK(application.getApplicationContext());
-            }
-        }
-        //魅族设备时，开启魅族推送
-        else if (Utils.isMeizuDevice()) {
-            String appId = Utils.getMetaDataString(application, "MEIZU_APP_ID").replace("innotech-", "");
-            String appKey = Utils.getMetaDataString(application, "MEIZU_APP_KEY");
-            LogUtils.e(application.getApplicationContext(), LogUtils.TAG_MEIZU + "Meizu  PushManager.register");
-            PushManager.register(application, appId, appKey);
-        }
-        //华为设备时，开启华为推送
-        else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {
-            if (CommonUtils.isMainProcess(application.getApplicationContext())) {
+            } else if (Utils.isMeizuDevice()) {//魅族设备时，开启魅族推送
+                new MeizuSDK(application.getApplicationContext());
+            } else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {//华为设备时，开启华为推送
                 new HuaweiSDK(application);
+            }else { //其他设备时，开启个推推送和socket长连接
+                initGeTuiPush();
             }
-        }
-        //oppo设备时，开启oppo推送
-//        else if (com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext()) && Utils.isOPPO()) {
+
+//        else if (com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext()) && Utils.isOPPO()) {//oppo设备时，开启oppo推送
 //            pushSDKName = oppoSDKName;
 //            String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
 //            String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
 //            com.coloros.mcssdk.PushManager.getInstance().register(application.getApplicationContext(), appKey, appSecret, new OppoPushCallback(application));
 //        }
-        //其他设备时，开启个推推送和socket长连接
-        else {
-            initGeTuiPush();
         }
     }
 

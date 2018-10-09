@@ -22,5 +22,6 @@
 
 #对方开放的类和接口不能混淆
 -keep class com.innotech.** {*;}
+
 -keep class com.inno.innosdk.pb.** { *; }
 -keep class com.inno.innosdk.bean.DeviceInfo { *; }

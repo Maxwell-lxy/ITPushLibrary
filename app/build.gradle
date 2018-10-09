@@ -18,23 +18,23 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
-                INNOTECH_PUSH_DEBUG : true,
-                INNOTECH_APP_ID     : 1008,
-                INNOTECH_APP_KEY    : "ddddddd",
+                INNOTECH_PUSH_DEBUG: true,
+                INNOTECH_APP_ID    : 1008,
+                INNOTECH_APP_KEY   : "ddddddd",
 //                INNOTECH_APP_ID     : 1000,
 //                INNOTECH_APP_KEY    : "YWJjZGRk",
 
-                MI_APP_ID           : "2882303761517836599",
-                MI_APP_KEY          : "5131783646599",
+                MI_APP_ID          : "2882303761517836599",
+                MI_APP_KEY         : "5131783646599",
 
-                MEIZU_APP_ID        : "112950",
-                MEIZU_APP_KEY       : "509a337735ba497ebba21d981924c9f4",
+                MEIZU_APP_ID       : "116007",
+                MEIZU_APP_KEY      : "9779ce34260d43faad9e47e0ca10c12f",
 
-                HMS_APP_ID          : "100244129",
+                HMS_APP_ID         : "100244129",
 
-                GETUI_APP_ID        : "2e48RoYBrh65BC4HRmkAg6",
-                GETUI_APP_KEY       : "PwG112qeeV5UiQrtVObz3A",
-                GETUI_APP_SECRET    : "rvsZ98fb3K6I9UcPTBHzF9",
+                GETUI_APP_ID       : "2e48RoYBrh65BC4HRmkAg6",
+                GETUI_APP_KEY      : "PwG112qeeV5UiQrtVObz3A",
+                GETUI_APP_SECRET   : "rvsZ98fb3K6I9UcPTBHzF9",
 
                 OPPO_APP_KEY       : "5vifLOB1A1s0s800scc4gwC4S",
                 OPPO_APP_SECRET    : "b4aB971Df1bD32eEB9882d2429898BB5"
@@ -60,6 +60,7 @@ dependencies {
     implementation 'com.android.support:support-v4:27.1.1'
 //    implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'

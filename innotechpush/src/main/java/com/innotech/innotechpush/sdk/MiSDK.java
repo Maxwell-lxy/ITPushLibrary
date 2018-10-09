@@ -20,7 +20,7 @@ public class MiSDK {
     public MiSDK(final Context context) {
         // 注册push服务，注册成功后会向DemoMessageReceiver发送广播
         // 可以从DemoMessageReceiver的onCommandResult方法中MiPushCommandMessage对象参数中获取注册信息
-        LogUtils.e(context, LogUtils.TAG_XIAOMI + "call MiSDK()");
+        LogUtils.e(context, LogUtils.TAG_XIAOMI + "初始化小米推送");
 
         String appId = Utils.getMetaDataString(context, "MI_APP_ID").replace("innotech-", "");
         String appKey = Utils.getMetaDataString(context, "MI_APP_KEY").replace("innotech-", "");

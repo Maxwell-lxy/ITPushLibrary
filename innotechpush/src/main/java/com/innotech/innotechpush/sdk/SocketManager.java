@@ -480,7 +480,7 @@ public class SocketManager {
         boolean isRead = true;
         String json = null;
         byte[] lenJ = new byte[len - 12];
-//        LogUtils.e(context, "getJsonByData：" + lenJ.length);
+        LogUtils.e(context, "getJsonByData：" + lenJ.length);
         try {
             while (isRead) {
                 int readLen = is.read(lenJ);
@@ -489,7 +489,7 @@ public class SocketManager {
                 }
             }
             json = new String(lenJ);
-//            printtest(json);
+            printtest(json);
         } catch (IOException e) {
             e.printStackTrace();
             DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "获取服务端回包的信息解析失败，len" + len);
@@ -501,12 +501,12 @@ public class SocketManager {
         if (xml.length() > 4000) {
             for (int i = 0; i < xml.length(); i += 4000) {
                 if (i + 4000 < xml.length())
-                    Log.e("getJsonByData" + i, xml.substring(i, i + 4000));
+                    LogUtils.e(context, "getJsonByData：" + xml.substring(i, i + 4000));
                 else
-                    Log.e("getJsonByData" + i, xml.substring(i, xml.length()));
+                    LogUtils.e(context, "getJsonByData：" + xml.substring(i, xml.length()));
             }
         } else
-            Log.i("getJsonByData", xml);
+            LogUtils.e(context, "getJsonByData：" + xml);
     }
 
 }
