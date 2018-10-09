@@ -1,11 +1,8 @@
 package com.innotech.innotechpush.sdk;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.Application;
-import android.content.Context;
 import android.os.Handler;
-import android.os.Process;
 
 import com.huawei.android.hms.agent.HMSAgent;
 import com.huawei.android.hms.agent.common.handler.ConnectHandler;
@@ -14,15 +11,11 @@ import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 
-import java.util.List;
-
 public class HuaweiSDK {
 
     public HuaweiSDK(Application application) {
-        if (shouldInit(application.getApplicationContext())) {
-            LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + " HMSAgent.init");
-            HMSAgent.init(application);
-        }
+        LogUtils.e(application.getApplicationContext(), LogUtils.TAG_HUAWEI + " HMSAgent.init");
+        HMSAgent.init(application);
     }
 
     /**
@@ -56,16 +49,4 @@ public class HuaweiSDK {
         });
     }
 
-    private boolean shouldInit(Context context) {
-        ActivityManager am = ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE));
-        List<ActivityManager.RunningAppProcessInfo> processInfos = am.getRunningAppProcesses();
-        String mainProcessName = context.getPackageName();
-        int myPid = Process.myPid();
-        for (ActivityManager.RunningAppProcessInfo info : processInfos) {
-            if (info.pid == myPid && mainProcessName.equals(info.processName)) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

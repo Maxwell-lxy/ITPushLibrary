@@ -63,18 +63,6 @@ public class CommonUtils {
     }
 
     /**
-     * 判断是否华为设备
-     *
-     * @return
-     */
-    public static boolean isHuaweiDevice() {
-        if (HUAWEI.equals(Build.BRAND) || HUAWEI.toUpperCase().equals(Build.MANUFACTURER)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
      * 返回系统属性
      *
      * @param propName 要检索的属性

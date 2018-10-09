@@ -363,7 +363,7 @@ public class InnotechPushMethod {
     }
 
     public static void launcher(Activity activity) {
-        if (Utils.isHuaweiDevice()) {
+        if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {
             HuaweiSDK.huaWeiConnect(activity);
         }
     }

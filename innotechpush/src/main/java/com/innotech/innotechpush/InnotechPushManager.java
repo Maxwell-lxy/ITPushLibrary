@@ -64,19 +64,22 @@ public class InnotechPushManager {
      */
     public void initPushSDK(Application application) {
         this.application = application;
-        SugarContext.init(application);
-        UserInfoModel.getInstance().init(application.getApplicationContext());
         String processName = getProcessName(application, android.os.Process.myPid());
         LogUtils.e(application, "当前进程名字：" + processName);
-
+        //动态注册广播
         if (CommonUtils.isMainProcess(application.getApplicationContext())) {
             registerMainReceiver(application.getApplicationContext());
         } else if (CommonUtils.isPushProcess(application.getApplicationContext())) {
             registerPushReceiver(application.getApplicationContext());
         }
 
+        SugarContext.init(application);
+        UserInfoModel.getInstance().init(application.getApplicationContext());
+
         if (Utils.isXiaomiDevice() || Utils.isMIUI()) {
-            new MiSDK(application.getApplicationContext());
+            if (CommonUtils.isMainProcess(application.getApplicationContext())) {
+                new MiSDK(application.getApplicationContext());
+            }
         }
         //魅族设备时，开启魅族推送
         else if (Utils.isMeizuDevice()) {
@@ -87,7 +90,9 @@ public class InnotechPushManager {
         }
         //华为设备时，开启华为推送
         else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {
-            new HuaweiSDK(application);
+            if (CommonUtils.isMainProcess(application.getApplicationContext())) {
+                new HuaweiSDK(application);
+            }
         }
         //oppo设备时，开启oppo推送
 //        else if (com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext()) && Utils.isOPPO()) {

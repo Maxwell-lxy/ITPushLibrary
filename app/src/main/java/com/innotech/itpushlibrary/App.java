@@ -21,15 +21,7 @@ public class App extends KeepApplication {
         int min = 1000;
         Random random = new Random();
         s = random.nextInt(max) % (max - min + 1) + min;
-//        startInnoSdk("test", "union", "" + s);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                InnotechPushManager.getInstance().initPushSDK(App.this);
-                InnotechPushManager.pushIcon = R.mipmap.ic_launcher;
-                InnotechPushManager.getInstance().setPushRevicer(new TestPushReciver());
-            }
-        }).start();
+        startInnoSdk("test", "union", "" + s);
     }
 
     private void startInnoSdk(String cid, String ch, String member_id) {

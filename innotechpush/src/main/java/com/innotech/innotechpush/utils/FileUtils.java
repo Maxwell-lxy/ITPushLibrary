@@ -5,6 +5,7 @@ import android.content.Context;
 import com.innotech.innotechpush.config.PushConstant;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 import static android.content.Context.MODE_APPEND;
@@ -37,6 +38,8 @@ public class FileUtils {
             fis.read(buffer);
             //将byte数组转换成指定格式的字符串
             result = new String(buffer, "UTF-8");
+        } catch (FileNotFoundException e) {
+//            LogUtils.e(context, "首次安装文件暂未生成");
         } catch (Exception e) {
             LogUtils.e(context, "读取file_token文件异常");
         }
