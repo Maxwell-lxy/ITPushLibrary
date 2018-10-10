@@ -480,14 +480,24 @@ public class SocketManager {
      * json数据
      */
     private String getJsonByData(InputStream is, int len) {
-        boolean isRead = true;
         String json = null;
+        //
         byte[] lenJ = new byte[len - 12];
         LogUtils.e(context, "getJsonByData：" + lenJ.length);
         try {
+            boolean isRead = true;
+            int readLen = 0;
             while (isRead) {
-                int readLen = is.read(lenJ);
-                if (readLen == -1 || readLen == len - 12) {
+                int curReadLen = 0;
+                if (lenJ.length - readLen < 1024) {
+                    curReadLen = is.read(lenJ, readLen, lenJ.length - readLen);
+                } else {
+                    curReadLen = is.read(lenJ, readLen, 1024);
+                }
+                readLen += curReadLen;
+                LogUtils.e(context, "readLen：" + readLen);
+                LogUtils.e(context, "curReadLen：" + curReadLen);
+                if (curReadLen == -1 || readLen == len - 12) {
                     isRead = false;
                 }
             }

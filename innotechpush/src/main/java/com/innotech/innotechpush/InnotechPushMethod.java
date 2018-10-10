@@ -358,7 +358,7 @@ public class InnotechPushMethod {
                 }
             }
         } catch (Exception e) {
-            LogUtils.e(context, "长连接回执之前丢失的回执失败");
+            LogUtils.e(context, "长连接回执之前丢失的回执失败" + e.getMessage());
         }
     }
 

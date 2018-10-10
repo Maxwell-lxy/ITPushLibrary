@@ -65,12 +65,14 @@ public final class HMSAgent implements INoProguard {
      */
     private static final String VER_020600200 = "020600200";
 
-
     private static final String VER_020601002 = "020601002";
+
+    private static final String VER_020601302 = "020601302";
+
     /**
      * 当前版本号 | Current version number
      */
-    public static final String CURVER = VER_020601002;
+    public static final String CURVER = VER_020601302;
 
     public static final class AgentResultCode {
 
@@ -252,7 +254,6 @@ public final class HMSAgent implements INoProguard {
     public static void checkUpdate (Activity activity, CheckUpdateHandler callback) {
         new CheckUpdateApi().checkUpdate(activity, callback);
     }
-
 
 
 

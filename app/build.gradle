@@ -30,7 +30,7 @@ android {
                 MEIZU_APP_ID       : "116007",
                 MEIZU_APP_KEY      : "9779ce34260d43faad9e47e0ca10c12f",
 
-                HMS_APP_ID         : "100244129",
+                HMS_APP_ID         : "100437753",
 
                 GETUI_APP_ID       : "2e48RoYBrh65BC4HRmkAg6",
                 GETUI_APP_KEY      : "PwG112qeeV5UiQrtVObz3A",
@@ -46,6 +46,7 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.releaseSigning
+            debuggable true
         }
     }
 }

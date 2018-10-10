@@ -25,16 +25,16 @@ public class App extends KeepApplication {
     }
 
     private void startInnoSdk(String cid, String ch, String member_id) {
-        InnoMain.setValueMap("ch", ch);//这里填入你们的渠道号
-        InnoMain.setValueMap("member_id", member_id);//这里填入你们的用户id
-        InnoMain.startInno(this, cid, new InnoMain.CallBack() {//cid为注册的业务方id
-            @Override
-            public void getOpenid(String openid, int isnew, String remark) {
+//        InnoMain.setValueMap("ch", ch);//这里填入你们的渠道号
+//        InnoMain.setValueMap("member_id", member_id);//这里填入你们的用户id
+//        InnoMain.startInno(this, cid, new InnoMain.CallBack() {//cid为注册的业务方id
+//            @Override
+//            public void getOpenid(String openid, int isnew, String remark) {
                 InnotechPushManager.getInstance().initPushSDK(App.this);
                 InnotechPushManager.pushIcon = R.mipmap.ic_launcher;
                 InnotechPushManager.getInstance().setPushRevicer(new TestPushReciver());
-            }
-        });
+//            }
+//        });
     }
 
     @Override
