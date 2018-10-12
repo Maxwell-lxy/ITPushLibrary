@@ -257,6 +257,7 @@ public class SocketManager {
                     LogUtils.e(context, "ack回值成功");
                     break;
                 case 10://心跳回包（HeartBeatRespCmd）
+                    DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "心跳回包成功");
                     LogUtils.e(context, "心跳回包成功");
                     break;
                 default:
@@ -334,6 +335,7 @@ public class SocketManager {
      */
     public void sendHeartData() {
         sendData("", 9);
+        DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "发送心跳指令");
         LogUtils.e(context, "发送心跳指令");
     }
 

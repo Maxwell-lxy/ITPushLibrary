@@ -252,27 +252,37 @@ public class NotificationUtils {
             notificationManager.createNotificationChannel(channel);
             Notification.Builder mBuilder = new Notification.Builder(context, NotificationUtils.notification_channel_id);
             mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
-                    .setContentText(msg.getContent())
+                    .setContentText(msg.getTitle())
                     .setAutoCancel(true)
+                    .setTicker(msg.getTitle())
                     .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
                     .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
                     .setDefaults(Notification.DEFAULT_VIBRATE)
                     .setSmallIcon(InnotechPushManager.pushIcon)
+                    .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
+                            , InnotechPushManager.pushIcon))
                     .setContent(remoteViews);
             mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
-            notificationManager.notify(id, mBuilder.build());
+            Notification not = mBuilder.build();
+            not.flags  = Notification.FLAG_AUTO_CANCEL | Notification.FLAG_ONGOING_EVENT;
+            notificationManager.notify(id, not);
         } else {
-            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context);
+            NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, NotificationUtils.notification_channel_id);
             mBuilder.setContentTitle(msg.getTitle())//设置通知栏标题
-                    .setContentText(msg.getContent())
+                    .setContentText(msg.getTitle())
+                    .setTicker(msg.getTitle())
                     .setAutoCancel(true)
                     .setWhen(System.currentTimeMillis())//通知产生的时间，会在通知信息里显示，一般是系统获取到的时间
                     .setPriority(Notification.PRIORITY_DEFAULT) //设置该通知优先级
                     .setDefaults(Notification.DEFAULT_VIBRATE)
                     .setSmallIcon(InnotechPushManager.pushIcon)
+                    .setLargeIcon(BitmapFactory.decodeResource(context.getResources()
+                            , InnotechPushManager.pushIcon))
                     .setContent(remoteViews);
             mBuilder.setContentIntent(contentIntent); //设置通知栏点击意图
-            notificationManager.notify(id, mBuilder.build());
+            Notification not = mBuilder.build();
+            not.flags  = Notification.FLAG_AUTO_CANCEL | Notification.FLAG_ONGOING_EVENT;
+            notificationManager.notify(id, not);
         }
     }
 
