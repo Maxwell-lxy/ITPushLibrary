@@ -2,6 +2,7 @@ package com.innotech.itpushlibrary;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 
 import com.innotech.innotechpush.InnotechPushMethod;
@@ -14,6 +15,22 @@ import com.innotech.innotechpush.utils.LogUtils;
  */
 
 public class TestPushReciver extends PushReciver {
+
+    public static Handler handler;
+
+    @Override
+    public void onReceiveGuid(Context context, String guid) {
+        super.onReceiveGuid(context, guid);
+        Message msg = new Message();
+        msg.what = 2;
+        Bundle b = new Bundle();// 存放数据
+        b.putString("guid", guid);
+        msg.setData(b);
+        if (handler != null) {
+            handler.sendMessage(msg);
+        }
+    }
+
     @Override
     public void onReceivePassThroughMessage(Context context, InnotechMessage mPushMessage) {
         // super.onReceivePassThroughMessage(context, miPushMessage);
@@ -23,8 +40,8 @@ public class TestPushReciver extends PushReciver {
         Bundle b = new Bundle();// 存放数据
         b.putString("custom", mPushMessage.getCustom());
         msg.setData(b);
-        if (InnotechPushMethod.getMyHandler() != null) {
-            InnotechPushMethod.getMyHandler().sendMessage(msg);
+        if (handler != null) {
+            handler.sendMessage(msg);
         }
     }
 

@@ -39,14 +39,12 @@ import java.util.List;
 
 public class InnotechPushMethod {
 
-    private static Handler myHandler;
-
     /**
      * app上传用户信息
      *
      * @param context：Android平台上app的上下文，建议传入当前app的application context
      */
-    public static void updateUserInfo(Context context, final RequestCallback mCallBack) {
+    public static void updateUserInfo(final Context context, final RequestCallback mCallBack) {
         try {
             //channel为空时说明部分数据被系统回收掉了，需要重新初始化一下
             if (TextUtils.isEmpty(UserInfoModel.getInstance().getChannel())) {
@@ -69,6 +67,11 @@ public class InnotechPushMethod {
             NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_UPDATEUSERINFO, json, sign, new RequestCallback() {
                 @Override
                 public void onSuccess(String msg) {
+                    if (InnotechPushManager.getPushReciver() != null) {
+                        InnotechPushManager.getPushReciver().onReceiveGuid(context, msg);
+                    } else {
+                        InnotechPushManager.innotechPushReciverIsNull(context);
+                    }
                     InnotechPushManager.getInstance().initSocketPush();
                     mCallBack.onSuccess(msg);
                 }
@@ -366,14 +369,6 @@ public class InnotechPushMethod {
         if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {
             HuaweiSDK.huaWeiConnect(activity);
         }
-    }
-
-    public static void setHandler(Handler handler) {
-        myHandler = handler;
-    }
-
-    public static Handler getMyHandler() {
-        return myHandler;
     }
 
     private static String getTK(Context context) {

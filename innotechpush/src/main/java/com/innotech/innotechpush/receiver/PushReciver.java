@@ -18,7 +18,16 @@ public class PushReciver {
     }
 
     /**
+     * 注册成功，返回GUID
+     * @param context
+     * @param guid
+     */
+    public void onReceiveGuid(Context context, String guid) {
+    }
+
+    /**
      * 透传信息处理回调方法
+     *
      * @param var1
      * @param mPushMessage
      */
@@ -27,14 +36,16 @@ public class PushReciver {
 
     /**
      * 点击通知栏消息回调方法
+     *
      * @param var1
      * @param mPushMessage
      */
-    public void onNotificationMessageClicked(Context var1,InnotechMessage mPushMessage) {
+    public void onNotificationMessageClicked(Context var1, InnotechMessage mPushMessage) {
     }
 
     /**
      * 通知栏详细到达时回调
+     *
      * @param var1
      * @param mPushMessage
      */
