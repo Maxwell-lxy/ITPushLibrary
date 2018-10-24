@@ -5,6 +5,11 @@ import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkRequest;
+import android.os.Build;
+import android.util.Log;
 
 import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.config.BroadcastConstant;
@@ -84,7 +89,7 @@ public class InnotechPushManager {
                 new MeizuSDK(application.getApplicationContext());
             } else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {//华为设备时，开启华为推送
                 new HuaweiSDK(application);
-            }else { //其他设备时，开启个推推送和socket长连接
+            } else { //其他设备时，开启个推推送和socket长连接
                 initGeTuiPush();
             }
 
@@ -178,4 +183,5 @@ public class InnotechPushManager {
         filter1.addAction(BroadcastConstant.ERROR);
         context.registerReceiver(new SocketClientRevicer(), filter1);
     }
+
 }

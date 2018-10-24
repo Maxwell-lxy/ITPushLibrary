@@ -141,6 +141,7 @@ public class PushIntentService extends GTIntentService {
         try {
             object = new JSONObject(data);
             int style = object.getInt("style");
+            String taskId = object.getString("task_id");
             String title = object.getString("title");
             String content = object.getString("content");
             String extra = object.getString("extra");
@@ -156,7 +157,7 @@ public class PushIntentService extends GTIntentService {
             mPushMessage.setContent(content);
             mPushMessage.setCustom(extra);
             mPushMessage.setUnfold(unfold);
-            mPushMessage.setMessageId(msg.getMessageId());
+            mPushMessage.setMessageId(taskId);
 
         } catch (JSONException e) {
             e.printStackTrace();

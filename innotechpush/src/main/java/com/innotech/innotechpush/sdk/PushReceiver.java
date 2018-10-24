@@ -36,7 +36,11 @@ public class PushReceiver extends BroadcastReceiver {
             int netWorkState = NetUtil.getNetWorkState(context);
             LogUtils.e(context, "netWorkState：" + netWorkState);
             if (netWorkState != -1) {
-                SocketManager.getInstance(context).reConnect();
+                if (!CommonUtils.isServiceRunning(context, SocketClientService.class.getName())) {
+                    context.startService(new Intent(context, SocketClientService.class));
+                } else {
+                    SocketManager.getInstance(context).reConnect();
+                }
             }
         } else if (action.equals(BroadcastConstant.ACTION_FRESH_PUSH + context.getPackageName())) {
             LogUtils.e(context, BroadcastConstant.ACTION_FRESH_PUSH + context.getPackageName());

@@ -350,14 +350,10 @@ public class InnotechPushMethod {
             List<SocketAck> acks = SocketAck.find(SocketAck.class, "cmd = ?", "6");
             if (acks != null && acks.size() > 0) {
                 for (final SocketAck ack : acks) {
-                    SocketManager.getInstance(context).sendData(ack.getJson(), ack.getCmd(), new SocketSendCallback() {
-                        @Override
-                        public void onResult(boolean result) {
-                            if (result) {
-                                ack.delete();
-                            }
-                        }
-                    });
+                    boolean result = SocketManager.getInstance(context).sendData(ack.getJson(), ack.getCmd());
+                    if (result) {
+                        ack.delete();
+                    }
                 }
             }
         } catch (Exception e) {
