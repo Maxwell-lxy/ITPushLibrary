@@ -168,11 +168,18 @@ public class SocketManager {
             @Override
             public void run() {
                 try {
+                    LogUtils.e(context, "这里是读的线程readThread:" + readThread);
                     byte[] lenB = new byte[16];
-                    while (mInputStream.read(lenB) != -1) {
+                    int tempRead = 0;
+                    while ((tempRead = mInputStream.read(lenB)) != -1) {
+                        if(tempRead != 16){
+                            LogUtils.e(context, "tempRead:" + tempRead);
+                        }
                         int len = getLenByData(lenB);
 //                        long requestId = getRequestIDByData(lenB);
                         int command = getCommandByData(lenB);
+                        LogUtils.e(context, "len:" + len);
+                        LogUtils.e(context, "command:" + command);
                         switch (command) {
                             case 1://登录成功（LoginRespCmd）
                                 LogUtils.e(context, "登录成功");
@@ -494,9 +501,9 @@ public class SocketManager {
             }
             json = new String(lenJ);
             printtest(json);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "获取服务端回包的信息解析失败，len" + len);
+            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "获取服务端回包的信息解析失败，len" + len + "，异常信息：" + e.getMessage());
         }
         return json;
     }

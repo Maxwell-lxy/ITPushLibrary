@@ -39,5 +39,5 @@
 -keep class com.huawei.hms.**{*;}
 -keep class com.huawei.gamebox.plugin.gameservice.**{*;}
 -keep public class com.huawei.android.hms.agent.** extends android.app.Activity { public *; protected *; }
--keep interface com.huawei.android.hms.agent.common.INoProguard {*;}
--keep class * extends com.huawei.android.hms.agent.common.INoProguard {*;}
+#-keep interface com.huawei.android.hms.agent.common.INoProguard {*;}
+#-keep class * extends com.huawei.android.hms.agent.common.INoProguard {*;}

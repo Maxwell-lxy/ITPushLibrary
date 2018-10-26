@@ -10,23 +10,25 @@ import android.util.Log;
 public class SocketClientJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
+        Log.e("allen", "Service onStartJob");
         return false;
     }
 
     @Override
     public boolean onStopJob(JobParameters params) {
+        Log.e("allen", "Service onStopJob");
         return false;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(SocketClientJobService.class.getSimpleName(), "Service created");
+        Log.e("allen", "Service created");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i(SocketClientJobService.class.getSimpleName(), "Service destroyed");
+        Log.e("allen", "Service destroyed");
     }
 }

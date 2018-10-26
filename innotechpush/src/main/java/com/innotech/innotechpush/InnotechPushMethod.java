@@ -2,12 +2,10 @@ package com.innotech.innotechpush;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Handler;
 import android.text.TextUtils;
 
 import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.callback.RequestCallback;
-import com.innotech.innotechpush.callback.SocketSendCallback;
 import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.db.ClientLog;
@@ -15,13 +13,11 @@ import com.innotech.innotechpush.db.ClientMsgNotify;
 import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.db.SocketAck;
 import com.innotech.innotechpush.sdk.HuaweiSDK;
-import com.innotech.innotechpush.sdk.SocketClientService;
 import com.innotech.innotechpush.sdk.SocketManager;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NetWorkUtils;
 import com.innotech.innotechpush.utils.SignUtils;
 import com.innotech.innotechpush.utils.TokenUtils;
-import com.innotech.innotechpush.utils.UserInfoSPUtils;
 import com.innotech.innotechpush.utils.Utils;
 
 import org.json.JSONArray;
@@ -30,7 +26,6 @@ import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
