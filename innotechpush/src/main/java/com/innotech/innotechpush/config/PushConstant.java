@@ -32,5 +32,10 @@ public class PushConstant {
      */
     public static boolean hasHuawei = true;
 
+    /**
+     * 默认开启oppo
+     * 如果不需要开启oppo则需要设为false
+     */
+    public static boolean hasOppo = true;
 
 }

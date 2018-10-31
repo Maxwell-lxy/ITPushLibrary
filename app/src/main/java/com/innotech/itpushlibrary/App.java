@@ -1,7 +1,12 @@
 package com.innotech.itpushlibrary;
 
+import android.content.Context;
+import android.support.multidex.MultiDex;
+import android.support.multidex.MultiDexApplication;
+
 import com.inno.innosdk.pb.InnoMain;
 import com.innotech.innotechpush.InnotechPushManager;
+import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.sdk.KeepApplication;
 
 import java.util.Random;
@@ -10,18 +15,26 @@ import java.util.Random;
  * Created by admin on 2018/4/11.
  */
 
-public class App extends KeepApplication {
+public class App extends MultiDexApplication {
 
     int s = 0;
 
     @Override
     public void onCreate() {
         super.onCreate();
+//        PushConstant.hasOppo = false;
+
         int max = 10000;
         int min = 1000;
         Random random = new Random();
         s = random.nextInt(max) % (max - min + 1) + min;
         startInnoSdk("test", "union", "" + s);
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 
     private void startInnoSdk(String cid, String ch, String member_id) {

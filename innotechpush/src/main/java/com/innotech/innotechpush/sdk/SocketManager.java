@@ -162,32 +162,32 @@ public class SocketManager {
      */
     private void readData() {
         if (readThread != null && readThread.isAlive()) {
-            return;
+            readThread.interrupt();
+            readThread = null;
         }
         readThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    LogUtils.e(context, "这里是读的线程readThread:" + readThread);
-                    byte[] lenB = new byte[16];
-                    int tempRead = 0;
-                    while ((tempRead = mInputStream.read(lenB)) != -1) {
-                        if(tempRead != 16){
-                            LogUtils.e(context, "tempRead:" + tempRead);
-                        }
+                    while (true) {
+                        //读取前16位
+                        byte[] lenB = readByLen(16);
                         int len = getLenByData(lenB);
 //                        long requestId = getRequestIDByData(lenB);
                         int command = getCommandByData(lenB);
+                        String json = "";
+                        if (len - 12 > 0) {
+                            json = getJsonByData(len - 12);
+                        }
                         LogUtils.e(context, "len:" + len);
                         LogUtils.e(context, "command:" + command);
                         switch (command) {
                             case 1://登录成功（LoginRespCmd）
                                 LogUtils.e(context, "登录成功");
                                 try {
-                                    String jsonA = getJsonByData(mInputStream, len);
-                                    if (!TextUtils.isEmpty(jsonA) && !"null".equals(jsonA)) {
+                                    if (!TextUtils.isEmpty(json) && !"null".equals(json)) {
                                         ArrayList<String> list = new ArrayList<>();
-                                        JSONArray array = new JSONArray(jsonA);
+                                        JSONArray array = new JSONArray(json);
                                         for (int i = 0; i < array.length(); i++) {
                                             JSONObject object = array.getJSONObject(i);
                                             PushMessage pushMessage = (PushMessage) DataAnalysis.jsonToT(PushMessage.class.getName(), object.toString());
@@ -201,7 +201,8 @@ public class SocketManager {
                                             if (CommonUtils.isXiaomiDevice()
                                                     || CommonUtils.isMIUI()
                                                     || CommonUtils.isMeizuDevice()
-                                                    || (Utils.isHuaweiDevice() && PushConstant.hasHuawei)) {
+                                                    || (Utils.isHuaweiDevice() && PushConstant.hasHuawei)
+                                                    || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))) {
                                                 ackCmd(list, 101);
                                             } else {
                                                 ackCmd(list, 1001);
@@ -217,9 +218,8 @@ public class SocketManager {
                             case 4://服务器推送消息（ForwardCmd）
                                 LogUtils.e(context, "收到服务器推送消息");
                                 //处理推送消息
-                                String jsonO = getJsonByData(mInputStream, len);
-                                if (!TextUtils.isEmpty(jsonO) && !"null".equals(jsonO)) {
-                                    PushMessage pushMessage = (PushMessage) DataAnalysis.jsonToT(PushMessage.class.getName(), jsonO);
+                                if (!TextUtils.isEmpty(json) && !"null".equals(json)) {
+                                    PushMessage pushMessage = (PushMessage) DataAnalysis.jsonToT(PushMessage.class.getName(), json);
                                     if (pushMessage != null) {
                                         PushMessageManager.getInstance(context).setNewMessage(pushMessage);
                                         ArrayList<String> list = new ArrayList<>();
@@ -227,7 +227,8 @@ public class SocketManager {
                                         if (CommonUtils.isXiaomiDevice()
                                                 || CommonUtils.isMIUI()
                                                 || CommonUtils.isMeizuDevice()
-                                                || (Utils.isHuaweiDevice() && PushConstant.hasHuawei)) {
+                                                || (Utils.isHuaweiDevice() && PushConstant.hasHuawei)
+                                                || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))) {
                                             ackCmd(list, 101);
                                         } else {
                                             ackCmd(list, 1);
@@ -237,37 +238,36 @@ public class SocketManager {
                                 }
                                 break;
                             case 7://ack回值成功（AckRespCmd）
-//                                getJsonByData(mInputStream, len);
-                                LogUtils.e(context, "ack回值成功");
+                                if (!TextUtils.isEmpty(json) && "true".equals(json)) {
+                                    LogUtils.e(context, "ack回值成功");
+                                }
                                 break;
                             case 10://心跳回包（HeartBeatRespCmd）
                                 DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "心跳回包成功");
                                 LogUtils.e(context, "心跳回包成功");
                                 break;
-                            default:
+                            default://未识别到command，重启一下socket
+                                if (mSocket != null) {
+                                    mSocket.close();
+                                    try {
+                                        Thread.sleep(5000);
+                                        reConnect();
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
                                 break;
                         }
-                    }
-                    //while循环中阻塞读，当服务器断开连接后，读操作就会返回-1，从而跳出循环执行后续的代码。
-                    //服务器断开了，需要重连
-                    LogUtils.e(context, "服务器断开了，正在尝试重连...");
-                    try {
-                        Thread.sleep(5000);
-                        reConnect();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
                     LogUtils.e(context, "IOException异常：" + e.getMessage());
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     try {
                         Thread.sleep(5000);
                         reConnect();
                     } catch (InterruptedException e1) {
-                        e.printStackTrace();
+                        e1.printStackTrace();
                     }
-//                }
                     DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "IOException异常：" + e.getMessage());
                 }
             }
@@ -323,6 +323,7 @@ public class SocketManager {
             object.put("guid", guid);
             object.put("app_id", appID);
             object.put("app_key", appKey);
+            object.put("version", PushConstant.INNOTECH_PUSH_VERSION);
             boolean result = sendData(object.toString(), 0);
             if (!result) {
                 LogUtils.e(context, "发送登录指令失败，进行重连。");
@@ -474,37 +475,40 @@ public class SocketManager {
     }
 
     /**
+     * 读取长度为len的字符数组
+     *
+     * @param len：长度
+     * @return 字符数组
+     */
+    private byte[] readByLen(int len) throws IOException {
+        byte[] result = new byte[len];
+        boolean isRead = true;
+        int readLen = 0;
+        while (isRead) {
+            int curReadLen = 0;
+            if (result.length - readLen < 1024) {
+                curReadLen = mInputStream.read(result, readLen, result.length - readLen);
+            } else {
+                curReadLen = mInputStream.read(result, readLen, 1024);
+            }
+            readLen += curReadLen;
+//            LogUtils.e(context, "readLen：" + readLen);
+//            LogUtils.e(context, "curReadLen：" + curReadLen);
+            if (curReadLen == -1 || readLen == len) {
+                isRead = false;
+            }
+        }
+        return result;
+    }
+
+    /**
      * 获取服务端回包的信息
      * json数据
      */
-    private String getJsonByData(InputStream is, int len) {
-        String json = null;
-        //
-        byte[] lenJ = new byte[len - 12];
-        LogUtils.e(context, "getJsonByData：" + lenJ.length);
-        try {
-            boolean isRead = true;
-            int readLen = 0;
-            while (isRead) {
-                int curReadLen = 0;
-                if (lenJ.length - readLen < 1024) {
-                    curReadLen = is.read(lenJ, readLen, lenJ.length - readLen);
-                } else {
-                    curReadLen = is.read(lenJ, readLen, 1024);
-                }
-                readLen += curReadLen;
-                LogUtils.e(context, "readLen：" + readLen);
-                LogUtils.e(context, "curReadLen：" + curReadLen);
-                if (curReadLen == -1 || readLen == len - 12) {
-                    isRead = false;
-                }
-            }
-            json = new String(lenJ);
-            printtest(json);
-        } catch (Exception e) {
-            e.printStackTrace();
-            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "获取服务端回包的信息解析失败，len" + len + "，异常信息：" + e.getMessage());
-        }
+    private String getJsonByData(int len) throws IOException {
+        byte[] lenJ = readByLen(len);
+        String json = new String(lenJ);
+        printtest(json);
         return json;
     }
 

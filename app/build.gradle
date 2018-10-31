@@ -45,6 +45,8 @@ android {
                 OPPO_APP_SECRET    : "b4aB971Df1bD32eEB9882d2429898BB5"
 
         ]
+
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -71,4 +73,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation project(':innotechpush')
+    implementation 'com.android.support:multidex:1.0.3'
 }

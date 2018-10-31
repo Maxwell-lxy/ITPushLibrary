@@ -6,11 +6,15 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import com.innotech.innotechpush.InnotechPushMethod;
+import com.innotech.innotechpush.utils.BroadcastUtils;
+
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class SocketClientJobService extends JobService {
     @Override
     public boolean onStartJob(JobParameters params) {
         Log.e("allen", "Service onStartJob");
+        BroadcastUtils.sendUpdateUserInfoBroadcast(this.getApplicationContext());
         return false;
     }
 

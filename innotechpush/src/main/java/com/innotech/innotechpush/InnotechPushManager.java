@@ -22,6 +22,7 @@ import com.innotech.innotechpush.sdk.MiSDK;
 import com.innotech.innotechpush.sdk.PushMessageReceiver;
 import com.innotech.innotechpush.sdk.PushReceiver;
 import com.innotech.innotechpush.sdk.SocketClientService;
+import com.innotech.innotechpush.service.OppoPushCallback;
 import com.innotech.innotechpush.service.PushIntentService;
 import com.innotech.innotechpush.service.PushService;
 import com.innotech.innotechpush.utils.CommonUtils;
@@ -89,16 +90,13 @@ public class InnotechPushManager {
                 new MeizuSDK(application.getApplicationContext());
             } else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {//华为设备时，开启华为推送
                 new HuaweiSDK(application);
+            } else if (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext())) {//oppo设备时，开启oppo推送
+                String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
+                String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
+                com.coloros.mcssdk.PushManager.getInstance().register(application.getApplicationContext(), appKey, appSecret, new OppoPushCallback(application));
             } else { //其他设备时，开启个推推送和socket长连接
                 initGeTuiPush();
             }
-
-//        else if (com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext()) && Utils.isOPPO()) {//oppo设备时，开启oppo推送
-//            pushSDKName = oppoSDKName;
-//            String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
-//            String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
-//            com.coloros.mcssdk.PushManager.getInstance().register(application.getApplicationContext(), appKey, appSecret, new OppoPushCallback(application));
-//        }
         }
     }
 
