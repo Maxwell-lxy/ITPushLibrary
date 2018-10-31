@@ -357,7 +357,7 @@ public class InnotechPushMethod {
     }
 
     public static void launcher(Activity activity) {
-        if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {
+        if (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41()) {
             HuaweiSDK.huaWeiConnect(activity);
         }
     }

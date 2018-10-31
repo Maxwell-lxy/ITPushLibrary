@@ -21,8 +21,8 @@ public class OppoPushCallback extends PushAdapter {
     public void onRegister(int code, String s) {
         if (code == 0) {
             Log.e("oppo", "注册成功，registerId:" + s);
-            UserInfoModel.getInstance().setDevice_token1(s);
-            BroadcastUtils.sendUpdateUserInfoBroadcast(context);
+//            UserInfoModel.getInstance().setDevice_token1(s);
+//            BroadcastUtils.sendUpdateUserInfoBroadcast(context);
         } else {
             Log.e("oppo", "注册失败，code=" + code + ",msg=" + s);
         }

@@ -201,8 +201,9 @@ public class SocketManager {
                                             if (CommonUtils.isXiaomiDevice()
                                                     || CommonUtils.isMIUI()
                                                     || CommonUtils.isMeizuDevice()
-                                                    || (Utils.isHuaweiDevice() && PushConstant.hasHuawei)
-                                                    || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))) {
+                                                    || (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41())
+//                                                    || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
+                                                    ) {
                                                 ackCmd(list, 101);
                                             } else {
                                                 ackCmd(list, 1001);
@@ -227,8 +228,9 @@ public class SocketManager {
                                         if (CommonUtils.isXiaomiDevice()
                                                 || CommonUtils.isMIUI()
                                                 || CommonUtils.isMeizuDevice()
-                                                || (Utils.isHuaweiDevice() && PushConstant.hasHuawei)
-                                                || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))) {
+                                                || (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41())
+//                                                || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
+                                                ) {
                                             ackCmd(list, 101);
                                         } else {
                                             ackCmd(list, 1);
