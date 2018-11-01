@@ -374,14 +374,13 @@ public class SocketManager {
                 reConnect();
             } else {
                 LogUtils.e(context, "发送ack指令成功：" + object.toString());
+                //客户端回执
+                JSONArray paramArray = new JSONArray();
+                paramArray.put(object);
+                InnotechPushMethod.clientMsgNotify(context, paramArray, 0);
             }
-            //客户端回执
-            JSONArray paramArray = new JSONArray();
-            paramArray.put(object);
-            InnotechPushMethod.clientMsgNotify(context, paramArray, 0);
         } catch (JSONException e) {
-            e.printStackTrace();
-            LogUtils.e(context, "发送ack指令时，出现异常。");
+            LogUtils.e(context, "发送ack指令时，出现异常。" + e.getMessage());
             DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "发送ack指令时，出现异常。" + msgList.toString());
         }
     }
@@ -537,7 +536,7 @@ public class SocketManager {
                 DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "重连结束...");
             }
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            LogUtils.e(context, "takeRCQueue：" + e.getMessage());
         }
     }
 

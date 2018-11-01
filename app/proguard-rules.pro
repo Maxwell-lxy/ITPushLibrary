@@ -42,3 +42,7 @@
 -keep public class com.huawei.android.hms.agent.** extends android.app.Activity { public *; protected *; }
 -keep interface com.huawei.android.hms.agent.common.INoProguard {*;}
 -keep class * extends com.huawei.android.hms.agent.common.INoProguard {*;}
+
+#bugly
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.**{*;}

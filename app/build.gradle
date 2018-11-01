@@ -45,7 +45,10 @@ android {
                 OPPO_APP_SECRET    : "b4aB971Df1bD32eEB9882d2429898BB5"
 
         ]
-
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi' //, 'x86', 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
         multiDexEnabled true
     }
     buildTypes {
@@ -74,4 +77,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation project(':innotechpush')
     implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.tencent.bugly:crashreport:2.6.5'
+    implementation 'com.tencent.bugly:nativecrashreport:3.3.1'
 }

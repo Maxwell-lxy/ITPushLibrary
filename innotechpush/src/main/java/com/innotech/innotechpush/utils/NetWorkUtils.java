@@ -72,7 +72,6 @@ public class NetWorkUtils {
                     SaveData.saveData(context, response.toString(), urlStr, mCallBack);
                 } catch (Exception e) {
                     LogUtils.e(context, "sendPostRequest方法出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
-                    e.printStackTrace();
                     if (mCallBack != null) {
                         mCallBack.onFail("sendPostRequest方法出现异常 Exception:" + e.getMessage());
                     }
@@ -81,7 +80,6 @@ public class NetWorkUtils {
                         try {
                             reader.close();
                         } catch (IOException e) {
-                            e.printStackTrace();
                             LogUtils.e(context, "BufferedReader关闭出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
                             if (mCallBack != null) {
                                 mCallBack.onFail("BufferedReader关闭出现异常 Exception:" + e.getMessage());

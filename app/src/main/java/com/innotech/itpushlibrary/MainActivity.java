@@ -15,6 +15,7 @@ import com.innotech.innotechpush.InnotechPushMethod;
 import com.innotech.innotechpush.callback.RequestCallback;
 import com.innotech.innotechpush.utils.UserInfoSPUtils;
 import com.innotech.innotechpush.utils.Utils;
+import com.tencent.bugly.crashreport.CrashReport;
 
 public class MainActivity extends Activity {
     EditText edAlias;
@@ -31,7 +32,6 @@ public class MainActivity extends Activity {
         InnotechPushMethod.launcher(this);
 
         TestPushReciver.handler = myHandler;
-
     }
 
     private void initViews() {

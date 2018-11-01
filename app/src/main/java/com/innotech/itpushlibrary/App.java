@@ -8,6 +8,7 @@ import com.inno.innosdk.pb.InnoMain;
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.sdk.KeepApplication;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.Random;
 
@@ -29,6 +30,7 @@ public class App extends MultiDexApplication {
         Random random = new Random();
         s = random.nextInt(max) % (max - min + 1) + min;
         startInnoSdk("test", "union", "" + s);
+        CrashReport.initCrashReport(getApplicationContext(), "450dd7d0c6", false);
     }
 
     @Override
