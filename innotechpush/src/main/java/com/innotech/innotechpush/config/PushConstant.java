@@ -24,7 +24,7 @@ public class PushConstant {
     /**
      * 推送版本号
      */
-    public static final String INNOTECH_PUSH_VERSION = "2.0.0";
+    public static final String INNOTECH_PUSH_VERSION = "2.0.3";
 
     /**
      * 默认开启华为
@@ -32,5 +32,10 @@ public class PushConstant {
      */
     public static boolean hasHuawei = true;
 
+    /**
+     * 默认开启oppo
+     * 如果不需要开启oppo则需要设为false
+     */
+    public static boolean hasOppo = true;
 
 }

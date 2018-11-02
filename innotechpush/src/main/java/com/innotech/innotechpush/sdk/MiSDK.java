@@ -26,7 +26,6 @@ public class MiSDK {
         String appKey = Utils.getMetaDataString(context, "MI_APP_KEY").replace("innotech-", "");
         MiPushClient.registerPush(context, appId, appKey);
         LogUtils.e(context, LogUtils.TAG_XIAOMI + "MiPushClient.registerPush appId:" + appId + " appKey:" + appKey);
-        DbUtils.addClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_XIAOMI + "MiPushClient.registerPush appId:" + appId + " appKey:" + appKey);
         LoggerInterface newLogger = new LoggerInterface() {
 
             @Override

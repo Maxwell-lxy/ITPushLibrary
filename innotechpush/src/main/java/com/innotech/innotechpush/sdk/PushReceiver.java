@@ -36,7 +36,11 @@ public class PushReceiver extends BroadcastReceiver {
             int netWorkState = NetUtil.getNetWorkState(context);
             LogUtils.e(context, "netWorkState：" + netWorkState);
             if (netWorkState != -1) {
-                SocketManager.getInstance(context).reConnect();
+                if (!CommonUtils.isServiceRunning(context, SocketClientService.class.getName())) {
+                    context.startService(new Intent(context, SocketClientService.class));
+                } else {
+                    SocketManager.getInstance(context).reConnect();
+                }
             }
         } else if (action.equals(BroadcastConstant.ACTION_FRESH_PUSH + context.getPackageName())) {
             LogUtils.e(context, BroadcastConstant.ACTION_FRESH_PUSH + context.getPackageName());
@@ -63,7 +67,6 @@ public class PushReceiver extends BroadcastReceiver {
                 } else {
                     SocketManager.getInstance(context).ackCmd(list, 3);
                 }
-                DbUtils.addClientLog(context, LogCode.LOG_DATA_NOTIFY, "通知被点击：" + message.getMsg_id());
             }
         } else if (BroadcastConstant.RECEIVE_MESSAGE.equals(action)) {
             //目前的逻辑
@@ -78,12 +81,13 @@ public class PushReceiver extends BroadcastReceiver {
                 } else if (CommonUtils.isXiaomiDevice()
                         || CommonUtils.isMIUI()
                         || CommonUtils.isMeizuDevice()
-                        || (Utils.isHuaweiDevice() && PushConstant.hasHuawei)) {
+                        || (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41())
+//                        || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
+                        ) {
                     SocketManager.getInstance(context).ackCmd(list, 102);
                 } else {
                     SocketManager.getInstance(context).ackCmd(list, 2);
                 }
-                DbUtils.addClientLog(context, LogCode.LOG_DATA_NOTIFY, "显示通知：" + message.getMsg_id());
             }
         }
     }

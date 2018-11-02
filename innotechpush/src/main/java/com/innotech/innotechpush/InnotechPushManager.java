@@ -1,10 +1,13 @@
 package com.innotech.innotechpush;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
+import android.os.Bundle;
 
 import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.config.BroadcastConstant;
@@ -14,15 +17,14 @@ import com.innotech.innotechpush.receiver.SocketClientRevicer;
 import com.innotech.innotechpush.sdk.HuaweiSDK;
 import com.innotech.innotechpush.sdk.MeizuSDK;
 import com.innotech.innotechpush.sdk.MiSDK;
-import com.innotech.innotechpush.sdk.PushMessageReceiver;
 import com.innotech.innotechpush.sdk.PushReceiver;
 import com.innotech.innotechpush.sdk.SocketClientService;
+import com.innotech.innotechpush.service.OppoPushCallback;
 import com.innotech.innotechpush.service.PushIntentService;
 import com.innotech.innotechpush.service.PushService;
 import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.Utils;
-import com.meizu.cloud.pushsdk.PushManager;
 import com.orm.SugarContext;
 
 import java.util.List;
@@ -63,7 +65,7 @@ public class InnotechPushManager {
      *
      * @param application
      */
-    public void initPushSDK(Application application) {
+    public void initPushSDK(final Application application) {
         this.application = application;
         String processName = getProcessName(application, android.os.Process.myPid());
         LogUtils.e(application, "当前进程名字：" + processName);
@@ -82,18 +84,57 @@ public class InnotechPushManager {
                 new MiSDK(application.getApplicationContext());
             } else if (Utils.isMeizuDevice()) {//魅族设备时，开启魅族推送
                 new MeizuSDK(application.getApplicationContext());
-            } else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {//华为设备时，开启华为推送
+            } else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41()) {//华为设备时，开启华为推送
                 new HuaweiSDK(application);
-            }else { //其他设备时，开启个推推送和socket长连接
+            } else { //其他设备时，开启个推推送和socket长连接
+                if (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext())) {//oppo设备时，开启oppo推送
+                    String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
+                    String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
+                    com.coloros.mcssdk.PushManager.getInstance().register(application.getApplicationContext(), appKey, appSecret, new OppoPushCallback(application));
+                }
                 initGeTuiPush();
             }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                application.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
+                    @Override
+                    public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+                        LogUtils.e(application.getApplicationContext(), "onActivityCreated" + activity.getLocalClassName());
+                    }
 
-//        else if (com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext()) && Utils.isOPPO()) {//oppo设备时，开启oppo推送
-//            pushSDKName = oppoSDKName;
-//            String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
-//            String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
-//            com.coloros.mcssdk.PushManager.getInstance().register(application.getApplicationContext(), appKey, appSecret, new OppoPushCallback(application));
-//        }
+                    @Override
+                    public void onActivityStarted(Activity activity) {
+                        LogUtils.e(application.getApplicationContext(), "onActivityStarted");
+                        if (!CommonUtils.isServiceRunning(application.getApplicationContext(), SocketClientService.class.getName())) {
+                            application.getApplicationContext().startService(new Intent(application.getApplicationContext(), SocketClientService.class));
+                        }
+                    }
+
+                    @Override
+                    public void onActivityResumed(Activity activity) {
+                        LogUtils.e(application.getApplicationContext(), "onActivityResumed");
+                    }
+
+                    @Override
+                    public void onActivityPaused(Activity activity) {
+                        LogUtils.e(application.getApplicationContext(), "onActivityPaused");
+                    }
+
+                    @Override
+                    public void onActivityStopped(Activity activity) {
+                        LogUtils.e(application.getApplicationContext(), "onActivityStopped");
+                    }
+
+                    @Override
+                    public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+                        LogUtils.e(application.getApplicationContext(), "onActivitySaveInstanceState");
+                    }
+
+                    @Override
+                    public void onActivityDestroyed(Activity activity) {
+                        LogUtils.e(application.getApplicationContext(), "onActivityDestroyed");
+                    }
+                });
+            }
         }
     }
 

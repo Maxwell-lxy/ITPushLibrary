@@ -1,15 +1,14 @@
 package com.innotech.innotechpush.sdk;
 
 import android.content.Context;
+import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 
 import com.innotech.innotechpush.InnotechPushMethod;
 import com.innotech.innotechpush.callback.RequestCallback;
 import com.innotech.innotechpush.callback.SocketSendCallback;
 import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
-import com.innotech.innotechpush.db.ClientLog;
 import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.DataAnalysis;
@@ -100,14 +99,9 @@ public class SocketManager {
     private void getSocketAddr(RequestCallback callback) throws JSONException {
         Integer appId = CommonUtils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
         String appKey = CommonUtils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
-        if (appId == null || TextUtils.isEmpty(appKey)) {
-            LogUtils.e(context, "INNOTECH_APP_ID或INNOTECH_APP_KEY配置有误");
-            return;
-        }
         String guid = TokenUtils.getGuid(context);
         if (TextUtils.isEmpty(guid)) {
             LogUtils.e(context, "guid不能为空");
-            DbUtils.addClientLog(context, LogCode.LOG_INIT, "getSocketAddr方法，guid为空");
             return;
         }
         JSONObject object = new JSONObject();
@@ -126,14 +120,9 @@ public class SocketManager {
         if (!TextUtils.isEmpty(host) && port != 0) {
             final Integer appId = CommonUtils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
             final String appKey = CommonUtils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
-            if (appId == null || TextUtils.isEmpty(appKey)) {
-                LogUtils.e(context, "INNOTECH_APP_ID或INNOTECH_APP_KEY配置有误");
-                return;
-            }
             final String guid = TokenUtils.getGuid(context);
             if (TextUtils.isEmpty(guid)) {
                 LogUtils.e(context, "guid不能为空");
-                DbUtils.addClientLog(context, LogCode.LOG_INIT, "connectWithHostAndPort方法，guid为空");
                 return;
             }
             thread = new Thread(new Runnable() {
@@ -142,32 +131,10 @@ public class SocketManager {
                     try {
                         mSocket = new Socket(host, port);
                         LogUtils.e(context, "与服务器(" + host + ":" + port + ")连接成功");
-                        if (isConnecting()) {
-                            //登录
-                            loginCmd(guid, appId, appKey);
-                            readData();
-                        }
-                    } catch (SocketException e) {
-                        e.printStackTrace();
-                        LogUtils.e(context, "SocketException异常：" + e.getMessage());
-                        try {
-                            Thread.sleep(5000);
-                            reConnect();
-                        } catch (InterruptedException e1) {
-                            e.printStackTrace();
-                        }
-                        DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "SocketException异常：" + e.getMessage());
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                        LogUtils.e(context, "UnknownHostException异常：" + e.getMessage());
-                        try {
-                            Thread.sleep(5000);
-                            reConnect();
-                        } catch (InterruptedException e1) {
-                            e.printStackTrace();
-                        }
-                        DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "UnknownHostException异常：" + e.getMessage());
-                    } catch (IOException e) {
+                        //登录
+                        loginCmd(guid, appId, appKey);
+                        readData();
+                    } catch (Exception e) {
                         e.printStackTrace();
                         LogUtils.e(context, "IOException异常：" + e.getMessage());
                         try {
@@ -217,7 +184,9 @@ public class SocketManager {
                                 if (CommonUtils.isXiaomiDevice()
                                         || CommonUtils.isMIUI()
                                         || CommonUtils.isMeizuDevice()
-                                        || (Utils.isHuaweiDevice() && PushConstant.hasHuawei)) {
+                                        || (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41())
+//                                        || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
+                                        ) {
                                     ackCmd(list, 101);
                                 } else {
                                     ackCmd(list, 1001);
@@ -243,7 +212,9 @@ public class SocketManager {
                             if (CommonUtils.isXiaomiDevice()
                                     || CommonUtils.isMIUI()
                                     || CommonUtils.isMeizuDevice()
-                                    || (Utils.isHuaweiDevice() && PushConstant.hasHuawei)) {
+                                    || (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41())
+//                                        || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
+                                    ) {
                                 ackCmd(list, 101);
                             } else {
                                 ackCmd(list, 1);
@@ -257,7 +228,6 @@ public class SocketManager {
                     LogUtils.e(context, "ack回值成功");
                     break;
                 case 10://心跳回包（HeartBeatRespCmd）
-                    DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "心跳回包成功");
                     LogUtils.e(context, "心跳回包成功");
                     break;
                 default:
@@ -321,11 +291,11 @@ public class SocketManager {
             object.put("guid", guid);
             object.put("app_id", appID);
             object.put("app_key", appKey);
+            object.put("version", PushConstant.INNOTECH_PUSH_VERSION);
             sendData(object.toString(), 0);
             LogUtils.e(context, "发送登录指令：" + object.toString());
         } catch (JSONException e) {
-            e.printStackTrace();
-            LogUtils.e(context, "发送登录指令时，出现异常。");
+            LogUtils.e(context, "发送登录指令时，出现异常。" + e.getMessage());
             DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "发送登录指令时，出现异常。" + guid + ";" + appID + ";" + appKey);
         }
     }
@@ -335,7 +305,6 @@ public class SocketManager {
      */
     public void sendHeartData() {
         sendData("", 9);
-        DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "发送心跳指令");
         LogUtils.e(context, "发送心跳指令");
     }
 
@@ -360,8 +329,7 @@ public class SocketManager {
             paramArray.put(object);
             InnotechPushMethod.clientMsgNotify(context, paramArray, 0);
         } catch (JSONException e) {
-            e.printStackTrace();
-            LogUtils.e(context, "发送ack指令时，出现异常。");
+            LogUtils.e(context, "发送ack指令时，出现异常。" + e.getMessage());
             DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "发送ack指令时，出现异常。" + msgList.toString());
         }
     }
@@ -406,7 +374,6 @@ public class SocketManager {
                         } else {
                             reConnect();
                         }
-                        e.printStackTrace();
                         DbUtils.addClientLog(context, LogCode.LOG_EX_IO, "socket发送信息失败..." + e.getMessage());
                     }
                 }
@@ -507,7 +474,7 @@ public class SocketManager {
             printtest(json);
         } catch (IOException e) {
             e.printStackTrace();
-            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "获取服务端回包的信息解析失败，len" + len);
+            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "获取服务端回包的信息解析失败，len" + len + "，异常信息：" + e.getMessage());
         }
         return json;
     }

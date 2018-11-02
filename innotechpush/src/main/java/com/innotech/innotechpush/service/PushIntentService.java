@@ -35,7 +35,6 @@ public class PushIntentService extends GTIntentService {
     @Override
     public void onReceiveServicePid(Context context, int i) {
         LogUtils.e(context, LogUtils.TAG_GETUI + "onReceiveServicePid -> " + "ServicePid = " + i);
-        DbUtils.addClientLog(context, LogCode.LOG_INIT, "onReceiveServicePid -> " + "ServicePid = " + i);
     }
 
     @Override
@@ -43,7 +42,6 @@ public class PushIntentService extends GTIntentService {
         LogUtils.e(context, LogUtils.TAG_GETUI + "onReceiveClientId -> " + "clientid = " + clientid);
         UserInfoModel.getInstance().setDevice_token1(clientid);
         BroadcastUtils.sendUpdateUserInfoBroadcast(context);
-        DbUtils.addClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_GETUI + "onReceiveClientId -> " + "clientid = " + clientid);
     }
 
     @Override
@@ -89,13 +87,11 @@ public class PushIntentService extends GTIntentService {
     @Override
     public void onReceiveOnlineState(Context context, boolean b) {
         LogUtils.e(context, LogUtils.TAG_GETUI + "onReceiveOnlineState() -> " + "b = " + b);
-        DbUtils.addClientLog(context, LogCode.LOG_INIT, "onReceiveOnlineState() -> " + "b = " + b);
     }
 
     @Override
     public void onReceiveCommandResult(Context context, GTCmdMessage gtCmdMessage) {
         LogUtils.e(context, LogUtils.TAG_GETUI + "onReceiveCommandResult() -> ");
-        DbUtils.addClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_GETUI + "onReceiveCommandResult() -> ");
     }
 
     @Override
@@ -141,6 +137,7 @@ public class PushIntentService extends GTIntentService {
         try {
             object = new JSONObject(data);
             int style = object.getInt("style");
+            String taskId = object.getString("task_id");
             String title = object.getString("title");
             String content = object.getString("content");
             String extra = object.getString("extra");
@@ -156,8 +153,7 @@ public class PushIntentService extends GTIntentService {
             mPushMessage.setContent(content);
             mPushMessage.setCustom(extra);
             mPushMessage.setUnfold(unfold);
-            mPushMessage.setMessageId(msg.getMessageId());
-
+            mPushMessage.setMessageId(taskId);
         } catch (JSONException e) {
             e.printStackTrace();
         }

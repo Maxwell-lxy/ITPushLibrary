@@ -2,7 +2,6 @@ package com.innotech.innotechpush;
 
 import android.app.Activity;
 import android.content.Context;
-import android.os.Handler;
 import android.text.TextUtils;
 
 import com.innotech.innotechpush.bean.UserInfoModel;
@@ -15,22 +14,18 @@ import com.innotech.innotechpush.db.ClientMsgNotify;
 import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.db.SocketAck;
 import com.innotech.innotechpush.sdk.HuaweiSDK;
-import com.innotech.innotechpush.sdk.SocketClientService;
 import com.innotech.innotechpush.sdk.SocketManager;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.NetWorkUtils;
 import com.innotech.innotechpush.utils.SignUtils;
 import com.innotech.innotechpush.utils.TokenUtils;
-import com.innotech.innotechpush.utils.UserInfoSPUtils;
 import com.innotech.innotechpush.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -111,7 +106,7 @@ public class InnotechPushMethod {
                     return;
                 }
             }
-            if (alias == null || alias.isEmpty() || alias.length() == 0) {
+            if (TextUtils.isEmpty(alias)) {
                 if (callback != null) {
                     callback.onFail("Alias can not be null or empty!");
                     return;
@@ -176,7 +171,7 @@ public class InnotechPushMethod {
     /**
      * 上报回执
      *
-     * @param context
+     * @param context：上下文
      */
     public synchronized static void uploadClientMsgNotify(final Context context) {
         try {
@@ -295,11 +290,9 @@ public class InnotechPushMethod {
                 }
             });
         } catch (JSONException e) {
-            LogUtils.e(context, "客户端日志失败");
-            e.printStackTrace();
+            LogUtils.e(context, "客户端日志失败" + e.getMessage());
         } catch (Exception e) {
-            LogUtils.e(context, "客户端日志失败");
-            e.printStackTrace();
+            LogUtils.e(context, "客户端日志失败" + e.getMessage());
         }
     }
 
@@ -307,7 +300,7 @@ public class InnotechPushMethod {
      * 上报日志
      * 启动service和心跳时进行上报
      *
-     * @param context
+     * @param context：上下文
      */
     public synchronized static void uploadLogs(final Context context) {
         try {
@@ -316,7 +309,7 @@ public class InnotechPushMethod {
             String imei = "";
             JSONArray array = new JSONArray();
             LogUtils.e(context, "logs的长度" + logs.size());
-            if (logs != null && logs.size() > 0) {
+            if (logs.size() > 0) {
                 for (ClientLog log : logs) {
                     array.put(log.getLogStr());
                     guid = log.getGuid();
@@ -366,7 +359,7 @@ public class InnotechPushMethod {
     }
 
     public static void launcher(Activity activity) {
-        if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {
+        if (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41()) {
             HuaweiSDK.huaWeiConnect(activity);
         }
     }
@@ -379,16 +372,8 @@ public class InnotechPushMethod {
             Object object = checkInfo.invoke(clazz.newInstance(), context);
             tk = (String) object;
             LogUtils.e(context, "反作弊的TK值：" + tk);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            LogUtils.e(context, "getTK异常：" + e.getMessage());
         }
         return tk;
     }

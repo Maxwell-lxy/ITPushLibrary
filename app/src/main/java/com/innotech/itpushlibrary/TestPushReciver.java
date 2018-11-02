@@ -1,6 +1,8 @@
 package com.innotech.itpushlibrary;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -49,6 +51,13 @@ public class TestPushReciver extends PushReciver {
     public void onNotificationMessageClicked(Context context, InnotechMessage mPushMessage) {
         // super.onNotificationMessageClicked(context, miPushMessage);
         showMessageInfoforTest(context, "onNotificationMessageClicked", mPushMessage);
+        Intent intent = new Intent(context, Main2Activity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        ComponentName comp = ComponentName
+                .unflattenFromString("com.innotech.itpushlibrary/.Main2Activity");
+        intent.setComponent(comp);
+        context.startActivity(intent);
+
     }
 
     @Override

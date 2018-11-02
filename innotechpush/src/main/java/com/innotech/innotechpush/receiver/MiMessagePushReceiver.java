@@ -182,7 +182,6 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
         }
         String dataInfo = "==jar== contentStr:" + contentStr + " titleStr:" + titleStr + " descriptionStr:" + descriptionStr;
         LogUtils.e(context, LogUtils.TAG_XIAOMI + "metodName:" + metodName + " mTopic:" + mTopic + " mAlias:" + mAlias + dataInfo);
-        DbUtils.addClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_XIAOMI + "metodName:" + metodName + " mTopic:" + mTopic + " mAlias:" + mAlias + dataInfo);
     }
 
     private InnotechMessage getCreateMessge(MiPushMessage miPushMessage) {

@@ -103,10 +103,11 @@ public class MeizuPushMsgReceiver extends MzPushMessageReceiver {
             registerStatus) {
         //调用新版订阅 PushManager.register(context,appId,appKey)回调
         LogUtils.e(context, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegisterStatus registerStatus:" + registerStatus);
-        DbUtils.addClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegisterStatus registerStatus:" + registerStatus);
         if (registerStatus.getCode().equals(RegisterStatus.SUCCESS_CODE)) {
             UserInfoModel.getInstance().setDevice_token1(registerStatus.getPushId());
             BroadcastUtils.sendUpdateUserInfoBroadcast(context);
+        } else {
+            DbUtils.addClientLog(context, LogCode.LOG_INIT, LogUtils.TAG_MEIZU + "MeizuPushMsgReceiver onRegisterStatus registerStatus:" + registerStatus);
         }
     }
 

@@ -3,6 +3,7 @@ package com.innotech.itpushlibrary;
 import com.inno.innosdk.pb.InnoMain;
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.sdk.KeepApplication;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.Random;
 
@@ -22,6 +23,7 @@ public class App extends KeepApplication {
         Random random = new Random();
         s = random.nextInt(max) % (max - min + 1) + min;
         startInnoSdk("test", "union", "" + s);
+        CrashReport.initCrashReport(getApplicationContext(), "450dd7d0c6", false);
     }
 
     private void startInnoSdk(String cid, String ch, String member_id) {
@@ -30,9 +32,9 @@ public class App extends KeepApplication {
 //        InnoMain.startInno(this, cid, new InnoMain.CallBack() {//cid为注册的业务方id
 //            @Override
 //            public void getOpenid(String openid, int isnew, String remark) {
-                InnotechPushManager.getInstance().initPushSDK(App.this);
-                InnotechPushManager.pushIcon = R.mipmap.ic_launcher;
-                InnotechPushManager.getInstance().setPushRevicer(new TestPushReciver());
+        InnotechPushManager.getInstance().initPushSDK(App.this);
+        InnotechPushManager.pushIcon = R.mipmap.ic_launcher;
+        InnotechPushManager.getInstance().setPushRevicer(new TestPushReciver());
 //            }
 //        });
     }

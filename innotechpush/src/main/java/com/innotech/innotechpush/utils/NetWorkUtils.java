@@ -18,9 +18,9 @@ import java.net.URL;
 
 public class NetWorkUtils {
     //正式环境
-    public static final String HOST = "gw.d.ywopt.com";
+//    public static final String HOST = "gw.d.ywopt.com";
     //测试环境
-//    public static final String HOST = "gw.t.ywopt.com";
+    public static final String HOST = "gw.t.ywopt.com";
     private static final String BASE_URL = "https://" + HOST + "/v1/pushaksk";
     public static final String URL_UPDATEUSERINFO = BASE_URL + "/updateuserinfo";
     public static final String URL_ALIAS = BASE_URL + "/userbindalias";
@@ -72,7 +72,6 @@ public class NetWorkUtils {
                     SaveData.saveData(context, response.toString(), urlStr, mCallBack);
                 } catch (Exception e) {
                     LogUtils.e(context, "sendPostRequest方法出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
-                    e.printStackTrace();
                     if (mCallBack != null) {
                         mCallBack.onFail("sendPostRequest方法出现异常 Exception:" + e.getMessage());
                     }
@@ -81,7 +80,6 @@ public class NetWorkUtils {
                         try {
                             reader.close();
                         } catch (IOException e) {
-                            e.printStackTrace();
                             LogUtils.e(context, "BufferedReader关闭出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
                             if (mCallBack != null) {
                                 mCallBack.onFail("BufferedReader关闭出现异常 Exception:" + e.getMessage());

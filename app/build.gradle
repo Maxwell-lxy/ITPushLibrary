@@ -14,15 +14,15 @@ android {
         applicationId "com.innotech.itpushlibrary"
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode 203
+        versionName "2.0.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 INNOTECH_PUSH_DEBUG: true,
-//                INNOTECH_APP_ID    : 1008,
-//                INNOTECH_APP_KEY   : "ddddddd",
-                INNOTECH_APP_ID     : 1000,
-                INNOTECH_APP_KEY    : "YWJjZGRk",
+                INNOTECH_APP_ID    : 1008,
+                INNOTECH_APP_KEY   : "ddddddd",
+//                INNOTECH_APP_ID     : 1000,
+//                INNOTECH_APP_KEY    : "YWJjZGRk",
 
                 MI_APP_ID          : "2882303761517836599",
                 MI_APP_KEY         : "5131783646599",
@@ -33,18 +33,23 @@ android {
                 HMS_APP_ID         : "100437753",
 
                 //个推（1000）
-                GETUI_APP_ID       : "2e48RoYBrh65BC4HRmkAg6",
-                GETUI_APP_KEY      : "PwG112qeeV5UiQrtVObz3A",
-                GETUI_APP_SECRET   : "rvsZ98fb3K6I9UcPTBHzF9",
+//                GETUI_APP_ID       : "2e48RoYBrh65BC4HRmkAg6",
+//                GETUI_APP_KEY      : "PwG112qeeV5UiQrtVObz3A",
+//                GETUI_APP_SECRET   : "rvsZ98fb3K6I9UcPTBHzF9",
                 //个推（1008）
-//                GETUI_APP_ID       : "a0UoMM4qza8jfpCskhyFy1",
-//                GETUI_APP_KEY      : "nn3yUZNhnB6n4LSg4two41",
-//                GETUI_APP_SECRET   : "zB9uZcRM6374vwuXJb2OH2",
+                GETUI_APP_ID       : "a0UoMM4qza8jfpCskhyFy1",
+                GETUI_APP_KEY      : "nn3yUZNhnB6n4LSg4two41",
+                GETUI_APP_SECRET   : "zB9uZcRM6374vwuXJb2OH2",
 
                 OPPO_APP_KEY       : "5vifLOB1A1s0s800scc4gwC4S",
                 OPPO_APP_SECRET    : "b4aB971Df1bD32eEB9882d2429898BB5"
 
         ]
+        ndk {
+            // 设置支持的SO库架构
+            abiFilters 'armeabi' , 'x86'//, 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+        }
+
     }
     buildTypes {
         release {
@@ -71,4 +76,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation project(':innotechpush')
+    implementation 'com.tencent.bugly:crashreport:2.6.6'
+    implementation 'com.tencent.bugly:nativecrashreport:3.3.1'
+
 }

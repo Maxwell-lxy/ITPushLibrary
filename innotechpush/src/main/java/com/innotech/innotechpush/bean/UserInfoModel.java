@@ -5,6 +5,7 @@ import android.os.Build;
 import android.text.TextUtils;
 
 import com.innotech.innotechpush.config.PushConstant;
+import com.innotech.innotechpush.sdk.HuaweiSDK;
 import com.innotech.innotechpush.utils.FileUtils;
 import com.innotech.innotechpush.utils.TokenUtils;
 import com.innotech.innotechpush.utils.UserInfoSPUtils;
@@ -69,11 +70,11 @@ public class UserInfoModel {
             this.channel = Channel.MZ;
         }
         //华为设备
-        else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei) {
+        else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41()) {
             this.channel = Channel.HW;
         }
         //oppo设备
-//        else if (com.coloros.mcssdk.PushManager.isSupportPush(context) && Utils.isOPPO()) {
+//        else if (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context)) {
 //            this.channel = Channel.OPPO;
 //        }
         //其他设备
