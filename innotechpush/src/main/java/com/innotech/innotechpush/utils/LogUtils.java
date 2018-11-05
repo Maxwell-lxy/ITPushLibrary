@@ -12,8 +12,8 @@ import com.innotech.innotechpush.config.PushConstant;
  */
 
 public class LogUtils {
-    public static  String TAG_HUAWEI = "[HuaWeiPush] ";
-    public static  String TAG_GETUI = "[GeTuiPush] ";
+    public static String TAG_HUAWEI = "[HuaWeiPush] ";
+    public static String TAG_GETUI = "[GeTuiPush] ";
     public static String TAG_XIAOMI = "[MiPush] ";
     public static String TAG_MEIZU = "[MeiZuPush] ";
     public static String TAG_UMENG = "[UmengPush] ";
@@ -21,27 +21,39 @@ public class LogUtils {
 
     private static final String TAG = "Innotech_Push";
 
-    private static Boolean isDebug(Context context){
+    private static Boolean isDebug(Context context) {
         return CommonUtils.getMetaDataBoolean(context, PushConstant.INNOTECH_PUSH_DEBUG);
     }
 
-    public static void i(Context context,String msg) {
+    public static void i(Context context, String msg) {
         if (isDebug(context))
             Log.i(TAG, msg);
     }
 
-    public static void d(Context context,String msg) {
+    public static void d(Context context, String msg) {
         if (isDebug(context))
             Log.d(TAG, msg);
     }
 
-    public static void e(Context context,String msg) {
+    public static void e(Context context, String msg) {
         if (isDebug(context))
             Log.e(TAG, msg);
     }
 
-    public static void v(Context context,String msg) {
+    public static void v(Context context, String msg) {
         if (isDebug(context))
             Log.v(TAG, msg);
+    }
+
+    public static void eLong(Context context, String msg) {
+        if (msg.length() > 4000) {
+            for (int i = 0; i < msg.length(); i += 4000) {
+                if (i + 4000 < msg.length())
+                    e(context, "getJsonByData：" + msg.substring(i, i + 4000));
+                else
+                    e(context, "getJsonByData：" + msg.substring(i, msg.length()));
+            }
+        } else
+            e(context, "getJsonByData：" + msg);
     }
 }

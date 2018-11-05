@@ -60,7 +60,6 @@ public class SaveData {
                 if (mCallBack != null) {
                     mCallBack.onSuccess(response.getData());
                 }
-                LogUtils.e(context, "获取socket地址成功！");
             } else {
                 if (mCallBack != null) {
                     mCallBack.onFail("获取socket地址失败！");

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.config.BroadcastConstant;
@@ -24,8 +25,11 @@ import com.innotech.innotechpush.service.PushIntentService;
 import com.innotech.innotechpush.service.PushService;
 import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.LogUtils;
+import com.innotech.innotechpush.utils.TokenUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.orm.SugarContext;
+
+import org.json.JSONException;
 
 import java.util.List;
 import java.util.concurrent.locks.Lock;
@@ -39,6 +43,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class InnotechPushManager {
     private static InnotechPushManager mInnotechPushManager = null;
     private Application application;
+    private Context appContext;
     private static PushReciver mPushReciver;
     /**
      * 个推和集团长连接做幂等时需要加锁，防止两个回调相隔时间较近或同时到达。
@@ -63,34 +68,35 @@ public class InnotechPushManager {
     /**
      * 初始化推送SDK
      *
-     * @param application
+     * @param application：业务方的application
      */
     public void initPushSDK(final Application application) {
         this.application = application;
+        this.appContext = application.getApplicationContext();
         String processName = getProcessName(application, android.os.Process.myPid());
         LogUtils.e(application, "当前进程名字：" + processName);
         //动态注册广播
-        if (CommonUtils.isMainProcess(application.getApplicationContext())) {
-            registerMainReceiver(application.getApplicationContext());
-        } else if (CommonUtils.isPushProcess(application.getApplicationContext())) {
-            registerPushReceiver(application.getApplicationContext());
+        if (CommonUtils.isMainProcess(appContext)) {
+            registerMainReceiver(appContext);
+        } else if (CommonUtils.isPushProcess(appContext)) {
+            registerPushReceiver(appContext);
         }
 
         SugarContext.init(application);
-        UserInfoModel.getInstance().init(application.getApplicationContext());
+        UserInfoModel.getInstance().init(appContext);
 
-        if (CommonUtils.isMainProcess(application.getApplicationContext())) {
+        if (CommonUtils.isMainProcess(appContext)) {
             if (Utils.isXiaomiDevice() || Utils.isMIUI()) {
-                new MiSDK(application.getApplicationContext());
+                new MiSDK(appContext);
             } else if (Utils.isMeizuDevice()) {//魅族设备时，开启魅族推送
-                new MeizuSDK(application.getApplicationContext());
+                new MeizuSDK(appContext);
             } else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41()) {//华为设备时，开启华为推送
                 new HuaweiSDK(application);
             } else { //其他设备时，开启个推推送和socket长连接
-                if (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(application.getApplicationContext())) {//oppo设备时，开启oppo推送
+                if (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(appContext)) {//oppo设备时，开启oppo推送
                     String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
                     String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
-                    com.coloros.mcssdk.PushManager.getInstance().register(application.getApplicationContext(), appKey, appSecret, new OppoPushCallback(application));
+                    com.coloros.mcssdk.PushManager.getInstance().register(appContext, appKey, appSecret, new OppoPushCallback(application));
                 }
                 initGeTuiPush();
             }
@@ -98,40 +104,43 @@ public class InnotechPushManager {
                 application.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
                     @Override
                     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-                        LogUtils.e(application.getApplicationContext(), "onActivityCreated" + activity.getLocalClassName());
+//                        LogUtils.e(appContext, "onActivityCreated" + activity.getLocalClassName());
                     }
 
                     @Override
                     public void onActivityStarted(Activity activity) {
-                        LogUtils.e(application.getApplicationContext(), "onActivityStarted");
-                        if (!CommonUtils.isServiceRunning(application.getApplicationContext(), SocketClientService.class.getName())) {
-                            application.getApplicationContext().startService(new Intent(application.getApplicationContext(), SocketClientService.class));
+                        try {
+                            String guid = TokenUtils.getGuid(appContext);
+                            if (!CommonUtils.isServiceRunning(appContext, SocketClientService.class.getName()) && !TextUtils.isEmpty(guid)) {
+                                appContext.startService(new Intent(appContext, SocketClientService.class));
+                            }
+                        } catch (JSONException e) {
                         }
                     }
 
                     @Override
                     public void onActivityResumed(Activity activity) {
-                        LogUtils.e(application.getApplicationContext(), "onActivityResumed");
+//                        LogUtils.e(appContext, "onActivityResumed");
                     }
 
                     @Override
                     public void onActivityPaused(Activity activity) {
-                        LogUtils.e(application.getApplicationContext(), "onActivityPaused");
+//                        LogUtils.e(appContext, "onActivityPaused");
                     }
 
                     @Override
                     public void onActivityStopped(Activity activity) {
-                        LogUtils.e(application.getApplicationContext(), "onActivityStopped");
+//                        LogUtils.e(appContext, "onActivityStopped");
                     }
 
                     @Override
                     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-                        LogUtils.e(application.getApplicationContext(), "onActivitySaveInstanceState");
+//                        LogUtils.e(appContext, "onActivitySaveInstanceState");
                     }
 
                     @Override
                     public void onActivityDestroyed(Activity activity) {
-                        LogUtils.e(application.getApplicationContext(), "onActivityDestroyed");
+//                        LogUtils.e(appContext, "onActivityDestroyed");
                     }
                 });
             }
@@ -139,17 +148,17 @@ public class InnotechPushManager {
     }
 
     public void initSocketPush() {
-        application.getApplicationContext().startService(new Intent(application.getApplicationContext(), SocketClientService.class));
+        appContext.startService(new Intent(appContext, SocketClientService.class));
     }
 
     /**
      * 初始化并开启个推推送
      */
     private void initGeTuiPush() {
-        LogUtils.e(application.getApplicationContext(), LogUtils.TAG_GETUI + "call initGeTuiPush()");
-        com.igexin.sdk.PushManager.getInstance().initialize(application.getApplicationContext(), PushService.class);
+        LogUtils.e(appContext, LogUtils.TAG_GETUI + "call initGeTuiPush()");
+        com.igexin.sdk.PushManager.getInstance().initialize(appContext, PushService.class);
         // com.getui.demo.DemoIntentService 为第三⽅方⾃自定义的推送服务事件接收类
-        com.igexin.sdk.PushManager.getInstance().registerPushIntentService(application.getApplicationContext(), PushIntentService.class);
+        com.igexin.sdk.PushManager.getInstance().registerPushIntentService(appContext, PushIntentService.class);
     }
 
     public void setPushRevicer(PushReciver mPushReciver) {
@@ -167,7 +176,7 @@ public class InnotechPushManager {
     /**
      * 获得幂等锁
      *
-     * @return
+     * @return 锁
      */
     public static Lock getIdempotentLock() {
         if (idempotentLock == null) {
@@ -177,14 +186,13 @@ public class InnotechPushManager {
     }
 
     /**
-     * 是否
-     *
-     * @param cxt
-     * @param pid
-     * @return
+     * 获取进程名
      */
-    public static String getProcessName(Context cxt, int pid) {
+    private static String getProcessName(Context cxt, int pid) {
         ActivityManager am = (ActivityManager) cxt.getSystemService(Context.ACTIVITY_SERVICE);
+        if (am == null) {
+            return null;
+        }
         List<ActivityManager.RunningAppProcessInfo> runningApps = am.getRunningAppProcesses();
         if (runningApps == null) {
             return null;
@@ -203,7 +211,7 @@ public class InnotechPushManager {
     }
 
     //动态注册广播
-    public void registerPushReceiver(Context context) {
+    private void registerPushReceiver(Context context) {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastConstant.RECEIVE_MESSAGE);
         filter.addAction(BroadcastConstant.MESSAGE_CLICK);
@@ -211,8 +219,8 @@ public class InnotechPushManager {
         context.registerReceiver(new PushReceiver(), filter);
     }
 
-    //
-    public void registerMainReceiver(Context context) {
+    //动态注册广播
+    private void registerMainReceiver(Context context) {
         IntentFilter filter1 = new IntentFilter();
         filter1.addAction(BroadcastConstant.RECEIVE_MESSAGE);
         filter1.addAction(BroadcastConstant.MESSAGE_CLICK);

@@ -34,8 +34,20 @@ import java.util.Random;
 public class SocketManager {
     private static SocketManager instance;
     private static Context context;
+    private static final int STATE_CONNECTED = 1;
+    private static final int STATE_UNCONNECTED = 0;
     private Socket mSocket;
-    private Thread thread;
+    //socket输入流
+    private InputStream mInputStream;
+    //socket输出流
+    private DataOutputStream mDataOutputStream;
+    //read线程
+    private Thread readThread;
+    //write线程
+    private Thread writeThread;
+    //是否正在重连
+    private boolean isReconnecting;
+
     //长连接发送数据用的线程
     private Thread sendThread;
     private Runnable sendRunnable;
@@ -53,43 +65,43 @@ public class SocketManager {
     }
 
     private SocketManager() {
-
+        isReconnecting = false;
     }
 
     /**
      * 初始化长连接
      */
     public synchronized void initSocket() {
-        if (mSocket == null || mSocket.isClosed()) {
-            try {
-                getSocketAddr(new RequestCallback() {
-                    @Override
-                    public void onSuccess(String hostAndPort) {
-                        String[] array = hostAndPort.split(":");
-                        try {
-                            connectWithHostAndPort(array[0].trim(), Integer.parseInt(array[1].trim()));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+        try {
+            getSocketAddr(new RequestCallback() {
+                @Override
+                public void onSuccess(String hostAndPort) {
+                    String[] array = hostAndPort.split(":");
+                    try {
+                        connectWithHostAndPort(array[0].trim(), Integer.parseInt(array[1].trim()));
+                    } catch (JSONException e) {
+                        isReconnecting = false;
+                        e.printStackTrace();
                     }
+                }
 
-                    @Override
-                    public void onFail(String msg) {
-                        LogUtils.e(context, msg);
-                        try {
-                            Thread.sleep(5000);
-                            reConnect();
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        DbUtils.addClientLog(context, LogCode.LOG_DATA_API, "获取长连接地址失败：" + msg);
+                @Override
+                public void onFail(String msg) {
+                    isReconnecting = false;
+                    LogUtils.e(context, msg);
+                    DbUtils.addClientLog(context, LogCode.LOG_DATA_API, "获取长连接地址失败：" + msg);
+                    try {
+                        Thread.sleep(5000);
+                        reConnect();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                });
-            } catch (JSONException e) {
-                e.printStackTrace();
-                LogUtils.e(context, "获取socket信息json参数有误");
-                DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "获取socket信息json参数有误");
-            }
+                }
+            });
+        } catch (JSONException e) {
+            isReconnecting = false;
+            LogUtils.e(context, "获取socket信息json参数有误" + e.getMessage());
+            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "获取socket信息json参数有误" + e.getMessage());
         }
     }
 
@@ -102,6 +114,7 @@ public class SocketManager {
         String guid = TokenUtils.getGuid(context);
         if (TextUtils.isEmpty(guid)) {
             LogUtils.e(context, "guid不能为空");
+            isReconnecting = false;
             return;
         }
         JSONObject object = new JSONObject();
@@ -123,126 +136,146 @@ public class SocketManager {
             final String guid = TokenUtils.getGuid(context);
             if (TextUtils.isEmpty(guid)) {
                 LogUtils.e(context, "guid不能为空");
+                isReconnecting = false;
                 return;
             }
-            thread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        mSocket = new Socket(host, port);
-                        LogUtils.e(context, "与服务器(" + host + ":" + port + ")连接成功");
-                        //登录
-                        loginCmd(guid, appId, appKey);
-                        readData();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        LogUtils.e(context, "IOException异常：" + e.getMessage());
-                        try {
-                            Thread.sleep(5000);
-                            reConnect();
-                        } catch (InterruptedException e1) {
-                            e.printStackTrace();
-                        }
-                        DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "IOException异常：" + e.getMessage());
-                    }
+            try {
+                mSocket = new Socket(host, port);
+                LogUtils.e(context, "与服务器(" + host + ":" + port + ")连接成功");
+                mInputStream = mSocket.getInputStream();
+//                mDataOutputStream = new DataOutputStream(mSocket.getOutputStream());
+                isReconnecting = false;
+                //登录
+                loginCmd(guid, appId, appKey);
+                readData();
+            } catch (Exception e) {
+                isReconnecting = false;
+                LogUtils.e(context, "Exception异常：" + e.getMessage());
+                try {
+                    Thread.sleep(5000);
+                    reConnect();
+                } catch (InterruptedException e1) {
+                    e.printStackTrace();
                 }
-            });
-            thread.start();
+                DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "Exception异常：" + e.getMessage());
+            }
         }
     }
 
     /**
      * 读取数据
      */
-    private void readData() throws IOException {
-        InputStream is = mSocket.getInputStream();
-        byte[] lenB = new byte[16];
-        while (is.read(lenB) != -1) {
-            int len = getLenByData(lenB);
-//            LogUtils.e(context, "len：" + len);
-            long requestId = getRequestIDByData(lenB);
-//            LogUtils.e(context, "requestId：" + requestId);
-            int command = getCommandByData(lenB);
-            switch (command) {
-                case 1://登录成功（LoginRespCmd）
-                    LogUtils.e(context, "登录成功");
-                    try {
-                        String jsonA = getJsonByData(is, len);
-                        if (!TextUtils.isEmpty(jsonA) && !"null".equals(jsonA)) {
-                            ArrayList<String> list = new ArrayList<String>();
-                            JSONArray array = new JSONArray(jsonA);
-                            for (int i = 0; i < array.length(); i++) {
-                                JSONObject object = array.getJSONObject(i);
-                                PushMessage pushMessage = (PushMessage) DataAnalysis.jsonToT(PushMessage.class.getName(), object.toString());
-                                if (pushMessage != null) {
-                                    pushMessage.setOffLineMsg(true);
-                                    PushMessageManager.getInstance(context).setNewMessage(pushMessage);
-                                    list.add(pushMessage.getMsg_id());
-                                }
-                            }
-                            if (list.size() > 0) {
-                                if (CommonUtils.isXiaomiDevice()
-                                        || CommonUtils.isMIUI()
-                                        || CommonUtils.isMeizuDevice()
-                                        || (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41())
-//                                        || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
-                                        ) {
-                                    ackCmd(list, 101);
-                                } else {
-                                    ackCmd(list, 1001);
-                                }
-                            }
+    private void readData() {
+        if (readThread != null && readThread.isAlive()) {
+            readThread.interrupt();
+            readThread = null;
+        }
+        readThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        byte[] lenB = readByLen(16);
+                        if (lenB == null) break;
+                        int len = getLenByData(lenB);
+                        long requestId = getRequestIDByData(lenB);
+                        int command = getCommandByData(lenB);
+                        String json = "";
+                        if (len - 12 > 0) {
+                            byte[] lenJ = readByLen(len - 12);
+                            if (lenJ == null) break;
+                            json = new String(lenJ);
                         }
-                        //长连接回执之前丢失的回执
-                        InnotechPushMethod.uploadSocketAck(context);
-                    } catch (JSONException e) {
+                        switch (command) {
+                            case 1://登录成功（LoginRespCmd）
+                                LogUtils.e(context, "登录成功");
+                                try {
+                                    if (!TextUtils.isEmpty(json) && !"null".equals(json)) {
+                                        ArrayList<String> list = new ArrayList<>();
+                                        JSONArray array = new JSONArray(json);
+                                        for (int i = 0; i < array.length(); i++) {
+                                            JSONObject object = array.getJSONObject(i);
+                                            PushMessage pushMessage = (PushMessage) DataAnalysis.jsonToT(PushMessage.class.getName(), object.toString());
+                                            if (pushMessage != null) {
+                                                pushMessage.setOffLineMsg(true);
+                                                PushMessageManager.getInstance(context).setNewMessage(pushMessage);
+                                                list.add(pushMessage.getMsg_id());
+                                            }
+                                        }
+                                        if (list.size() > 0) {
+                                            if (CommonUtils.isXiaomiDevice()
+                                                    || CommonUtils.isMIUI()
+                                                    || CommonUtils.isMeizuDevice()
+                                                    || (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41())
+//                                        || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
+                                                    ) {
+                                                ackCmd(list, 101);
+                                            } else {
+                                                ackCmd(list, 1001);
+                                            }
+                                            DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "收到服务器推送消息(offlinemsg)：" + list.toString());
+                                        }
+                                    }
+                                    //长连接回执之前丢失的回执
+                                    InnotechPushMethod.uploadSocketAck(context);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                break;
+                            case 4://服务器推送消息（ForwardCmd）
+                                //处理推送消息
+                                if (!TextUtils.isEmpty(json) && !"null".equals(json)) {
+                                    PushMessage pushMessage = (PushMessage) DataAnalysis.jsonToT(PushMessage.class.getName(), json);
+                                    if (pushMessage != null) {
+                                        PushMessageManager.getInstance(context).setNewMessage(pushMessage);
+                                        ArrayList<String> list = new ArrayList<>();
+                                        list.add(pushMessage.getMsg_id());
+                                        if (CommonUtils.isXiaomiDevice()
+                                                || CommonUtils.isMIUI()
+                                                || CommonUtils.isMeizuDevice()
+                                                || (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41())
+//                                        || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
+                                                ) {
+                                            ackCmd(list, 101);
+                                        } else {
+                                            ackCmd(list, 1);
+                                        }
+                                        DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "收到服务器推送消息：" + pushMessage.getMsg_id());
+                                    }
+                                }
+                                break;
+                            case 7://ack回值成功（AckRespCmd）
+                                LogUtils.e(context, "ack回值成功");
+                                break;
+                            case 10://心跳回包（HeartBeatRespCmd）
+                                LogUtils.e(context, "心跳回包成功");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    //while循环中阻塞读，当服务器断开连接后，读操作就会返回-1，从而跳出循环执行后续的代码。
+                    //服务器断开了，需要重连
+                    LogUtils.e(context, "服务器断开了，正在尝试重连...");
+                    try {
+                        Thread.sleep(5000);
+                        reConnect();
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    break;
-                case 4://服务器推送消息（ForwardCmd）
-                    LogUtils.e(context, "收到服务器推送消息");
-                    //处理推送消息
-                    String jsonO = getJsonByData(is, len);
-                    if (!TextUtils.isEmpty(jsonO) && !"null".equals(jsonO)) {
-                        PushMessage pushMessage = (PushMessage) DataAnalysis.jsonToT(PushMessage.class.getName(), jsonO);
-                        if (pushMessage != null) {
-                            PushMessageManager.getInstance(context).setNewMessage(pushMessage);
-                            ArrayList<String> list = new ArrayList<String>();
-                            list.add(pushMessage.getMsg_id());
-                            if (CommonUtils.isXiaomiDevice()
-                                    || CommonUtils.isMIUI()
-                                    || CommonUtils.isMeizuDevice()
-                                    || (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41())
-//                                        || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
-                                    ) {
-                                ackCmd(list, 101);
-                            } else {
-                                ackCmd(list, 1);
-                            }
-                            DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "收到服务器推送消息：" + pushMessage.getMsg_id());
-                        }
+                } catch (IOException e) {
+                    LogUtils.e(context, "IOException异常：" + e.getMessage());
+                    try {
+                        Thread.sleep(5000);
+                        reConnect();
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
                     }
-                    break;
-                case 7://ack回值成功（AckRespCmd）
-                    getJsonByData(is, len);
-                    LogUtils.e(context, "ack回值成功");
-                    break;
-                case 10://心跳回包（HeartBeatRespCmd）
-                    LogUtils.e(context, "心跳回包成功");
-                    break;
-                default:
-                    break;
+                    DbUtils.addClientLog(context, LogCode.LOG_EX_SOCKET, "IOException异常：" + e.getMessage());
+                }
             }
-        }
-        //while循环中阻塞读，当服务器断开连接后，读操作就会返回-1，从而跳出循环执行后续的代码。
-        //服务器断开了，需要重连
-        LogUtils.e(context, "服务器断开了，正在尝试重连...");
-        try {
-            Thread.sleep(5000);
-            reConnect();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        });
+        readThread.start();
     }
 
     /**
@@ -261,6 +294,10 @@ public class SocketManager {
      * isConnecting()只能判断客户端是否处于正常连接状态
      */
     public synchronized void reConnect() {
+        if (isReconnecting) {
+            return;
+        }
+        isReconnecting = true;
         sendData("", 9, new SocketSendCallback() {
             @Override
             public void onResult(boolean result) {
@@ -273,10 +310,12 @@ public class SocketManager {
                         LogUtils.e(context, "正在重连...");
                         DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "正在重连...");
                     } catch (IOException e) {
+                        isReconnecting = false;
                         LogUtils.e(context, "socket close异常...");
                         DbUtils.addClientLog(context, LogCode.LOG_EX_IO, "socket close异常..." + e.getMessage());
-                        e.printStackTrace();
                     }
+                } else {
+                    isReconnecting = false;
                 }
             }
         });
@@ -364,7 +403,7 @@ public class SocketManager {
                             callback.onResult(true);
                         }
                     } catch (IOException e) {
-                        LogUtils.e(context, "socket发送信息失败..." + e.getMessage());
+                        LogUtils.e(context, "socket发送信息失败，cmd：" + cmd + "，异常信息：" + e.getMessage());
                         //存放本次发送的回执
                         if (cmd == 6) {
                             DbUtils.addSocketAck(context, json, cmd);
@@ -374,7 +413,7 @@ public class SocketManager {
                         } else {
                             reConnect();
                         }
-                        DbUtils.addClientLog(context, LogCode.LOG_EX_IO, "socket发送信息失败..." + e.getMessage());
+                        DbUtils.addClientLog(context, LogCode.LOG_EX_IO, "socket发送信息失败，cmd：" + cmd + "，异常信息：" + e.getMessage());
                     }
                 }
             };
@@ -398,7 +437,7 @@ public class SocketManager {
     /**
      * 生成8字节随机数
      *
-     * @return
+     * @return 8字节随机数
      */
     private byte[] getRequestID() {
         byte[] b = new byte[8];
@@ -445,50 +484,32 @@ public class SocketManager {
     }
 
     /**
-     * 获取服务端回包的信息
-     * json数据
+     * 读取长度为len的字符数组
+     *
+     * @param len：长度
+     * @return 字符数组
      */
-    private String getJsonByData(InputStream is, int len) {
-        String json = null;
-        //
-        byte[] lenJ = new byte[len - 12];
-        LogUtils.e(context, "getJsonByData：" + lenJ.length);
-        try {
-            boolean isRead = true;
-            int readLen = 0;
-            while (isRead) {
-                int curReadLen = 0;
-                if (lenJ.length - readLen < 1024) {
-                    curReadLen = is.read(lenJ, readLen, lenJ.length - readLen);
-                } else {
-                    curReadLen = is.read(lenJ, readLen, 1024);
-                }
-                readLen += curReadLen;
-                LogUtils.e(context, "readLen：" + readLen);
-                LogUtils.e(context, "curReadLen：" + curReadLen);
-                if (curReadLen == -1 || readLen == len - 12) {
-                    isRead = false;
-                }
+    private byte[] readByLen(int len) throws IOException {
+        byte[] result = new byte[len];
+        boolean isRead = true;
+        int readLen = 0;
+        while (isRead) {
+            int curReadLen = 0;
+            if (result.length - readLen < 1024) {
+                curReadLen = mInputStream.read(result, readLen, result.length - readLen);
+            } else {
+                curReadLen = mInputStream.read(result, readLen, 1024);
             }
-            json = new String(lenJ);
-            printtest(json);
-        } catch (IOException e) {
-            e.printStackTrace();
-            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "获取服务端回包的信息解析失败，len" + len + "，异常信息：" + e.getMessage());
+            readLen += curReadLen;
+//            LogUtils.e(context, "readLen：" + readLen);
+            LogUtils.e(context, "curReadLen：" + curReadLen);
+            if (readLen == len) isRead = false;
+            if (curReadLen == -1) {
+                result = null;
+                break;
+            }
         }
-        return json;
-    }
-
-    private void printtest(String xml) {
-        if (xml.length() > 4000) {
-            for (int i = 0; i < xml.length(); i += 4000) {
-                if (i + 4000 < xml.length())
-                    LogUtils.e(context, "getJsonByData：" + xml.substring(i, i + 4000));
-                else
-                    LogUtils.e(context, "getJsonByData：" + xml.substring(i, xml.length()));
-            }
-        } else
-            LogUtils.e(context, "getJsonByData：" + xml);
+        return result;
     }
 
 }
