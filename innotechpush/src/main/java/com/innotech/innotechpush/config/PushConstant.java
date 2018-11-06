@@ -38,4 +38,10 @@ public class PushConstant {
      */
     public static boolean hasOppo = true;
 
+    /**
+     * 默认开启vivo
+     * 如果不需要开启vivo则需要设为false
+     */
+    public static boolean hasVivo = true;
+
 }

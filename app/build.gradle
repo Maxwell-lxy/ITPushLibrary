@@ -23,15 +23,14 @@ android {
                 INNOTECH_APP_KEY   : "ddddddd",
 //                INNOTECH_APP_ID     : 1000,
 //                INNOTECH_APP_KEY    : "YWJjZGRk",
-
+                //小米
                 MI_APP_ID          : "2882303761517836599",
                 MI_APP_KEY         : "5131783646599",
-
+                //魅族
                 MEIZU_APP_ID       : "116007",
                 MEIZU_APP_KEY      : "9779ce34260d43faad9e47e0ca10c12f",
-
+                //华为
                 HMS_APP_ID         : "100437753",
-
                 //个推（1000）
 //                GETUI_APP_ID       : "2e48RoYBrh65BC4HRmkAg6",
 //                GETUI_APP_KEY      : "PwG112qeeV5UiQrtVObz3A",
@@ -40,14 +39,16 @@ android {
                 GETUI_APP_ID       : "a0UoMM4qza8jfpCskhyFy1",
                 GETUI_APP_KEY      : "nn3yUZNhnB6n4LSg4two41",
                 GETUI_APP_SECRET   : "zB9uZcRM6374vwuXJb2OH2",
-
+                //OPPO
                 OPPO_APP_KEY       : "5vifLOB1A1s0s800scc4gwC4S",
-                OPPO_APP_SECRET    : "b4aB971Df1bD32eEB9882d2429898BB5"
-
+                OPPO_APP_SECRET    : "b4aB971Df1bD32eEB9882d2429898BB5",
+                //VIVO
+                VIVO_APP_ID        : "10351",
+                VIVO_APP_KEY       : "753460d1-cf6a-4d68-b16a-fe6d7fabed54"
         ]
         ndk {
             // 设置支持的SO库架构
-            abiFilters 'armeabi' , 'x86'//, 'armeabi-v7a', 'x86_64', 'arm64-v8a'
+            abiFilters 'armeabi', 'x86'//, 'armeabi-v7a', 'x86_64', 'arm64-v8a'
         }
 
     }

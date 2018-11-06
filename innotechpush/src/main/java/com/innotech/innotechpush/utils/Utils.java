@@ -51,6 +51,8 @@ public class Utils {
     private static final String MIUI_VERSION_NAME = "ro.miui.ui.version.name";
     private static final String MEIZU = "Meizu";
     private static final String HUAWEI = "Huawei";
+    private static final String OPPO = "oppo";
+    private static final String VIVO = "vivo";
 
     /**
      * 判断是否小米设备
@@ -101,8 +103,25 @@ public class Utils {
         return false;
     }
 
+    /**
+     * 判断是否OPPO设备
+     *
+     * @return
+     */
     public static boolean isOPPO() {
-        if (Build.BRAND.equalsIgnoreCase("OPPO")) {
+        if (OPPO.equalsIgnoreCase(Build.BRAND)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否VIVO设备
+     *
+     * @return
+     */
+    public static boolean isVivo() {
+        if (VIVO.equalsIgnoreCase(Build.BRAND) || VIVO.equalsIgnoreCase(Build.MANUFACTURER)) {
             return true;
         }
         return false;
@@ -283,7 +302,7 @@ public class Utils {
         try {
             imei = telephonyManager.getDeviceId();
         } catch (SecurityException ex) {
-            LogUtils.e(context,"没有权限，获取不到imei");
+            LogUtils.e(context, "没有权限，获取不到imei");
         }
         return imei;
     }

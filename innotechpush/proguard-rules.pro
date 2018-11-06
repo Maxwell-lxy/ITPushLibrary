@@ -62,3 +62,9 @@
 #-keep public class com.innotech.innotechpush.utils.Utils {
 #    public boolean isNotificationEnable(***);
 #}
+
+#vivo
+-dontwarn com.vivo.push.**
+-keep class com.vivo.push.**{*; }
+-keep class com.vivo.vms.**{*; }
+-keep class com.innotech.innotechpush.receiver.VivoPushReceiver{*;}

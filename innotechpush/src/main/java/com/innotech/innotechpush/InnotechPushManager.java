@@ -28,6 +28,8 @@ import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.TokenUtils;
 import com.innotech.innotechpush.utils.Utils;
 import com.orm.SugarContext;
+import com.vivo.push.IPushActionListener;
+import com.vivo.push.PushClient;
 
 import org.json.JSONException;
 
@@ -97,6 +99,15 @@ public class InnotechPushManager {
                     String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
                     String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
                     com.coloros.mcssdk.PushManager.getInstance().register(appContext, appKey, appSecret, new OppoPushCallback(application));
+                }
+                if (Utils.isVivo() && PushConstant.hasVivo ) {//&& PushClient.getInstance(appContext).isSupport()
+                    PushClient.getInstance(appContext).initialize();
+                    PushClient.getInstance(appContext).turnOnPush(new IPushActionListener() {
+                        @Override
+                        public void onStateChanged(int state) {
+                            LogUtils.e(appContext, "vivo state:" + state);
+                        }
+                    });
                 }
                 initGeTuiPush();
             }
