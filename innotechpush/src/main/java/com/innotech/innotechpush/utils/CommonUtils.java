@@ -4,11 +4,14 @@ import android.app.ActivityManager;
 import android.app.AppOpsManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
+
+import com.innotech.innotechpush.sdk.SocketClientService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -198,7 +201,7 @@ public class CommonUtils {
     /**
      * 判断服务是否开启
      *
-     * @return
+     * @return boolean
      */
     public static boolean isServiceRunning(Context context, String ServiceName) {
         if (("").equals(ServiceName) || ServiceName == null)
@@ -295,31 +298,6 @@ public class CommonUtils {
     }
 
     /**
-     * whether application is in background
-     * <ul>
-     * <li>need use permission android.permission.GET_TASKS in Manifest.xml</li>
-     * </ul>
-     *
-     * @param context 上下文
-     * @return if application is in background return true, otherwise return
-     * false
-     */
-    public static boolean isApplicationInBackground(Context context) {
-        ActivityManager am = (ActivityManager) context
-                .getSystemService(Context.ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> taskList = am.getRunningTasks(1);
-        if (taskList != null && !taskList.isEmpty()) {
-            ComponentName topActivity = taskList.get(0).topActivity;
-            if (topActivity != null
-                    && !topActivity.getPackageName().equals(
-                    context.getPackageName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * 将字节数组转为long<br>
      * 如果input为null,或offset指定的剩余数组长度不足8字节则抛出异常
      *
@@ -374,5 +352,51 @@ public class CommonUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * 判断应用是否在后台
+     *
+     * @param context：上下文
+     * @return boolean
+     */
+    public static boolean isBackground(Context context) {
+        ActivityManager activityManager = (ActivityManager) context
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        List<ActivityManager.RunningAppProcessInfo> appProcesses = activityManager
+                .getRunningAppProcesses();
+        for (ActivityManager.RunningAppProcessInfo appProcess : appProcesses) {
+            if (appProcess.processName.equals(context.getPackageName())) {
+                if (appProcess.importance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                    Log.i(context.getPackageName(), "后台"
+                            + appProcess.processName);
+                    return true;
+                } else {
+                    Log.i(context.getPackageName(), "前台"
+                            + appProcess.processName);
+                    return false;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 判断是否适合打开服务
+     * 1、服务是否已存在
+     * 2、8.0及以上版本需要判断是否在后台
+     *
+     * @return boolean
+     */
+    public static boolean isCanRunService(Context context, String serviceName) {
+        boolean isCan = false;
+        if (!isServiceRunning(context, serviceName)) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {//8.0以下版本
+                isCan = true;
+            } else if (!isBackground(context)) {//8.0及以上版本，判断是否在后台
+                isCan = true;
+            }
+        }
+        return isCan;
     }
 }

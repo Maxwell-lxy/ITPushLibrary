@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.os.Build;
 
 import com.innotech.innotechpush.InnotechPushMethod;
 import com.innotech.innotechpush.config.BroadcastConstant;
@@ -29,14 +30,14 @@ public class PushReceiver extends BroadcastReceiver {
                 || Intent.ACTION_MEDIA_MOUNTED.equals(action)
                 || Intent.ACTION_POWER_CONNECTED.equals(action)
                 || Intent.ACTION_POWER_DISCONNECTED.equals(action)) {
-            if (!CommonUtils.isServiceRunning(context, SocketClientService.class.getName())) {
+            if (CommonUtils.isCanRunService(context, SocketClientService.class.getName())) {
                 context.startService(new Intent(context, SocketClientService.class));
             }
         } else if (ConnectivityManager.CONNECTIVITY_ACTION.equals(action)) {
             int netWorkState = NetUtil.getNetWorkState(context);
             LogUtils.e(context, "netWorkState：" + netWorkState);
             if (netWorkState != -1) {
-                if (!CommonUtils.isServiceRunning(context, SocketClientService.class.getName())) {
+                if (CommonUtils.isCanRunService(context, SocketClientService.class.getName())) {
                     context.startService(new Intent(context, SocketClientService.class));
                 } else {
                     SocketManager.getInstance(context).reConnect();
@@ -44,7 +45,7 @@ public class PushReceiver extends BroadcastReceiver {
             }
         } else if (action.equals(BroadcastConstant.ACTION_FRESH_PUSH + context.getPackageName())) {
             LogUtils.e(context, BroadcastConstant.ACTION_FRESH_PUSH + context.getPackageName());
-            if (!CommonUtils.isServiceRunning(context, SocketClientService.class.getName())) {
+            if (CommonUtils.isCanRunService(context, SocketClientService.class.getName())) {
                 context.startService(new Intent(context, SocketClientService.class));
             }
             //发送心跳包
