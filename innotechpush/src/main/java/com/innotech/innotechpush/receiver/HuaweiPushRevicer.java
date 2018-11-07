@@ -84,14 +84,16 @@ public class HuaweiPushRevicer extends PushReceiver {
                     }
                     mPushMessage.setCustom(object.toString());
                     //华为点击回执
-                    JSONObject ackObject = new JSONObject();
-                    JSONArray ackArray = new JSONArray();
-                    ackArray.put(taskId);
-                    ackObject.put("msg_ids", ackArray);
-                    ackObject.put("type", 7003);
-                    JSONArray paramArray = new JSONArray();
-                    paramArray.put(ackObject);
-                    InnotechPushMethod.clientMsgNotify(context, paramArray, 0);
+                    if (!TextUtils.isEmpty(taskId)) {
+                        JSONObject ackObject = new JSONObject();
+                        JSONArray ackArray = new JSONArray();
+                        ackArray.put(taskId);
+                        ackObject.put("msg_ids", ackArray);
+                        ackObject.put("type", 7003);
+                        JSONArray paramArray = new JSONArray();
+                        paramArray.put(ackObject);
+                        InnotechPushMethod.clientMsgNotify(context, paramArray, 0);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

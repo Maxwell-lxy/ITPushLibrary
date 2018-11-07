@@ -155,6 +155,7 @@ public class InnotechPushMethod {
                     if (tryTime < 3) {
                         LogUtils.e(context, "客户端消息回执尝试再次请求");
                         clientMsgNotify(context, array, tryTime + 1);
+                        DbUtils.addClientLog(context, LogCode.LOG_DATA_API, "客户端消息回执尝试再次请求,array:" + array + "trytime:" + tryTime);
                     } else {
                         LogUtils.e(context, "客户端消息回执失败");
                         //写入本地数据库

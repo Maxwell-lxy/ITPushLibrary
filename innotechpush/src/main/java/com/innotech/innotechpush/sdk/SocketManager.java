@@ -30,6 +30,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public class SocketManager {
     private static SocketManager instance;
@@ -45,8 +46,8 @@ public class SocketManager {
     private Thread readThread;
     //write线程
     private Thread writeThread;
-    //是否正在重连
-    private boolean isReconnecting;
+    //重连时，使用SynchronousQueue起到锁同步的效果
+    private ArrayBlockingQueue<Integer> reConnectQueue;
 
     //长连接发送数据用的线程
     private Thread sendThread;
@@ -65,7 +66,7 @@ public class SocketManager {
     }
 
     private SocketManager() {
-        isReconnecting = false;
+        reConnectQueue = new ArrayBlockingQueue<>(1);
     }
 
     /**
@@ -73,33 +74,37 @@ public class SocketManager {
      */
     public synchronized void initSocket() {
         try {
-            getSocketAddr(new RequestCallback() {
+            boolean isSuccess = getSocketAddr(new RequestCallback() {
                 @Override
                 public void onSuccess(String hostAndPort) {
                     String[] array = hostAndPort.split(":");
                     try {
                         connectWithHostAndPort(array[0].trim(), Integer.parseInt(array[1].trim()));
                     } catch (JSONException e) {
-                        isReconnecting = false;
-                        e.printStackTrace();
+                        takeRCQueue();
+                        LogUtils.e(context, "建立socket时json参数有误");
+                        DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "建立socket时json参数有误");
                     }
                 }
 
                 @Override
                 public void onFail(String msg) {
-                    isReconnecting = false;
                     LogUtils.e(context, msg);
-                    DbUtils.addClientLog(context, LogCode.LOG_DATA_API, "获取长连接地址失败：" + msg);
+                    takeRCQueue();
                     try {
                         Thread.sleep(5000);
                         reConnect();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    DbUtils.addClientLog(context, LogCode.LOG_DATA_API, "获取长连接地址失败：" + msg);
                 }
             });
+            if (!isSuccess) {//没有执行到网络请求就返回时，如果队列有值，需要消费掉
+                takeRCQueue();
+            }
         } catch (JSONException e) {
-            isReconnecting = false;
+            takeRCQueue();
             LogUtils.e(context, "获取socket信息json参数有误" + e.getMessage());
             DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "获取socket信息json参数有误" + e.getMessage());
         }
@@ -108,14 +113,13 @@ public class SocketManager {
     /**
      * 获取长连接地址信息
      */
-    private void getSocketAddr(RequestCallback callback) throws JSONException {
+    private boolean getSocketAddr(RequestCallback callback) throws JSONException {
         Integer appId = CommonUtils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
         String appKey = CommonUtils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
         String guid = TokenUtils.getGuid(context);
         if (TextUtils.isEmpty(guid)) {
             LogUtils.e(context, "guid不能为空");
-            isReconnecting = false;
-            return;
+            return false;
         }
         JSONObject object = new JSONObject();
         object.put("app_id", appId);
@@ -124,6 +128,7 @@ public class SocketManager {
         String json = object.toString();
         String sign = SignUtils.sign("POST", NetWorkUtils.PATH_SOCKET_ADDR, json);
         NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_SOCKET_ADDR, json, sign, callback);
+        return true;
     }
 
     /**
@@ -136,7 +141,7 @@ public class SocketManager {
             final String guid = TokenUtils.getGuid(context);
             if (TextUtils.isEmpty(guid)) {
                 LogUtils.e(context, "guid不能为空");
-                isReconnecting = false;
+                takeRCQueue();
                 return;
             }
             try {
@@ -144,13 +149,13 @@ public class SocketManager {
                 LogUtils.e(context, "与服务器(" + host + ":" + port + ")连接成功");
                 mInputStream = mSocket.getInputStream();
 //                mDataOutputStream = new DataOutputStream(mSocket.getOutputStream());
-                isReconnecting = false;
+                takeRCQueue();
                 //登录
                 loginCmd(guid, appId, appKey);
                 readData();
             } catch (Exception e) {
-                isReconnecting = false;
                 LogUtils.e(context, "Exception异常：" + e.getMessage());
+                takeRCQueue();
                 try {
                     Thread.sleep(5000);
                     reConnect();
@@ -294,31 +299,33 @@ public class SocketManager {
      * isConnecting()只能判断客户端是否处于正常连接状态
      */
     public synchronized void reConnect() {
-        if (isReconnecting) {
-            return;
-        }
-        isReconnecting = true;
-        sendData("", 9, new SocketSendCallback() {
-            @Override
-            public void onResult(boolean result) {
-                if (!result) {
-                    try {
-                        if (mSocket != null) {
-                            mSocket.close();
+        //重现时，使用reConnectQueue,防止多线程并发
+        try {
+            reConnectQueue.put(1);
+            LogUtils.e(context, "重连开始...");
+            DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "重连开始...");
+            sendData("", 9, new SocketSendCallback() {
+                @Override
+                public void onResult(boolean result) {
+                    if (!result) {//发送失败，需要重连
+                        try {
+                            if (mSocket != null) {
+                                mSocket.close();
+                            }
+                            SocketManager.getInstance(context).initSocket();
+                        } catch (IOException e) {
+                            takeRCQueue();
+                            LogUtils.e(context, "socket close异常..." + e.getMessage());
+                            DbUtils.addClientLog(context, LogCode.LOG_EX_IO, "socket close异常..." + e.getMessage());
                         }
-                        SocketManager.getInstance(context).initSocket();
-                        LogUtils.e(context, "正在重连...");
-                        DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "正在重连...");
-                    } catch (IOException e) {
-                        isReconnecting = false;
-                        LogUtils.e(context, "socket close异常...");
-                        DbUtils.addClientLog(context, LogCode.LOG_EX_IO, "socket close异常..." + e.getMessage());
+                    } else {//发送成功，长连接正常，解锁
+                        takeRCQueue();
                     }
-                } else {
-                    isReconnecting = false;
                 }
-            }
-        });
+            });
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -510,6 +517,21 @@ public class SocketManager {
             }
         }
         return result;
+    }
+
+    /**
+     * 消费队列中的值，从而解除阻塞
+     */
+    private void takeRCQueue() {
+        try {
+            if (reConnectQueue.contains(1)) {
+                reConnectQueue.take();
+                LogUtils.e(context, "重连结束...");
+                DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "重连结束...");
+            }
+        } catch (InterruptedException e) {
+            LogUtils.e(context, "takeRCQueue：" + e.getMessage());
+        }
     }
 
 }
