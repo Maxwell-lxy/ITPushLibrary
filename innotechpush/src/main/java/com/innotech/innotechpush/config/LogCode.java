@@ -13,4 +13,7 @@ public class LogCode {
     public static final int LOG_EX_JSON = 401;
     public static final int LOG_EX_IO = 402;
     public static final int LOG_EX_SOCKET = 403;
+    //socket
+    public static final int LOG_SOCKET_WRITE = 501;
+    public static final int LOG_SOCKET_READ = 502;
 }

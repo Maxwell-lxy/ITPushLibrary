@@ -58,9 +58,10 @@ public class PushReceiver extends BroadcastReceiver {
         } else if (BroadcastConstant.MESSAGE_CLICK.equals(action)) {
             //通知被点击之后需要给服务器发送回执
             LogUtils.e(context, "通知被点击");
+            Integer appId = CommonUtils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
             PushMessage message = (PushMessage) intent.getSerializableExtra("PushMessage");
-            if (message != null) {
-                ArrayList<String> list = new ArrayList<String>();
+            if (message != null && message.getAppId() == appId) {
+                ArrayList<String> list = new ArrayList<>();
                 list.add(message.getMsg_id());
                 if (message.isOffLineMsg()) {
                     SocketManager.getInstance(context).ackCmd(list, 1003);
@@ -74,7 +75,7 @@ public class PushReceiver extends BroadcastReceiver {
             Integer appId = CommonUtils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
             PushMessage message = (PushMessage) intent.getSerializableExtra("PushMessage");
             if (CommonUtils.isNotificationEnabled(context) && message.getAppId() == appId) {
-                ArrayList<String> list = new ArrayList<String>();
+                ArrayList<String> list = new ArrayList<>();
                 list.add(message.getMsg_id());
                 if (message.isOffLineMsg()) {
                     SocketManager.getInstance(context).ackCmd(list, 1002);

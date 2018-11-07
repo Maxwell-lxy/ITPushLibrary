@@ -4,9 +4,11 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.huawei.hms.support.api.push.PushReceiver;
 import com.innotech.innotechpush.InnotechPushManager;
+import com.innotech.innotechpush.InnotechPushMethod;
 import com.innotech.innotechpush.bean.InnotechMessage;
 import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.config.LogCode;
@@ -55,19 +57,52 @@ public class HuaweiPushRevicer extends PushReceiver {
         LogUtils.e(context, LogUtils.TAG_HUAWEI + "收到通知栏消息点击事件,onEvent");
         if (Event.NOTIFICATION_OPENED.equals(event) || Event.NOTIFICATION_CLICK_BTN.equals(event)) {
             int notifyId = extras.getInt(BOUND_KEY.pushNotifyId, 0);
-            LogUtils.e(context, LogUtils.TAG_HUAWEI + "收到通知栏消息点击事件,notifyId:" + notifyId);
-            LogUtils.e(context, LogUtils.TAG_HUAWEI + " extras:" + extras);
+            String message = extras.getString(BOUND_KEY.pushMsgKey);
             if (0 != notifyId) {
                 NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                manager.cancel(notifyId);
+                if (manager != null) {
+                    manager.cancel(notifyId);
+                }
             }
+            InnotechMessage mPushMessage = new InnotechMessage();
+            String taskId = "";
+            if (!TextUtils.isEmpty(message)) {
+                try {
+                    JSONArray array = new JSONArray(message);
+                    JSONObject object = new JSONObject();
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject o = array.getJSONObject(i);
+                        Iterator<String> it = o.keys();
+                        while (it.hasNext()) {
+                            String key = it.next();
+                            if (key.equals("innotech_task_id")) {
+                                taskId = (String) o.get(key);
+                                continue;
+                            }
+                            object.put(key, o.get(key));
+                        }
+                    }
+                    mPushMessage.setCustom(object.toString());
+                    //华为点击回执
+                    JSONObject ackObject = new JSONObject();
+                    JSONArray ackArray = new JSONArray();
+                    ackArray.put(taskId);
+                    ackObject.put("msg_ids", ackArray);
+                    ackObject.put("type", 7003);
+                    JSONArray paramArray = new JSONArray();
+                    paramArray.put(ackObject);
+                    InnotechPushMethod.clientMsgNotify(context, paramArray, 0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (InnotechPushManager.getPushReciver() != null) {
+                InnotechPushManager.getPushReciver().onNotificationMessageClicked(context, mPushMessage);
+            } else {
+                InnotechPushManager.innotechPushReciverIsNull(context);
+            }
+        }
 
-        }
-        if (InnotechPushManager.getPushReciver() != null) {
-            InnotechPushManager.getPushReciver().onNotificationMessageClicked(context, getCreateMessge(extras));
-        } else {
-            InnotechPushManager.innotechPushReciverIsNull(context);
-        }
         super.onEvent(context, event, extras);
     }
 
@@ -82,6 +117,7 @@ public class HuaweiPushRevicer extends PushReceiver {
         String message = extras.getString(BOUND_KEY.pushMsgKey);
 //        mPushMessage.setData(message);
         if (!TextUtils.isEmpty(message)) {
+//            Log.e("allen", message);
             try {
                 JSONArray array = new JSONArray(message);
                 JSONObject object = new JSONObject();
@@ -90,9 +126,11 @@ public class HuaweiPushRevicer extends PushReceiver {
                     Iterator<String> it = o.keys();
                     while (it.hasNext()) {
                         String key = it.next();
+                        if (key.equals("innotech_task_id")) continue;
                         object.put(key, o.get(key));
                     }
                 }
+                Log.e("allen", object.toString());
                 mPushMessage.setCustom(object.toString());
             } catch (JSONException e) {
                 e.printStackTrace();

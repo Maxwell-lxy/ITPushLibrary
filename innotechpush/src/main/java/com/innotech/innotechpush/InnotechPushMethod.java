@@ -338,15 +338,19 @@ public class InnotechPushMethod {
     /**
      * 长连接回执之前丢失的回执
      */
-    public static void uploadSocketAck(Context context) {
+    public static void uploadSocketAck(final Context context) {
         try {
             List<SocketAck> acks = SocketAck.find(SocketAck.class, "cmd = ?", "6");
             if (acks != null && acks.size() > 0) {
                 for (final SocketAck ack : acks) {
+                    LogUtils.e(context, "补发长连接丢失的回执：json：" + ack.getJson() + "，ack：" + ack.getCmd());
+                    DbUtils.addClientLog(context, LogCode.LOG_SOCKET_WRITE, "补发长连接丢失的回执：json：" + ack.getJson() + "，ack：" + ack.getCmd());
                     SocketManager.getInstance(context).sendData(ack.getJson(), ack.getCmd(), new SocketSendCallback() {
                         @Override
                         public void onResult(boolean result) {
                             if (result) {
+                                LogUtils.e(context, "成功补发长连接丢失的回执：json：" + ack.getJson() + "，ack：" + ack.getCmd());
+                                DbUtils.addClientLog(context, LogCode.LOG_SOCKET_WRITE, "成功补发长连接丢失的回执：json：" + ack.getJson() + "，ack：" + ack.getCmd());
                                 ack.delete();
                             }
                         }

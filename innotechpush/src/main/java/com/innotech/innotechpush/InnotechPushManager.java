@@ -95,12 +95,15 @@ public class InnotechPushManager {
             } else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41()) {//华为设备时，开启华为推送
                 new HuaweiSDK(application);
             } else { //其他设备时，开启个推推送和socket长连接
+                initGeTuiPush();
+                LogUtils.e(appContext, "是否支持oppo推送：" + com.coloros.mcssdk.PushManager.isSupportPush(appContext));
                 if (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(appContext)) {//oppo设备时，开启oppo推送
                     String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
                     String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
                     com.coloros.mcssdk.PushManager.getInstance().register(appContext, appKey, appSecret, new OppoPushCallback(application));
                 }
-                if (Utils.isVivo() && PushConstant.hasVivo ) {//&& PushClient.getInstance(appContext).isSupport()
+                LogUtils.e(appContext, "是否支持vivo推送：" + PushClient.getInstance(appContext).isSupport());
+                if (Utils.isVivo() && PushConstant.hasVivo && PushClient.getInstance(appContext).isSupport()) {
                     PushClient.getInstance(appContext).initialize();
                     PushClient.getInstance(appContext).turnOnPush(new IPushActionListener() {
                         @Override
@@ -109,7 +112,6 @@ public class InnotechPushManager {
                         }
                     });
                 }
-                initGeTuiPush();
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
                 application.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
