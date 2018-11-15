@@ -139,8 +139,8 @@ public class InnotechPushMethod {
             object.put("imei", imei == null ? "" : imei);
             object.put("open_id", openId);
             final JSONObject paramsObj = new JSONObject();
-            paramsObj.put("content", object);
-            paramsObj.put("app_id", appId);
+            paramsObj.put("content", object.toString());
+            paramsObj.put("app_id", appId + "notify");
             String params = paramsObj.toString();
             String sign = SignUtils.sign(NetWorkUtils.HOST_LOG, "POST", NetWorkUtils.PATH_LOG, params);
             NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_LOG, params, sign, new RequestCallback() {
@@ -169,7 +169,7 @@ public class InnotechPushMethod {
      */
     public synchronized static void uploadClientMsgNotify(final Context context) {
         try {
-            final List<ClientMsgNotify> notifies = ClientMsgNotify.find(ClientMsgNotify.class, null, null, null, "ID", "10");
+            final List<ClientMsgNotify> notifies = ClientMsgNotify.find(ClientMsgNotify.class, null, null, null, "ID", "100");
             JSONArray msgIdsArrayForType1 = new JSONArray();
             JSONArray msgIdsArrayForType2 = new JSONArray();
             JSONArray msgIdsArrayForType3 = new JSONArray();
@@ -181,7 +181,7 @@ public class InnotechPushMethod {
                 for (ClientMsgNotify notify : notifies) {
                     if (!TextUtils.isEmpty(notify.getNotifyData())) {
                         JSONObject notifyData = new JSONObject(notify.getNotifyData());
-                        JSONObject notifyObj = notifyData.getJSONObject("notify_data");
+                        JSONObject notifyObj = new JSONObject(notifyData.optString("content"));
                         guid = notifyObj.getString("guid");
                         imei = notifyObj.getString("imei");
                         openId = notifyObj.getString("open_id");
@@ -210,32 +210,36 @@ public class InnotechPushMethod {
                         }
                     }
                 }
-
-                JSONObject idTypesObj1 = new JSONObject();
-                idTypesObj1.put("msg_ids", msgIdsArrayForType1);
-                idTypesObj1.put("type", 1);
-                JSONObject idTypesObj2 = new JSONObject();
-                idTypesObj2.put("msg_ids", msgIdsArrayForType2);
-                idTypesObj2.put("type", 2);
-                JSONObject idTypesObj3 = new JSONObject();
-                idTypesObj3.put("msg_ids", msgIdsArrayForType3);
-                idTypesObj3.put("type", 3);
                 JSONArray idTypesArray = new JSONArray();
-                idTypesArray.put(idTypesObj1);
-                idTypesArray.put(idTypesObj2);
-                idTypesArray.put(idTypesObj3);
+                if (msgIdsArrayForType1.length() > 0) {
+                    JSONObject idTypesObj1 = new JSONObject();
+                    idTypesObj1.put("msg_ids", msgIdsArrayForType1);
+                    idTypesObj1.put("type", 1);
+                    idTypesArray.put(idTypesObj1);
+                }
+                if (msgIdsArrayForType2.length() > 0) {
+                    JSONObject idTypesObj2 = new JSONObject();
+                    idTypesObj2.put("msg_ids", msgIdsArrayForType2);
+                    idTypesObj2.put("type", 2);
+                    idTypesArray.put(idTypesObj2);
+                }
+                if (msgIdsArrayForType3.length() > 0) {
+                    JSONObject idTypesObj3 = new JSONObject();
+                    idTypesObj3.put("msg_ids", msgIdsArrayForType3);
+                    idTypesObj3.put("type", 3);
+                    idTypesArray.put(idTypesObj3);
+                }
                 JSONObject object = new JSONObject();
                 object.put("id_types", idTypesArray);
                 object.put("guid", guid);
-                object.put("try_time", 3);
                 object.put("imei", imei);
                 object.put("open_id", openId);
-                object.put("app_id", appId);
                 final JSONObject paramsObj = new JSONObject();
-                paramsObj.put("notify_data", object);
+                paramsObj.put("content", object.toString());
+                paramsObj.put("app_id", appId + "notify");
                 String params = paramsObj.toString();
-                String sign = SignUtils.sign("POST", NetWorkUtils.PATH_CLIENT_MSG_NOTIFY, params);
-                NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_CLIENT_MSG_NOTIFY, params, sign, new RequestCallback() {
+                String sign = SignUtils.sign(NetWorkUtils.HOST_LOG, "POST", NetWorkUtils.PATH_LOG, params);
+                NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_LOG, params, sign, new RequestCallback() {
                     @Override
                     public void onSuccess(String msg) {
                         LogUtils.e(context, "客户端消息回执成功");

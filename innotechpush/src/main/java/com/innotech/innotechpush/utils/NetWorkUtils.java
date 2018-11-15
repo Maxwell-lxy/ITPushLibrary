@@ -29,11 +29,11 @@ public class NetWorkUtils {
     public static final String URL_UPDATEUSERINFO = BASE_URL + "/updateuserinfo";
     public static final String URL_ALIAS = BASE_URL + "/userbindalias";
     public static final String URL_SOCKET_ADDR = BASE_URL + "/socketaddr";
-    public static final String URL_CLIENT_MSG_NOTIFY = BASE_URL + "/clientmsgnotify";
     public static final String PATH_UPDATEUSERINFO = "/v1/pushaksk/updateuserinfo";
     public static final String PATH_ALIAS = "/v1/pushaksk/userbindalias";
     public static final String PATH_SOCKET_ADDR = "/v1/pushaksk/socketaddr";
-    public static final String PATH_CLIENT_MSG_NOTIFY = "/v1/pushaksk/clientmsgnotify";
+//    public static final String URL_CLIENT_MSG_NOTIFY = BASE_URL + "/clientmsgnotify";
+//    public static final String PATH_CLIENT_MSG_NOTIFY = "/v1/pushaksk/clientmsgnotify";
     //    public static final String URL_CLIENT_LOG = BASE_URL + "/clientlog";
     //    public static final String PATH_CLIENT_LOG = "/v1/pushaksk/clientlog";
     //log server日志

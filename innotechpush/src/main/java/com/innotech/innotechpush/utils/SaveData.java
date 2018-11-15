@@ -66,30 +66,16 @@ public class SaveData {
                 }
             }
         }
-        //客户端消息回执接口
-        else if (url.equals(NetWorkUtils.URL_CLIENT_MSG_NOTIFY)) {
-            BaseResponse response = new DataAnalysis().analysisData(json, null);
-            if (response.getCode() == 0) {
-                if (mCallBack != null) {
-                    mCallBack.onSuccess("客户端消息回执成功！");
-                }
-
-            } else {
-                if (mCallBack != null) {
-                    mCallBack.onFail("客户端消息回执失败！");
-                }
-            }
-        }
-        //客户端日志接口
+        //客户端日志接口、客户端消息回执接口
         else if (url.equals(NetWorkUtils.URL_LOG)) {
             BaseResponse response = new DataAnalysis().analysisData(json, null);
             if (response.getCode() == 0) {
                 if (mCallBack != null) {
-                    mCallBack.onSuccess("客户端日志成功！");
+                    mCallBack.onSuccess("LogServer成功！");
                 }
             } else {
                 if (mCallBack != null) {
-                    mCallBack.onFail("客户端日志失败！");
+                    mCallBack.onFail("LogServer失败！");
                 }
             }
         }
