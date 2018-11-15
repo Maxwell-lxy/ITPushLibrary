@@ -1,10 +1,10 @@
 package com.innotech.innotechpush.sdk;
 
 import android.content.Context;
-import android.os.Handler;
 import android.text.TextUtils;
 
 import com.innotech.innotechpush.InnotechPushMethod;
+import com.innotech.innotechpush.bean.WriteData;
 import com.innotech.innotechpush.callback.RequestCallback;
 import com.innotech.innotechpush.callback.SocketSendCallback;
 import com.innotech.innotechpush.config.LogCode;
@@ -26,17 +26,17 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class SocketManager {
+    private static final int CMD_LOGIN = 0;//登录指令码
+    private static final int CMD_ACK = 6;//ack指令码
+    private static final int CMD_HEART = 9;//心跳指令码
     private static SocketManager instance;
     private static Context context;
-    private static final int STATE_CONNECTED = 1;
-    private static final int STATE_UNCONNECTED = 0;
     private Socket mSocket;
     //socket输入流
     private InputStream mInputStream;
@@ -46,6 +46,12 @@ public class SocketManager {
     private Thread readThread;
     //write线程
     private Thread writeThread;
+    /**
+     * write LinkedBlockingQueue
+     * 要写给服务端的信息先放入Queue中，再从Queue中取出进行处理
+     * 防止多线程同时写产生批量写失败
+     */
+    private LinkedBlockingQueue<WriteData> writeQueue;
     //重连时，使用SynchronousQueue起到锁同步的效果
     private ArrayBlockingQueue<Integer> reConnectQueue;
 
@@ -67,6 +73,7 @@ public class SocketManager {
 
     private SocketManager() {
         reConnectQueue = new ArrayBlockingQueue<>(1);
+        writeQueue = new LinkedBlockingQueue<>();
     }
 
     /**
@@ -148,11 +155,12 @@ public class SocketManager {
                 mSocket = new Socket(host, port);
                 LogUtils.e(context, "与服务器(" + host + ":" + port + ")连接成功");
                 mInputStream = mSocket.getInputStream();
-//                mDataOutputStream = new DataOutputStream(mSocket.getOutputStream());
+                mDataOutputStream = new DataOutputStream(mSocket.getOutputStream());
                 takeRCQueue();
+                readData();
+                writeData();
                 //登录
                 loginCmd(guid, appId, appKey);
-                readData();
             } catch (Exception e) {
                 LogUtils.e(context, "Exception异常：" + e.getMessage());
                 takeRCQueue();
@@ -171,10 +179,6 @@ public class SocketManager {
      * 读取数据
      */
     private void readData() {
-        if (readThread != null && readThread.isAlive()) {
-            readThread.interrupt();
-            readThread = null;
-        }
         readThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -190,6 +194,7 @@ public class SocketManager {
                             byte[] lenJ = readByLen(len - 12);
                             if (lenJ == null) break;
                             json = new String(lenJ);
+                            LogUtils.eLong(context, "readData json:" + json);
                         }
                         switch (command) {
                             case 1://登录成功（LoginRespCmd）
@@ -284,14 +289,44 @@ public class SocketManager {
     }
 
     /**
+     * 写数据
+     */
+    private void writeData() {
+        writeThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        WriteData writeData = writeQueue.take();
+                        if (isConnecting()) {
+                            LogUtils.e(context, "socket状态为：连接中...");
+                            try {
+                                mDataOutputStream.write(writeData.getData());
+                                writeData.getResultQueue().put(true);
+                            } catch (IOException e) {
+                                LogUtils.e(context, "socket发送信息失败，异常信息：" + e.getMessage());
+                                writeData.getResultQueue().put(false);
+                                DbUtils.addClientLog(context, LogCode.LOG_EX_IO, "socket发送信息失败，异常信息：" + e.getMessage());
+                            }
+                        } else {
+                            LogUtils.e(context, "socket状态为：已断开连接...");
+                            writeData.getResultQueue().put(false);
+                            DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "socket状态为：已断开连接...");
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        writeThread.start();
+    }
+
+    /**
      * 是否连接中
      */
     private boolean isConnecting() {
-        if (mSocket != null && mSocket.isConnected() && !mSocket.isClosed() && !mSocket.isInputShutdown()) {
-            return true;
-        } else {
-            return false;
-        }
+        return mSocket != null && mSocket.isConnected() && !mSocket.isClosed() && !mSocket.isInputShutdown();
     }
 
     /**
@@ -309,9 +344,7 @@ public class SocketManager {
                 public void onResult(boolean result) {
                     if (!result) {//发送失败，需要重连
                         try {
-                            if (mSocket != null) {
-                                mSocket.close();
-                            }
+                            reset();
                             SocketManager.getInstance(context).initSocket();
                         } catch (IOException e) {
                             takeRCQueue();
@@ -329,16 +362,46 @@ public class SocketManager {
     }
 
     /**
+     * 重置所有相关的允许重新连接
+     *
+     * @throws IOException
+     */
+    private void reset() throws IOException {
+        if (writeThread != null) {
+            writeThread.interrupt();
+            writeThread = null;
+        }
+        if (readThread != null) {
+            readThread.interrupt();
+            readThread = null;
+        }
+        if (mSocket != null) {
+            mSocket.close();
+            mSocket = null;
+        }
+    }
+
+    /**
      * 登录
      */
-    public void loginCmd(String guid, int appID, String appKey) {
+    private void loginCmd(String guid, int appID, String appKey) {
         try {
             JSONObject object = new JSONObject();
             object.put("guid", guid);
             object.put("app_id", appID);
             object.put("app_key", appKey);
             object.put("version", PushConstant.INNOTECH_PUSH_VERSION);
-            sendData(object.toString(), 0);
+            WriteData writeData = new WriteData(CMD_LOGIN, object.toString());
+            try {
+                writeQueue.put(writeData);
+                boolean result = writeData.getResultQueue().take();
+                if (!result) {//写失败
+                    //重连
+                    reConnect();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             LogUtils.e(context, "发送登录指令：" + object.toString());
         } catch (JSONException e) {
             LogUtils.e(context, "发送登录指令时，出现异常。" + e.getMessage());
@@ -350,7 +413,17 @@ public class SocketManager {
      * 发送心跳信息
      */
     public void sendHeartData() {
-        sendData("", 9);
+        WriteData writeData = new WriteData(CMD_HEART, "");
+        try {
+            writeQueue.put(writeData);
+            boolean result = writeData.getResultQueue().take();
+            if (!result) {//写失败
+                //重连
+                reConnect();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         LogUtils.e(context, "发送心跳指令");
     }
 
@@ -368,23 +441,29 @@ public class SocketManager {
             }
             object.put("msg_ids", array);
             object.put("type", type);
-            sendData(object.toString(), 6);
-            LogUtils.e(context, "发送ack指令：" + object.toString());
             //客户端回执
             JSONArray paramArray = new JSONArray();
             paramArray.put(object);
-            InnotechPushMethod.clientMsgNotify(context, paramArray, 0);
+            InnotechPushMethod.clientMsgNotify(context, paramArray);
+            //存入queue
+            WriteData writeData = new WriteData(CMD_ACK, object.toString());
+            try {
+                writeQueue.put(writeData);
+                boolean result = writeData.getResultQueue().take();
+                if (!result) {//写失败
+                    //存数据库，等待补发
+                    DbUtils.addSocketAck(context, object.toString(), CMD_ACK);
+                    //重连
+                    reConnect();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            LogUtils.e(context, "发送ack指令：" + object.toString());
         } catch (JSONException e) {
             LogUtils.e(context, "发送ack指令时，出现异常。" + e.getMessage());
             DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "发送ack指令时，出现异常。" + msgList.toString());
         }
-    }
-
-    /**
-     * 向服务端发消息
-     */
-    public void sendData(String json, int cmd) {
-        sendData(json, cmd, null);
     }
 
     public void sendData(final String json, final int cmd, final SocketSendCallback callback) {
@@ -459,9 +538,7 @@ public class SocketManager {
      */
     private int getLenByData(byte[] data) {
         byte[] bytes = new byte[4];
-        for (int i = 0; i < 4; i++) {
-            bytes[i] = data[i];
-        }
+        System.arraycopy(data, 0, bytes, 0, 4);
         return CommonUtils.big_bytesToInt(bytes);
     }
 
@@ -471,22 +548,19 @@ public class SocketManager {
      */
     private long getRequestIDByData(byte[] data) {
         byte[] bytes = new byte[8];
-        for (int i = 0; i < 8; i++) {
-            bytes[i] = data[i + 4];
-        }
+        System.arraycopy(data, 4, bytes, 0, 8);
         return CommonUtils.longFrom8Bytes(bytes, 0, false);
     }
 
     /**
      * 获取服务端回包的信息
      * 3字节命令的值
+     * 第一位已被服务端用于其他用途，默认补充为0，为了凑齐4字节进行计算
      */
     private int getCommandByData(byte[] data) {
         byte[] bytes = new byte[4];
         bytes[0] = 0;
-        for (int i = 1; i < 4; i++) {
-            bytes[i] = data[i + 12];
-        }
+        System.arraycopy(data, 13, bytes, 1, 3);
         return CommonUtils.big_bytesToInt(bytes);
     }
 
@@ -501,7 +575,7 @@ public class SocketManager {
         boolean isRead = true;
         int readLen = 0;
         while (isRead) {
-            int curReadLen = 0;
+            int curReadLen;
             if (result.length - readLen < 1024) {
                 curReadLen = mInputStream.read(result, readLen, result.length - readLen);
             } else {

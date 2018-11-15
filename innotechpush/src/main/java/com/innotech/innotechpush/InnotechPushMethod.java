@@ -127,7 +127,7 @@ public class InnotechPushMethod {
     /**
      * 客户端消息回执接口
      */
-    public static void clientMsgNotify(final Context context, final JSONArray array, final int tryTime) {
+    public static void clientMsgNotify(final Context context, final JSONArray array) {
         try {
             String guid = TokenUtils.getGuid(context);
             String imei = Utils.getIMEI(context);
@@ -136,15 +136,14 @@ public class InnotechPushMethod {
             JSONObject object = new JSONObject();
             object.put("id_types", array);
             object.put("guid", guid);
-            object.put("try_time", tryTime);
             object.put("imei", imei == null ? "" : imei);
             object.put("open_id", openId);
-            object.put("app_id", appId);
             final JSONObject paramsObj = new JSONObject();
-            paramsObj.put("notify_data", object);
+            paramsObj.put("content", object);
+            paramsObj.put("app_id", appId);
             String params = paramsObj.toString();
-            String sign = SignUtils.sign("POST", NetWorkUtils.PATH_CLIENT_MSG_NOTIFY, params);
-            NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_CLIENT_MSG_NOTIFY, params, sign, new RequestCallback() {
+            String sign = SignUtils.sign(NetWorkUtils.HOST_LOG, "POST", NetWorkUtils.PATH_LOG, params);
+            NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_LOG, params, sign, new RequestCallback() {
                 @Override
                 public void onSuccess(String msg) {
                     LogUtils.e(context, "客户端消息回执成功");
@@ -152,15 +151,9 @@ public class InnotechPushMethod {
 
                 @Override
                 public void onFail(String msg) {
-                    if (tryTime < 3) {
-                        LogUtils.e(context, "客户端消息回执尝试再次请求");
-                        clientMsgNotify(context, array, tryTime + 1);
-                        DbUtils.addClientLog(context, LogCode.LOG_DATA_API, "客户端消息回执尝试再次请求,array:" + array + "trytime:" + tryTime);
-                    } else {
-                        LogUtils.e(context, "客户端消息回执失败");
-                        //写入本地数据库
-                        DbUtils.addClientMsgNotify(context, paramsObj.toString());
-                    }
+                    LogUtils.e(context, "客户端消息回执失败");
+                    //写入本地数据库
+                    DbUtils.addClientMsgNotify(context, paramsObj.toString());
                 }
             });
         } catch (JSONException e) {
@@ -270,14 +263,15 @@ public class InnotechPushMethod {
     public synchronized static void clientlog(final Context context, String log, String guid, String imei, final RequestCallback callback) {
         try {
             int appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
+            StringBuffer sb = new StringBuffer(log);
+            sb.append(",guid:" + guid);
+            sb.append(",imei:" + imei);
             JSONObject paramsObj = new JSONObject();
-            paramsObj.put("log_str", log);
-            paramsObj.put("guid", guid);
-            paramsObj.put("imei", imei);
-            paramsObj.put("app_id", appId);
+            paramsObj.put("content", sb.toString());
+            paramsObj.put("app_id", String.valueOf(appId));
             String params = paramsObj.toString();
-            String sign = SignUtils.sign("POST", NetWorkUtils.PATH_CLIENT_LOG, params);
-            NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_CLIENT_LOG, params, sign, new RequestCallback() {
+            String sign = SignUtils.sign(NetWorkUtils.HOST_LOG, "POST", NetWorkUtils.PATH_LOG, params);
+            NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_LOG, params, sign, new RequestCallback() {
                 @Override
                 public void onSuccess(String msg) {
                     LogUtils.e(context, "客户端日志成功");
@@ -305,7 +299,7 @@ public class InnotechPushMethod {
      */
     public synchronized static void uploadLogs(final Context context) {
         try {
-            final List<ClientLog> logs = ClientLog.find(ClientLog.class, null, null, null, "ID", "20");
+            final List<ClientLog> logs = ClientLog.find(ClientLog.class, null, null, null, "ID", "100");
             String guid = "";
             String imei = "";
             JSONArray array = new JSONArray();

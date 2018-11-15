@@ -45,6 +45,26 @@ public class SignUtils {
     }
 
     /**
+     * 生成签名信息
+     *
+     * @param method：GET           POST
+     * @param path：接口地址（不含host部分）
+     * @param json：接口参数，转化为json字符串
+     * @return 签名信息
+     */
+    public static String sign(String host, String method, String path, String json) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(method).append(" ").append(path).append("\n");
+        sb.append("Host: ").append(host).append("\n");
+        sb.append("Content-Type: ").append(CONTENT_TYPE).append("\n");
+        sb.append("\n");
+        sb.append(json);
+        String b64code = hmac_sha1(sb.toString());
+        b64code = b64code.replace('/', '_').replace('+', '-');
+        return "mt " + AK + ":" + b64code;
+    }
+
+    /**
      * hmac加密
      */
     private static String hmac_sha1(String data) {

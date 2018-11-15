@@ -2,6 +2,7 @@ package com.innotech.innotechpush.receiver;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.R;

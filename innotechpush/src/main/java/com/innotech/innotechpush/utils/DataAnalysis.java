@@ -31,7 +31,7 @@ public class DataAnalysis<T> {
             JSONObject jsonObject = new JSONObject(response);
             int code = jsonObject.getInt("code");
             String msg = jsonObject.getString("msg");
-            String data = jsonObject.getString("data");
+            String data = jsonObject.optString("data");
             baseResponse.setCode(code);
             baseResponse.setMsg(msg);
             if (!TextUtils.isEmpty(className)) {

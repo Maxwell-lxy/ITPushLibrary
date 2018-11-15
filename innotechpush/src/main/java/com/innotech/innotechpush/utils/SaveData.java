@@ -81,13 +81,12 @@ public class SaveData {
             }
         }
         //客户端日志接口
-        else if (url.equals(NetWorkUtils.URL_CLIENT_LOG)) {
+        else if (url.equals(NetWorkUtils.URL_LOG)) {
             BaseResponse response = new DataAnalysis().analysisData(json, null);
             if (response.getCode() == 0) {
                 if (mCallBack != null) {
                     mCallBack.onSuccess("客户端日志成功！");
                 }
-
             } else {
                 if (mCallBack != null) {
                     mCallBack.onFail("客户端日志失败！");

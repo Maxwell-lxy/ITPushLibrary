@@ -17,22 +17,28 @@ import java.net.URL;
  */
 
 public class NetWorkUtils {
+    private static int CONNECT_TIMEOUT = 5000;
     //正式环境
-    public static final String HOST = "gw.d.ywopt.com";
+//    public static final String HOST = "gw.d.ywopt.com";
+//    public static final String HOST_LOG = "push.l.ywopt.com";
     //测试环境
-//    public static final String HOST = "gw.t.ywopt.com";
+    public static final String HOST = "gw.t.ywopt.com";
+    public static final String HOST_LOG = "139.224.168.192:8081";
+
     private static final String BASE_URL = "https://" + HOST + "/v1/pushaksk";
     public static final String URL_UPDATEUSERINFO = BASE_URL + "/updateuserinfo";
     public static final String URL_ALIAS = BASE_URL + "/userbindalias";
     public static final String URL_SOCKET_ADDR = BASE_URL + "/socketaddr";
     public static final String URL_CLIENT_MSG_NOTIFY = BASE_URL + "/clientmsgnotify";
-    public static final String URL_CLIENT_LOG = BASE_URL + "/clientlog";
     public static final String PATH_UPDATEUSERINFO = "/v1/pushaksk/updateuserinfo";
     public static final String PATH_ALIAS = "/v1/pushaksk/userbindalias";
     public static final String PATH_SOCKET_ADDR = "/v1/pushaksk/socketaddr";
     public static final String PATH_CLIENT_MSG_NOTIFY = "/v1/pushaksk/clientmsgnotify";
-    public static final String PATH_CLIENT_LOG = "/v1/pushaksk/clientlog";
-    private static int CONNECT_TIMEOUT = 5000;
+    //    public static final String URL_CLIENT_LOG = BASE_URL + "/clientlog";
+    //    public static final String PATH_CLIENT_LOG = "/v1/pushaksk/clientlog";
+    //log server日志
+    public static final String PATH_LOG = "/log";
+    public static final String URL_LOG = "http://" + HOST_LOG + PATH_LOG;
 
     public synchronized static void sendPostRequest(final Context context, final String urlStr, final String paramsStr, final String sign, final RequestCallback mCallBack) {
         //开启线程来发起网络请求
