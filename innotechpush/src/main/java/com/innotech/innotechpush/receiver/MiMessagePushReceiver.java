@@ -14,6 +14,7 @@ import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.sdk.MiSDK;
 import com.innotech.innotechpush.utils.BroadcastUtils;
 import com.innotech.innotechpush.utils.LogUtils;
+import com.innotech.innotechpush.utils.TokenSP;
 import com.xiaomi.mipush.sdk.ErrorCode;
 import com.xiaomi.mipush.sdk.MiPushClient;
 import com.xiaomi.mipush.sdk.MiPushCommandMessage;
@@ -24,15 +25,18 @@ import java.util.List;
 
 public class MiMessagePushReceiver extends PushMessageReceiver {
     private String mRegId;
+    private long mResultCode = -1;
+    private String mReason;
+    private String mCommand;
+    private String mMessage;
     private String mTopic;
     private String mAlias;
-    private String mAccount;
+    private String mUserAccount;
     private String mStartTime;
     private String mEndTime;
 
     @Override
     public void onReceivePassThroughMessage(Context context, MiPushMessage miPushMessage) {
-        // super.onReceivePassThroughMessage(context, miPushMessage);
         showMessageInfoforTest(context, "onReceivePassThroughMessage", miPushMessage);
         if (InnotechPushManager.getPushReciver() != null) {
             InnotechPushManager.getPushReciver().onReceivePassThroughMessage(context, getCreateMessge(miPushMessage));
@@ -43,7 +47,6 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
 
     @Override
     public void onNotificationMessageClicked(Context context, MiPushMessage miPushMessage) {
-        // super.onNotificationMessageClicked(context, miPushMessage);
         showMessageInfoforTest(context, "onNotificationMessageClicked", miPushMessage);
         if (InnotechPushManager.getPushReciver() != null) {
             InnotechPushManager.getPushReciver().onNotificationMessageClicked(context, getCreateMessge(miPushMessage));
@@ -54,7 +57,6 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
 
     @Override
     public void onNotificationMessageArrived(Context context, MiPushMessage miPushMessage) {
-        //  super.onNotificationMessageArrived(context, miPushMessage);
         showMessageInfoforTest(context, "onNotificationMessageArrived", miPushMessage);
         if (InnotechPushManager.getPushReciver() != null) {
             InnotechPushManager.getPushReciver().onNotificationMessageArrived(context, getCreateMessge(miPushMessage));
@@ -64,43 +66,9 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
     }
 
     @Override
-    public void onReceiveMessage(Context context, MiPushMessage miPushMessage) {
-        //  super.onReceiveMessage(context, miPushMessage);
-        showMessageInfoforTest(context, "onReceiveMessage", miPushMessage);
-    }
-
-    @Override
-    public void onReceiveRegisterResult(Context context, MiPushCommandMessage miPushCommandMessage) {
-        // super.onReceiveRegisterResult(context, miPushCommandMessage);
-        String command = miPushCommandMessage.getCommand();
-        List<String> arguments = miPushCommandMessage.getCommandArguments();
-        String cmdArg1 = ((arguments != null && arguments.size() > 0) ? arguments.get(0) : null);
-        String log;
-        if (MiPushClient.COMMAND_REGISTER.equals(command)) {
-            if (miPushCommandMessage.getResultCode() == ErrorCode.SUCCESS) {
-                mRegId = cmdArg1;
-                log = context.getString(R.string.register_success);
-            } else {
-                log = context.getString(R.string.register_fail);
-                try {
-                    Thread.sleep(5500);
-                    new MiSDK(context);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            log = miPushCommandMessage.getReason();
-        }
-
-        LogUtils.e(context, LogUtils.TAG_XIAOMI + "metodName:onReceiveRegisterResult" + " log:" + log);
-        DbUtils.addClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_XIAOMI + "metodName:onReceiveRegisterResult" + " log:" + log);
-    }
-
-    @Override
     public void onCommandResult(Context context, MiPushCommandMessage message) {
-        //  super.onCommandResult(context, miPushCommandMessage);
         String command = message.getCommand();
+        LogUtils.e(context, "小米指令：" + command);
         List<String> arguments = message.getCommandArguments();
         String cmdArg1 = ((arguments != null && arguments.size() > 0) ? arguments.get(0) : null);
         String cmdArg2 = ((arguments != null && arguments.size() > 1) ? arguments.get(1) : null);
@@ -109,6 +77,7 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
             if (message.getResultCode() == ErrorCode.SUCCESS) {
                 mRegId = cmdArg1;
                 log = context.getString(R.string.register_success);
+                TokenSP.putString(context, TokenSP.KEY_MI_REGID, mRegId);
                 UserInfoModel.getInstance().setDevice_token1(mRegId);
                 BroadcastUtils.sendUpdateUserInfoBroadcast(context);
             } else {
@@ -127,20 +96,6 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
                 log = context.getString(R.string.unset_alias_success, mAlias);
             } else {
                 log = context.getString(R.string.unset_alias_fail, message.getReason());
-            }
-        } else if (MiPushClient.COMMAND_SET_ACCOUNT.equals(command)) {
-            if (message.getResultCode() == ErrorCode.SUCCESS) {
-                mAccount = cmdArg1;
-                log = context.getString(R.string.set_account_success, mAccount);
-            } else {
-                log = context.getString(R.string.set_account_fail, message.getReason());
-            }
-        } else if (MiPushClient.COMMAND_UNSET_ACCOUNT.equals(command)) {
-            if (message.getResultCode() == ErrorCode.SUCCESS) {
-                mAccount = cmdArg1;
-                log = context.getString(R.string.unset_account_success, mAccount);
-            } else {
-                log = context.getString(R.string.unset_account_fail, message.getReason());
             }
         } else if (MiPushClient.COMMAND_SUBSCRIBE_TOPIC.equals(command)) {
             if (message.getResultCode() == ErrorCode.SUCCESS) {
@@ -169,6 +124,28 @@ public class MiMessagePushReceiver extends PushMessageReceiver {
         }
         LogUtils.e(context, LogUtils.TAG_XIAOMI + "metodName:onCommandResult" + " log:" + log + " mRegId:" + mRegId);
         DbUtils.addClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_XIAOMI + "metodName:onCommandResult" + " log:" + log + " mRegId:" + mRegId);
+    }
+
+    @Override
+    public void onReceiveRegisterResult(Context context, MiPushCommandMessage message) {
+        String command = message.getCommand();
+        LogUtils.e(context, "小米指令：" + command);
+        List<String> arguments = message.getCommandArguments();
+        String cmdArg1 = ((arguments != null && arguments.size() > 0) ? arguments.get(0) : null);
+        String cmdArg2 = ((arguments != null && arguments.size() > 1) ? arguments.get(1) : null);
+        String log;
+        if (MiPushClient.COMMAND_REGISTER.equals(command)) {
+            if (message.getResultCode() == ErrorCode.SUCCESS) {
+                mRegId = cmdArg1;
+                log = context.getString(R.string.register_success);
+            } else {
+                log = context.getString(R.string.register_fail);
+            }
+        } else {
+            log = message.getReason();
+        }
+        LogUtils.e(context, LogUtils.TAG_XIAOMI + "metodName:onReceiveRegisterResult" + " log:" + log);
+        DbUtils.addClientLog(context, LogCode.LOG_DATA_NOTIFY, LogUtils.TAG_XIAOMI + "metodName:onReceiveRegisterResult" + " log:" + log);
     }
 
 

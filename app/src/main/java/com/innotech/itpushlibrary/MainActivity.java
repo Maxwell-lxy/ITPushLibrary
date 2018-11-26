@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -13,7 +12,6 @@ import android.widget.Toast;
 
 import com.innotech.innotechpush.InnotechPushMethod;
 import com.innotech.innotechpush.callback.RequestCallback;
-import com.innotech.innotechpush.utils.UserInfoSPUtils;
 import com.innotech.innotechpush.utils.Utils;
 
 public class MainActivity extends Activity {
@@ -35,40 +33,34 @@ public class MainActivity extends Activity {
     }
 
     private void initViews() {
-        Button btnSetAlias = (Button) findViewById(R.id.btnAlias);
-        txtGuid = (TextView) findViewById(R.id.txtGuid);
-        txtNotiCustom = (TextView) findViewById(R.id.txtNotiCustom);
-        String guid = UserInfoSPUtils.getString(this, UserInfoSPUtils.KEY_GUID, "null");
-        txtGuid.setText(guid);
-        edAlias = (EditText) findViewById(R.id.edAlias);
-        txtSetAliasResult = (TextView) findViewById(R.id.txtSetAliasResult);
-        String deviceInfo = "IMEI:" + Utils.getIMEI(this) + " AndroidID:" + Utils.getAndroidId(this) + " SerialNumber:" + Utils.getSerialNumber();
+        Button btnSetAlias = findViewById(R.id.btnAlias);
+        txtGuid = findViewById(R.id.txtGuid);
+        txtNotiCustom = findViewById(R.id.txtNotiCustom);
+        edAlias = findViewById(R.id.edAlias);
+        txtSetAliasResult = findViewById(R.id.txtSetAliasResult);
 
-        btnSetAlias.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String alias = getNewAliasName();
-                if (alias != null) {
-                    txtSetAliasResult.setText("");
-                    String aliasStr = edAlias.getText().toString();
-                    InnotechPushMethod.setAlias(MainActivity.this, aliasStr, new RequestCallback() {
-                        @Override
-                        public void onSuccess(String msg) {
-                            Log.i("Innotech_Push", ">>>>>>>>>>>>setAlias onSuccess msg:" + msg);
-                            updateUI("Set Alias success!");
-                        }
+        btnSetAlias.setOnClickListener(v -> {
+            String alias = getNewAliasName();
+            if (alias != null) {
+                txtSetAliasResult.setText("");
+                String aliasStr = edAlias.getText().toString();
+                InnotechPushMethod.setAlias(MainActivity.this, aliasStr, new RequestCallback() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        Log.i("Innotech_Push", ">>>>>>>>>>>>setAlias onSuccess msg:" + msg);
+                        updateUI("Set Alias success!");
+                    }
 
-                        @Override
-                        public void onFail(String msg) {
-                            Log.i("Innotech_Push", ">>>>>>>>>>>setAlias onFail msg:" + msg);
-                            updateUI("Set Alias Fail!");
-                        }
-                    });
-                } else {
-                    Toast.makeText(MainActivity.this, "别名不能够为空", Toast.LENGTH_SHORT).show();
-                }
-
+                    @Override
+                    public void onFail(String msg) {
+                        Log.i("Innotech_Push", ">>>>>>>>>>>setAlias onFail msg:" + msg);
+                        updateUI("Set Alias Fail!");
+                    }
+                });
+            } else {
+                Toast.makeText(MainActivity.this, "别名不能够为空", Toast.LENGTH_SHORT).show();
             }
+
         });
     }
 

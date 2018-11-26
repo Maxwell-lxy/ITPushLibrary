@@ -296,6 +296,8 @@ public class SocketManager {
             @Override
             public void run() {
                 while (true) {
+                    boolean isInterrupted = Thread.currentThread().isInterrupted();
+                    if (isInterrupted) break;
                     try {
                         WriteData writeData = writeQueue.take();
                         if (isConnecting()) {

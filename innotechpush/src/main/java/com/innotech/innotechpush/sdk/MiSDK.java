@@ -1,11 +1,16 @@
 package com.innotech.innotechpush.sdk;
 
 import android.content.Context;
+import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.config.LogCode;
+import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.utils.LogUtils;
+import com.innotech.innotechpush.utils.TokenSP;
 import com.innotech.innotechpush.utils.Utils;
 import com.xiaomi.channel.commonutils.logger.LoggerInterface;
 import com.xiaomi.mipush.sdk.Logger;
@@ -17,15 +22,14 @@ import com.xiaomi.mipush.sdk.MiPushClient;
 
 public class MiSDK {
 
+
     public MiSDK(final Context context) {
         // 注册push服务，注册成功后会向DemoMessageReceiver发送广播
         // 可以从DemoMessageReceiver的onCommandResult方法中MiPushCommandMessage对象参数中获取注册信息
-        LogUtils.e(context, LogUtils.TAG_XIAOMI + "初始化小米推送");
-
         String appId = Utils.getMetaDataString(context, "MI_APP_ID").replace("innotech-", "");
         String appKey = Utils.getMetaDataString(context, "MI_APP_KEY").replace("innotech-", "");
-        MiPushClient.registerPush(context, appId, appKey);
         LogUtils.e(context, LogUtils.TAG_XIAOMI + "MiPushClient.registerPush appId:" + appId + " appKey:" + appKey);
+        MiPushClient.registerPush(context, appId, appKey);
         LoggerInterface newLogger = new LoggerInterface() {
 
             @Override
@@ -46,7 +50,15 @@ public class MiSDK {
             }
         };
         Logger.setLogger(context, newLogger);
-
+        //开启一个10s的定时器，10s小米注册没有成功则注册union渠道
+        new Handler().postDelayed(() -> {
+            String regId = TokenSP.getString(context, TokenSP.KEY_MI_REGID, "");
+            if (TextUtils.isEmpty(regId)) {
+                InnotechPushManager.getInstance().initGeTuiPush();
+                LogUtils.e(context, "MiPushClient.registerPush fail init GeTui push");
+                DbUtils.addClientLog(context, LogCode.LOG_INIT, "MiPushClient.registerPush fail init GeTui push");
+            }
+        }, 10000);
     }
 
 }

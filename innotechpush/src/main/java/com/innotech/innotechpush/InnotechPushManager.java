@@ -168,7 +168,7 @@ public class InnotechPushManager {
     /**
      * 初始化并开启个推推送
      */
-    private void initGeTuiPush() {
+    public void initGeTuiPush() {
         LogUtils.e(appContext, LogUtils.TAG_GETUI + "call initGeTuiPush()");
         com.igexin.sdk.PushManager.getInstance().initialize(appContext, PushService.class);
         // com.getui.demo.DemoIntentService 为第三⽅方⾃自定义的推送服务事件接收类

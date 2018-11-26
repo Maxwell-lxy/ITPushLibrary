@@ -25,6 +25,8 @@ public class SocketClientService extends Service {
         SocketManager.getInstance(this.getApplicationContext()).initSocket();
         //上传本地回执
         InnotechPushMethod.uploadClientMsgNotify(this.getApplicationContext());
+        //上传本地回执（华为点击）
+        InnotechPushMethod.uploadClientMsgNotifyHW(this.getApplicationContext());
         //上报日志
         InnotechPushMethod.uploadLogs(this.getApplicationContext());
     }

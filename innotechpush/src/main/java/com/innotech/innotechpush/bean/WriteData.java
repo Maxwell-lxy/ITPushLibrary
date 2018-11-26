@@ -24,7 +24,7 @@ public class WriteData {
     //写的结果
     private LinkedBlockingQueue<Boolean> resultQueue;
 
-    public WriteData(int cmd, String json) {
+    public WriteData(Integer cmd, String json) {
         resultQueue = new LinkedBlockingQueue<>();
         this.len = CommonUtils.big_intToByte(!TextUtils.isEmpty(json) ? json.length() + 12 : 12, 4);
         this.requestsID = getRequestID();

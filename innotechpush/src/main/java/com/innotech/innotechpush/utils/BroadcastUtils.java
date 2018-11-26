@@ -29,6 +29,7 @@ public class BroadcastUtils {
                 LogUtils.e(context, ">>>>>>>>>>> UserInfo onFail msg:" + msg);
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
                     JobInfo.Builder builder = new JobInfo.Builder(1, new ComponentName(context, SocketClientJobService.class));
+                    builder.setMinimumLatency(5000);
                     builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
                     JobScheduler tm = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
                     if (tm != null) {

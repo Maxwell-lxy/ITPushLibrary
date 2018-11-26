@@ -39,6 +39,21 @@ public class DbUtils {
     }
 
     /**
+     * db添加回执记录
+     *
+     * @param context
+     * @param params
+     */
+    public static void addClientMsgNotifyHW(Context context, String params) {
+        try {
+            ClientMsgNotifyHW notify = new ClientMsgNotifyHW(params);
+            notify.save();
+        } catch (Exception e) {
+            LogUtils.e(context, "db添加回执记录（华为点击）异常");
+        }
+    }
+
+    /**
      * db添加长连接回执
      *
      * @param context

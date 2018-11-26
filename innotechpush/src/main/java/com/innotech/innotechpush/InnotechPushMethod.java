@@ -11,6 +11,7 @@ import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.db.ClientLog;
 import com.innotech.innotechpush.db.ClientMsgNotify;
+import com.innotech.innotechpush.db.ClientMsgNotifyHW;
 import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.db.SocketAck;
 import com.innotech.innotechpush.sdk.HuaweiSDK;
@@ -163,6 +164,47 @@ public class InnotechPushMethod {
     }
 
     /**
+     * 客户端消息回执接口
+     * 用于华为通知消息点击
+     */
+    public static void clientMsgNotifyHW(final Context context, final JSONArray array) {
+        try {
+            String guid = TokenUtils.getGuid(context);
+            String imei = Utils.getIMEI(context);
+            String openId = getTK(context);
+            int appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
+            JSONObject object = new JSONObject();
+            object.put("id_types", array);
+            object.put("guid", guid);
+            object.put("imei", imei == null ? "" : imei);
+            object.put("open_id", openId);
+            object.put("app_id", appId);
+            final JSONObject paramsObj = new JSONObject();
+            paramsObj.put("notify_data", object);
+            String params = paramsObj.toString();
+            String sign = SignUtils.sign("POST", NetWorkUtils.PATH_CLIENT_MSG_NOTIFY, params);
+            NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_CLIENT_MSG_NOTIFY, params, sign, new RequestCallback() {
+                @Override
+                public void onSuccess(String msg) {
+                    LogUtils.e(context, "客户端消息回执成功(华为点击)");
+
+                    DbUtils.addClientMsgNotifyHW(context, paramsObj.toString());
+                }
+
+                @Override
+                public void onFail(String msg) {
+                    LogUtils.e(context, "客户端消息回执失败(华为点击)");
+                    //写入本地数据库
+                    DbUtils.addClientMsgNotifyHW(context, paramsObj.toString());
+                }
+            });
+        } catch (JSONException e) {
+            LogUtils.e(context, "客户端消息回执(华为点击)参数转换json出错！");
+            DbUtils.addClientLog(context, LogCode.LOG_EX_JSON, "客户端消息回执(华为点击)参数转换json出错");
+        }
+    }
+
+    /**
      * 上报回执
      *
      * @param context：上下文
@@ -262,9 +304,80 @@ public class InnotechPushMethod {
     }
 
     /**
+     * 上报回执（华为点击）
+     *
+     * @param context：上下文
+     */
+    public synchronized static void uploadClientMsgNotifyHW(final Context context) {
+        try {
+            final List<ClientMsgNotifyHW> notifies = ClientMsgNotifyHW.find(ClientMsgNotifyHW.class, null, null, null, "ID", "100");
+            JSONArray msgIdsArrayForType = new JSONArray();
+            String guid = "";
+            String imei = "";
+            String openId = "";
+            int appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
+            if (notifies != null && notifies.size() > 0) {
+                for (ClientMsgNotifyHW notify : notifies) {
+                    if (!TextUtils.isEmpty(notify.getNotifyData())) {
+                        JSONObject notifyData = new JSONObject(notify.getNotifyData());
+                        JSONObject notifyObj = notifyData.getJSONObject("notify_data");
+                        guid = notifyObj.getString("guid");
+                        imei = notifyObj.getString("imei");
+                        openId = notifyObj.getString("open_id");
+                        JSONArray idTypeArray = notifyObj.getJSONArray("id_types");
+                        for (int i = 0; i < idTypeArray.length(); i++) {
+                            JSONObject obj = idTypeArray.getJSONObject(i);
+                            int type = obj.getInt("type");
+                            JSONArray msgIdsArray = obj.getJSONArray("msg_ids");
+                            for (int j = 0; j < msgIdsArray.length(); j++) {
+                                msgIdsArrayForType.put(msgIdsArray.getString(j));
+                            }
+                        }
+                    }
+                }
+                JSONArray idTypesArray = new JSONArray();
+                if (msgIdsArrayForType.length() > 0) {
+                    JSONObject idTypesObj = new JSONObject();
+                    idTypesObj.put("msg_ids", msgIdsArrayForType);
+                    idTypesObj.put("type", 7003);
+                    idTypesArray.put(idTypesObj);
+                }
+                JSONObject object = new JSONObject();
+                object.put("id_types", idTypesArray);
+                object.put("guid", guid);
+                object.put("imei", imei);
+                object.put("open_id", openId);
+                object.put("app_id", appId);
+                final JSONObject paramsObj = new JSONObject();
+                paramsObj.put("notify_data", object);
+                String params = paramsObj.toString();
+                String sign = SignUtils.sign("POST", NetWorkUtils.PATH_CLIENT_MSG_NOTIFY, params);
+                NetWorkUtils.sendPostRequest(context, NetWorkUtils.URL_CLIENT_MSG_NOTIFY, params, sign, new RequestCallback() {
+                    @Override
+                    public void onSuccess(String msg) {
+                        LogUtils.e(context, "客户端消息回执(华为点击)成功");
+                        for (ClientMsgNotifyHW notify : notifies) {
+                            notify.delete();
+                        }
+                    }
+
+                    @Override
+                    public void onFail(String msg) {
+                        LogUtils.e(context, "客户端消息回执(华为点击)失败");
+                    }
+                });
+            }
+        } catch (JSONException e) {
+            LogUtils.e(context, "客户端消息回执(华为点击)参数转换json出错！" + e.getMessage());
+        } catch (Exception e) {
+            LogUtils.e(context, "客户端消息回执(华为点击)异常！" + e.getMessage());
+        }
+    }
+
+    /**
      * 客户端API - 客户端日志接口
      */
-    public synchronized static void clientlog(final Context context, String log, String guid, String imei, final RequestCallback callback) {
+    private synchronized static void clientlog(final Context context, String log, String guid, String imei, final RequestCallback callback) {
         try {
             int appId = Utils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
             StringBuffer sb = new StringBuffer(log);

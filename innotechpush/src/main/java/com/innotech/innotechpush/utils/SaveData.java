@@ -25,7 +25,6 @@ public class SaveData {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-//                UserInfoSPUtils.putString(context, UserInfoSPUtils.KEY_GUID, response.getData().getGuid());
                 if (mCallBack != null) {
                     mCallBack.onSuccess(response.getData().getGuid());
                 }
@@ -76,6 +75,19 @@ public class SaveData {
             } else {
                 if (mCallBack != null) {
                     mCallBack.onFail("LogServer失败！");
+                }
+            }
+        }
+        //（华为点击）客户端消息回执接口
+        else if (url.equals(NetWorkUtils.URL_CLIENT_MSG_NOTIFY)) {
+            BaseResponse response = new DataAnalysis().analysisData(json, null);
+            if (response.getCode() == 0) {
+                if (mCallBack != null) {
+                    mCallBack.onSuccess("客户端消息回执成功（华为点击）！");
+                }
+            } else {
+                if (mCallBack != null) {
+                    mCallBack.onFail("客户端消息回执失败（华为点击）！");
                 }
             }
         }

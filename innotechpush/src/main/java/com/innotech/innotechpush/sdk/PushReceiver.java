@@ -52,6 +52,8 @@ public class PushReceiver extends BroadcastReceiver {
             SocketManager.getInstance(context).sendHeartData();
             //上传本地回执
             InnotechPushMethod.uploadClientMsgNotify(context);
+            //上传本地回执（华为点击）
+            InnotechPushMethod.uploadClientMsgNotifyHW(context);
             //上报日志
             InnotechPushMethod.uploadLogs(context);
             //定时检查service存活，发送长连接心跳包

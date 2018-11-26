@@ -2,6 +2,8 @@ package com.innotech.innotechpush.utils;
 
 import android.content.Context;
 
+import com.innotech.innotechpush.bean.BaseResponse;
+import com.innotech.innotechpush.bean.Guid;
 import com.innotech.innotechpush.callback.RequestCallback;
 
 import java.io.BufferedReader;
@@ -11,6 +13,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
 
 /**
  * 网络请求类
@@ -24,77 +29,81 @@ public class NetWorkUtils {
     //测试环境
     public static final String HOST = "gw.t.ywopt.com";
     public static final String HOST_LOG = "139.224.168.192:8081";
-
-    private static final String BASE_URL = "https://" + HOST + "/v1/pushaksk";
-    public static final String URL_UPDATEUSERINFO = BASE_URL + "/updateuserinfo";
-    public static final String URL_ALIAS = BASE_URL + "/userbindalias";
-    public static final String URL_SOCKET_ADDR = BASE_URL + "/socketaddr";
+    /**
+     * 用户上报信息
+     */
     public static final String PATH_UPDATEUSERINFO = "/v1/pushaksk/updateuserinfo";
+    public static final String URL_UPDATEUSERINFO = "https://" + HOST + PATH_UPDATEUSERINFO;
+    /**
+     * 设置别名
+     */
     public static final String PATH_ALIAS = "/v1/pushaksk/userbindalias";
+    public static final String URL_ALIAS = "https://" + HOST + PATH_ALIAS;
+    /**
+     * 获取长连接地址
+     */
     public static final String PATH_SOCKET_ADDR = "/v1/pushaksk/socketaddr";
-//    public static final String URL_CLIENT_MSG_NOTIFY = BASE_URL + "/clientmsgnotify";
-//    public static final String PATH_CLIENT_MSG_NOTIFY = "/v1/pushaksk/clientmsgnotify";
-    //    public static final String URL_CLIENT_LOG = BASE_URL + "/clientlog";
-    //    public static final String PATH_CLIENT_LOG = "/v1/pushaksk/clientlog";
-    //log server日志
+    public static final String URL_SOCKET_ADDR = "https://" + HOST + PATH_SOCKET_ADDR;
+    /**
+     * 短连接回值，用于华为通知点击时触发
+     */
+    public static final String PATH_CLIENT_MSG_NOTIFY = "/v1/pushaksk/clientmsgnotify";
+    public static final String URL_CLIENT_MSG_NOTIFY = "https://" + HOST + PATH_CLIENT_MSG_NOTIFY;
+    /**
+     * log server日志
+     */
     public static final String PATH_LOG = "/log";
     public static final String URL_LOG = "http://" + HOST_LOG + PATH_LOG;
+//    public static final String URL_LOG = "https://" + HOST_LOG + PATH_LOG;
 
     public synchronized static void sendPostRequest(final Context context, final String urlStr, final String paramsStr, final String sign, final RequestCallback mCallBack) {
         //开启线程来发起网络请求
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                HttpURLConnection connection = null;
-                BufferedReader reader = null;
-                try {
-                    LogUtils.e(context, "sendPostRequest() url:" + urlStr + " sign:" + sign + " paramsStr:" + paramsStr);
-                    URL url = new URL(urlStr);
-                    connection = (HttpURLConnection) url.openConnection();
-                    if (sign != null) {
-                        connection.setRequestProperty("Authorization", sign);
-                    }
-                    connection.setRequestMethod("POST");
-                    connection.setConnectTimeout(CONNECT_TIMEOUT);
-                    connection.setReadTimeout(CONNECT_TIMEOUT);
-                    connection.setRequestProperty("Connection", "Keep-Alive");
-                    connection.setRequestProperty("Charset", "UTF-8");
-                    // 设置文件类型:
-                    connection.setRequestProperty("Content-Type", "application/json");
-                    // 设置接收类型否则返回415错误
-                    //conn.setRequestProperty("accept","*/*")此处为暴力方法设置接受所有类型，以此来防范返回415;
-//                    connection.setRequestProperty("accept", "application/json");
-                    DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-                    out.write(paramsStr.getBytes());
-                    InputStream in = connection.getInputStream();
-                    //下面对获取到的输入流进行读取
-                    reader = new BufferedReader(new InputStreamReader(in));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
-                    }
-                    LogUtils.e(context, "sendPostRequest() response:" + response.toString());
-                    SaveData.saveData(context, response.toString(), urlStr, mCallBack);
-                } catch (Exception e) {
-                    LogUtils.e(context, "sendPostRequest方法出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
-                    if (mCallBack != null) {
-                        mCallBack.onFail("sendPostRequest方法出现异常 Exception:" + e.getMessage());
-                    }
-                } finally {
-                    if (reader != null) {
-                        try {
-                            reader.close();
-                        } catch (IOException e) {
-                            LogUtils.e(context, "BufferedReader关闭出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
-                            if (mCallBack != null) {
-                                mCallBack.onFail("BufferedReader关闭出现异常 Exception:" + e.getMessage());
-                            }
+        new Thread(() -> {
+            HttpURLConnection connection = null;
+            BufferedReader reader = null;
+            try {
+                LogUtils.e(context, "sendPostRequest() url:" + urlStr + " sign:" + sign + " paramsStr:" + paramsStr);
+                URL url = new URL(urlStr);
+                connection = (HttpURLConnection) url.openConnection();
+                if (sign != null) {
+                    connection.setRequestProperty("Authorization", sign);
+                }
+                connection.setRequestMethod("POST");
+                connection.setConnectTimeout(CONNECT_TIMEOUT);
+                connection.setReadTimeout(CONNECT_TIMEOUT);
+                connection.setRequestProperty("Connection", "Keep-Alive");
+                connection.setRequestProperty("Charset", "UTF-8");
+                connection.setRequestProperty("Content-Type", "application/json");
+                DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+                out.write(paramsStr.getBytes());
+                InputStream in = connection.getInputStream();
+                //下面对获取到的输入流进行读取
+                reader = new BufferedReader(new InputStreamReader(in));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                LogUtils.e(context, "sendPostRequest() response:" + response.toString());
+                SaveData.saveData(context, response.toString(), urlStr, mCallBack);
+            } catch (Exception e) {
+                LogUtils.e(context, "sendPostRequest方法出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
+                if (mCallBack != null) {
+                    mCallBack.onFail("sendPostRequest方法出现异常 Exception:" + e.getMessage());
+                }
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException e) {
+                        LogUtils.e(context, "BufferedReader关闭出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
+                        if (mCallBack != null) {
+                            mCallBack.onFail("BufferedReader关闭出现异常 Exception:" + e.getMessage());
                         }
                     }
-                    if (connection != null) {
-                        connection.disconnect();
-                    }
+                }
+                if (connection != null) {
+                    connection.disconnect();
                 }
             }
         }).start();

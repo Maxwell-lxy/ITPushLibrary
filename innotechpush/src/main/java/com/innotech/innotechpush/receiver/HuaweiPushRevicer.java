@@ -66,7 +66,7 @@ public class HuaweiPushRevicer extends PushReceiver {
             }
             InnotechMessage mPushMessage = new InnotechMessage();
             String taskId = "";
-            LogUtils.e(context,message);
+            LogUtils.e(context, message);
             if (!TextUtils.isEmpty(message)) {
                 try {
                     JSONArray array = new JSONArray(message);
@@ -93,6 +93,7 @@ public class HuaweiPushRevicer extends PushReceiver {
                         ackObject.put("type", 7003);
                         JSONArray paramArray = new JSONArray();
                         paramArray.put(ackObject);
+                        InnotechPushMethod.clientMsgNotifyHW(context, paramArray);
                         InnotechPushMethod.clientMsgNotify(context, paramArray);
                     }
                 } catch (JSONException e) {
