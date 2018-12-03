@@ -3,6 +3,8 @@ package com.innotech.itpushlibrary;
 import com.inno.innosdk.pb.InnoMain;
 import com.innotech.innotechpush.InnotechPushManager;
 import com.innotech.innotechpush.sdk.KeepApplication;
+import com.meituan.robust.PatchExecutor;
+import com.meituan.robust.patch.annotaion.Modify;
 import com.tencent.bugly.crashreport.CrashReport;
 
 import java.util.Random;
@@ -18,6 +20,9 @@ public class App extends KeepApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        if(PermissionUtils.isGrantSDCardReadPermission(this)){
+            new PatchExecutor(getApplicationContext(), new PatchManipulateImp(), new RobustCallBackSample()).start();
+        }
         int max = 10000;
         int min = 1000;
         Random random = new Random();

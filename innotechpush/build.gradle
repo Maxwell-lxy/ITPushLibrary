@@ -1,4 +1,8 @@
-apply plugin: 'com.android.library'
+//apply plugin: 'com.android.library'
+apply plugin: 'com.android.application'
+//制作补丁时将这个打开，auto-patch-plugin紧跟着com.android.application
+//apply plugin: 'auto-patch-plugin'
+apply plugin: 'robust'
 
 android {
     compileSdkVersion 27
@@ -11,8 +15,45 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        manifestPlaceholders = [
+                INNOTECH_PUSH_DEBUG: true,
+                INNOTECH_APP_ID    : 1008,
+                INNOTECH_APP_KEY   : "ddddddd",
+//                INNOTECH_APP_ID     : 1000,
+//                INNOTECH_APP_KEY    : "YWJjZGRk",
+                //小米
+                MI_APP_ID          : "2882303761517836599",
+                MI_APP_KEY         : "5131783646599",
+                //魅族
+                MEIZU_APP_ID       : "116007",
+                MEIZU_APP_KEY      : "9779ce34260d43faad9e47e0ca10c12f",
+                //华为
+                HMS_APP_ID         : "100437753",
+                //个推（1000）
+//                GETUI_APP_ID       : "2e48RoYBrh65BC4HRmkAg6",
+//                GETUI_APP_KEY      : "PwG112qeeV5UiQrtVObz3A",
+//                GETUI_APP_SECRET   : "rvsZ98fb3K6I9UcPTBHzF9",
+                //个推（1008）
+                GETUI_APP_ID       : "a0UoMM4qza8jfpCskhyFy1",
+                GETUI_APP_KEY      : "nn3yUZNhnB6n4LSg4two41",
+                GETUI_APP_SECRET   : "zB9uZcRM6374vwuXJb2OH2",
+                //OPPO
+                OPPO_APP_KEY       : "5vifLOB1A1s0s800scc4gwC4S",
+                OPPO_APP_SECRET    : "b4aB971Df1bD32eEB9882d2429898BB5",
+                //VIVO
+                VIVO_APP_ID        : "10351",
+                VIVO_APP_KEY       : "753460d1-cf6a-4d68-b16a-fe6d7fabed54"
+        ]
+
         ndk {
             abiFilters "armeabi", "armeabi-v7a", "x86_64"
+        }
+
+        lintOptions {
+            checkReleaseBuilds false
+            // Or, if you prefer, you can continue to check for errors in release builds,
+            // but continue the build even when errors are found:
+            abortOnError false
         }
     }
 
@@ -42,4 +83,5 @@ dependencies {
     //个推推送
     implementation 'com.getui:sdk:2.12.5.0'
     implementation 'com.github.satyan:sugar:1.5'
+    implementation 'com.meituan.robust:robust:0.4.82'
 }

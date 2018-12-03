@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,14 +13,18 @@ import android.widget.Toast;
 
 import com.innotech.innotechpush.InnotechPushMethod;
 import com.innotech.innotechpush.callback.RequestCallback;
-import com.innotech.innotechpush.utils.Utils;
+import com.meituan.robust.PatchExecutor;
+import com.meituan.robust.patch.annotaion.Add;
+import com.meituan.robust.patch.annotaion.Modify;
 
 public class MainActivity extends Activity {
+    private static final int REQUEST_CODE_SDCARD_READ = 1;
     EditText edAlias;
     public TextView txtGuid, txtNotiCustom;
     TextView txtSetAliasResult;
     private MyHandler myHandler = new MyHandler();
 
+    @Modify
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +35,14 @@ public class MainActivity extends Activity {
 
         TestPushReciver.handler = myHandler;
 
+        //热更
+        if (isGrantSDCardReadPermission()) {
+            runRobust();
+        } else {
+            requestPermission();
+        }
+        Toast.makeText(this, getStringupdate(), Toast.LENGTH_LONG).show();
+        Log.e("jimmy","这是热更上去的内容");
     }
 
     private void initViews() {
@@ -112,5 +125,44 @@ public class MainActivity extends Activity {
             }
 
         }
+    }
+
+    private boolean isGrantSDCardReadPermission() {
+        return PermissionUtils.isGrantSDCardReadPermission(this);
+    }
+
+    private void requestPermission() {
+        PermissionUtils.requestSDCardReadPermission(this, REQUEST_CODE_SDCARD_READ);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_SDCARD_READ:
+                handlePermissionResult();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    private void handlePermissionResult() {
+        if (isGrantSDCardReadPermission()) {
+            runRobust();
+        } else {
+            Toast.makeText(this, "failure because without sd card read permission", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    private void runRobust() {
+        new PatchExecutor(getApplicationContext(), new PatchManipulateImp(), new RobustCallBackSample()).start();
+    }
+
+    //增加方法
+    @Add
+    public String getStringupdate() {
+        return "Robust";
     }
 }

@@ -1,4 +1,7 @@
 apply plugin: 'com.android.application'
+//制作补丁时将这个打开，auto-patch-plugin紧跟着com.android.application
+//apply plugin: 'auto-patch-plugin'
+apply plugin: 'robust'
 
 android {
     compileSdkVersion 27
@@ -77,7 +80,8 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    implementation project(':innotechpush')
+//    implementation project(':innotechpush')
     implementation 'com.tencent.bugly:crashreport:2.6.6'
     implementation 'com.tencent.bugly:nativecrashreport:3.3.1'
+    implementation 'com.meituan.robust:robust:0.4.82'
 }
