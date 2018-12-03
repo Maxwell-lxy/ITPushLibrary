@@ -316,7 +316,7 @@ public class SocketManager {
                             DbUtils.addClientLog(context, LogCode.LOG_DATA_COMMON, "socket状态为：已断开连接...");
                         }
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        LogUtils.e(context, "writeQueue writeData InterruptedException" + e.getMessage());
                     }
                 }
             }
@@ -573,26 +573,34 @@ public class SocketManager {
      * @return 字符数组
      */
     private byte[] readByLen(int len) throws IOException {
-        byte[] result = new byte[len];
-        boolean isRead = true;
-        int readLen = 0;
-        while (isRead) {
-            int curReadLen;
-            if (result.length - readLen < 1024) {
-                curReadLen = mInputStream.read(result, readLen, result.length - readLen);
-            } else {
-                curReadLen = mInputStream.read(result, readLen, 1024);
+        try {
+            byte[] result = new byte[len];
+            boolean isRead = true;
+            int readLen = 0;
+            while (isRead) {
+                int curReadLen;
+                if (result.length - readLen < 1024) {
+                    curReadLen = mInputStream.read(result, readLen, result.length - readLen);
+                } else {
+                    curReadLen = mInputStream.read(result, readLen, 1024);
+                }
+                readLen += curReadLen;
+                LogUtils.e(context, "curReadLen：" + curReadLen);
+                if (readLen == len) isRead = false;
+                if (curReadLen == -1) {
+                    result = null;
+                    break;
+                }
             }
-            readLen += curReadLen;
-//            LogUtils.e(context, "readLen：" + readLen);
-            LogUtils.e(context, "curReadLen：" + curReadLen);
-            if (readLen == len) isRead = false;
-            if (curReadLen == -1) {
-                result = null;
-                break;
+            return result;
+        } catch (OutOfMemoryError e) {
+            LogUtils.e(context, "readByLen OutOfMemoryError");
+            if (mSocket != null) {
+                mSocket.close();
+                mSocket = null;
             }
+            return null;
         }
-        return result;
     }
 
     /**

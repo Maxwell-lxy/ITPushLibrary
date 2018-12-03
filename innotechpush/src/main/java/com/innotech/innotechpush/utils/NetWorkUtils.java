@@ -24,11 +24,11 @@ import java.util.concurrent.FutureTask;
 public class NetWorkUtils {
     private static int CONNECT_TIMEOUT = 5000;
     //正式环境
-//    public static final String HOST = "gw.d.ywopt.com";
-//    public static final String HOST_LOG = "push.l.ywopt.com";
+    public static final String HOST = "gw.d.ywopt.com";
+    public static final String HOST_LOG = "push.l.ywopt.com";
     //测试环境
-    public static final String HOST = "gw.t.ywopt.com";
-    public static final String HOST_LOG = "139.224.168.192:8081";
+//    public static final String HOST = "gw.t.ywopt.com";
+//    public static final String HOST_LOG = "139.224.168.192:8081";
     /**
      * 用户上报信息
      */
@@ -53,8 +53,8 @@ public class NetWorkUtils {
      * log server日志
      */
     public static final String PATH_LOG = "/log";
-    public static final String URL_LOG = "http://" + HOST_LOG + PATH_LOG;
-//    public static final String URL_LOG = "https://" + HOST_LOG + PATH_LOG;
+//    public static final String URL_LOG = "http://" + HOST_LOG + PATH_LOG;
+    public static final String URL_LOG = "https://" + HOST_LOG + PATH_LOG;
 
     public synchronized static void sendPostRequest(final Context context, final String urlStr, final String paramsStr, final String sign, final RequestCallback mCallBack) {
         //开启线程来发起网络请求
