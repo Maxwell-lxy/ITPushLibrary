@@ -20,9 +20,9 @@ public class App extends KeepApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        if(PermissionUtils.isGrantSDCardReadPermission(this)){
-            new PatchExecutor(getApplicationContext(), new PatchManipulateImp(), new RobustCallBackSample()).start();
-        }
+//        if(PermissionUtils.isGrantSDCardReadPermission(this)){
+//            new PatchExecutor(getApplicationContext(), new PatchManipulateImp(), new RobustCallBackSample()).start();
+//        }
         int max = 10000;
         int min = 1000;
         Random random = new Random();

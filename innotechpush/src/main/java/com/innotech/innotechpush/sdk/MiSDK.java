@@ -12,6 +12,7 @@ import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.TokenSP;
 import com.innotech.innotechpush.utils.Utils;
+import com.meituan.robust.patch.annotaion.Modify;
 import com.xiaomi.channel.commonutils.logger.LoggerInterface;
 import com.xiaomi.mipush.sdk.Logger;
 import com.xiaomi.mipush.sdk.MiPushClient;
@@ -23,6 +24,7 @@ import com.xiaomi.mipush.sdk.MiPushClient;
 public class MiSDK {
 
 
+    @Modify
     public MiSDK(final Context context) {
         // 注册push服务，注册成功后会向DemoMessageReceiver发送广播
         // 可以从DemoMessageReceiver的onCommandResult方法中MiPushCommandMessage对象参数中获取注册信息
@@ -53,6 +55,7 @@ public class MiSDK {
         //开启一个10s的定时器，10s小米注册没有成功则注册union渠道
         new Handler().postDelayed(() -> {
             String regId = TokenSP.getString(context, TokenSP.KEY_MI_REGID, "");
+            LogUtils.e(context,"小米是否初始化成功");
             if (TextUtils.isEmpty(regId)) {
                 InnotechPushManager.getInstance().initGeTuiPush();
                 LogUtils.e(context, "MiPushClient.registerPush fail init GeTui push");

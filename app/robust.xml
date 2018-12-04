@@ -42,6 +42,7 @@
         <name>com.sankuai</name>
         <name>com.dianping</name>
         <name>com.innotech.itpushlibrary</name>
+        <name>com.innotech.innotechpush</name>
     </packname>
 
     <!--不需要Robust插入代码的包名，Robust库不需要插入代码，如下的配置项请保留，还可以根据各个APP的情况执行添加-->

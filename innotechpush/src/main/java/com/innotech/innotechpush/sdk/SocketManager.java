@@ -17,6 +17,7 @@ import com.innotech.innotechpush.utils.NetWorkUtils;
 import com.innotech.innotechpush.utils.SignUtils;
 import com.innotech.innotechpush.utils.TokenUtils;
 import com.innotech.innotechpush.utils.Utils;
+import com.meituan.robust.patch.annotaion.Modify;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -79,7 +80,9 @@ public class SocketManager {
     /**
      * 初始化长连接
      */
+    @Modify
     public synchronized void initSocket() {
+        LogUtils.e(context,"实验实验实验 initSocket");
         try {
             boolean isSuccess = getSocketAddr(new RequestCallback() {
                 @Override
@@ -141,7 +144,9 @@ public class SocketManager {
     /**
      * 建立长连接
      */
+    @Modify
     private void connectWithHostAndPort(final String host, final int port) throws JSONException {
+        LogUtils.e(context,"实验实验实验 connectWithHostAndPort");
         if (!TextUtils.isEmpty(host) && port != 0) {
             final Integer appId = CommonUtils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
             final String appKey = CommonUtils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
@@ -178,7 +183,9 @@ public class SocketManager {
     /**
      * 读取数据
      */
+    @Modify
     private void readData() {
+        LogUtils.e(context,"实验实验实验 readData");
         readThread = new Thread(new Runnable() {
             @Override
             public void run() {

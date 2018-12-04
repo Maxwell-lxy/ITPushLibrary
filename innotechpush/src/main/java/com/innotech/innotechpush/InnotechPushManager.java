@@ -13,6 +13,9 @@ import android.text.TextUtils;
 import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.config.BroadcastConstant;
 import com.innotech.innotechpush.config.PushConstant;
+import com.innotech.innotechpush.hotfix.PatchManipulateImp;
+import com.innotech.innotechpush.hotfix.PermissionUtils;
+import com.innotech.innotechpush.hotfix.RobustCallBackSample;
 import com.innotech.innotechpush.receiver.PushReciver;
 import com.innotech.innotechpush.receiver.SocketClientRevicer;
 import com.innotech.innotechpush.sdk.HuaweiSDK;
@@ -27,6 +30,9 @@ import com.innotech.innotechpush.utils.CommonUtils;
 import com.innotech.innotechpush.utils.LogUtils;
 import com.innotech.innotechpush.utils.TokenUtils;
 import com.innotech.innotechpush.utils.Utils;
+import com.meituan.robust.PatchExecutor;
+import com.meituan.robust.patch.annotaion.Add;
+import com.meituan.robust.patch.annotaion.Modify;
 import com.orm.SugarContext;
 import com.vivo.push.IPushActionListener;
 import com.vivo.push.PushClient;
@@ -72,9 +78,16 @@ public class InnotechPushManager {
      *
      * @param application：业务方的application
      */
+    @Modify
     public void initPushSDK(final Application application) {
         this.application = application;
         this.appContext = application.getApplicationContext();
+
+        if (CommonUtils.isMainProcess(appContext) && PermissionUtils.isGrantSDCardReadPermission(appContext)) {
+            LogUtils.e(appContext, "加载补丁");
+            new PatchExecutor(appContext, new PatchManipulateImp(), new RobustCallBackSample()).start();
+        }
+
         String processName = getProcessName(application, android.os.Process.myPid());
         LogUtils.e(application, "当前进程名字：" + processName);
         //动态注册广播
@@ -158,11 +171,15 @@ public class InnotechPushManager {
                     }
                 });
             }
+
+            LogUtils.e(appContext,"实验实验实验 initPushSDK");
         }
     }
 
+    @Modify
     public void initSocketPush() {
         appContext.startService(new Intent(appContext, SocketClientService.class));
+        LogUtils.e(appContext,"实验实验实验 initSocketPush");
     }
 
     /**
@@ -241,4 +258,5 @@ public class InnotechPushManager {
         filter1.addAction(BroadcastConstant.ERROR);
         context.registerReceiver(new SocketClientRevicer(), filter1);
     }
+
 }

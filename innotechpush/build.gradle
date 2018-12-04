@@ -1,8 +1,18 @@
-//apply plugin: 'com.android.library'
-apply plugin: 'com.android.application'
-//制作补丁时将这个打开，auto-patch-plugin紧跟着com.android.application
-//apply plugin: 'auto-patch-plugin'
-apply plugin: 'robust'
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+// apply plugin表示该项目会使用指定的插件,sdk对应的是com.android.library
+if (isAppModule.toBoolean()) {
+    // Application模式，使用robust
+    apply plugin: 'com.android.application'
+    if (isPatchModule.toBoolean()) {
+        //制作补丁时将这个打开，auto-patch-plugin紧跟着com.android.application
+        apply plugin: 'auto-patch-plugin'
+    }
+    apply plugin: 'robust'
+} else {
+    apply plugin: 'com.android.library'
+}
 
 android {
     compileSdkVersion 27
@@ -85,3 +95,227 @@ dependencies {
     implementation 'com.github.satyan:sugar:1.5'
     implementation 'com.meituan.robust:robust:0.4.82'
 }
+
+// 项目打release版本apk包的话，必然会调用到assemble(渠道)Release的命令，于是我们可以用正则匹配来匹配所有渠道的打Release包过程
+//Pattern p = Pattern.compile("^assemble(.*)Release\$")
+
+// 在task添加到列表的时候，进行打包task的匹配
+//tasks.whenTaskAdded { task ->
+//    if (!isAppModule.toBoolean()) {
+//        // 不是Application模式不处理
+//        return
+//    }
+//    // 在任务执行的时候，匹配执行assemble(渠道)Release的打APK任务
+//    Matcher m = p.matcher(task.name)
+//    if (m.find()) {
+//        // 取出渠道
+////        String flavor = m.group(1)
+////        if (flavor.length() > 1) {
+////            // 渠道命名的修正，首字母小写，例如develop渠道对应命令为assembleDevelopRelease
+////            flavor = flavor.substring(0, 1).toLowerCase() + flavor.substring(1)
+////        }
+//
+//        // 打release包task完成之后进行资源的整合以及jar包去指定class文件，并且生成aar包
+//        task.doLast {
+//
+//            delete {
+//                // 删除上次生成的文件目录，目录为 \sdk\robustjar\release
+//                delete projectDir.toString() + File.separator + 'robustjar' + File.separator + "release"
+//            }
+//
+//            // 打包所需资源所在的父目录， \sdk\build\intermediates
+//            String intermediatesPath = buildDir.toString() + File.separator + "intermediates"
+//
+//            // gradle-3.0.0 & robust-0.4.71对应的路径为 \sdk\build\intermediates\transforms\proguard\release\0.jar
+//            String robustJarPath = intermediatesPath + File.separator + "transforms" + File.separator + "proguard" + File.separator + "release" + File.separator + "0.jar"
+//
+//            // 资源文件的路径，\sdk\build\intermediates\assets\release
+//            String assetsPath = intermediatesPath + File.separator + "assets" + File.separator + "release"
+//
+//            // 依赖本地jar包路径，\sdk\build\intermediates\jniLibs\release
+//            String libsPath = intermediatesPath + File.separator + "jniLibs" + File.separator + "release"
+//
+//            // 由于上述问题，直接用项目的res路径 \sdk\src\main\res ，因此第三方依赖的资源文件无法整合，但是我是基于生成只包含自身代码的jar包和资源，其余依赖宿主另外再依赖的方案，所以可以这样处理
+//            String resPath = projectDir.toString() + File.separator + "src" + File.separator + "main" + File.separator + "res"
+//
+//            // 资源id路径，\sdk\build\intermediates\symbols\release
+//            String resIdPath = intermediatesPath + File.separator + "symbols" + File.separator + "release"
+//
+//            // 清单文件路径，\sdk\build\intermediates\manifests\full\release，由于是生成的application的清单文件，因此下面还会做删除组件声明的处理
+//            String manifestPath = intermediatesPath + File.separator + "manifests" + File.separator + "full" + File.separator + "release"
+//
+//            // 整合上述文件后的目标路径，\sdk\robustjar\release\origin
+//            String destination = projectDir.toString() + File.separator + /*'outputs' + File.separator +*/'robustjar' + File.separator + 'release' + File.separator + 'origin'
+//
+//            File file = file(robustJarPath)
+//            if (file.exists()) {
+//                println '开始复制robust插桩jar包'
+//                copy {
+//
+//                    // 拷贝到assets目录
+//                    from(assetsPath) {
+//                        into 'assets'
+//                    }
+//
+//                    // .so文件拷贝到jni目录
+//                    from(libsPath) {
+//                        into 'jni'
+//                        include '**/*/*.so'
+//                    }
+//
+//                    // 资源文件拷贝到res目录
+//                    from(resPath) {
+//                        // 排除MainActivity加载的布局文件，因为输出的是jar包，加MainActivity仅仅是为了能让打apk包任务执行
+//                        exclude '/layout/activity_main.xml'
+//                        exclude {
+//                            // 排除空文件夹
+//                            it.isDirectory() && it.getFile().listFiles().length == 0
+//                        }
+//                        into 'res'
+//                    }
+//
+//                    // 拷贝此目录下资源id文件 R.txt
+//                    from resIdPath
+//
+//                    // 拷贝到目录 \sdk\robustjar\(渠道)\release\origin
+//                    into destination
+//
+//                }
+//
+//                copy {
+//                    // 复制供宿主的混淆规则，这里我在android{ defaultConfig { consumerProguardFiles 'lib-proguard-rules.pro' }}，配置了一个混淆规则
+//                    def files = android.defaultConfig.consumerProguardFiles
+//                    if (files != null && files.size() > 0) {
+//                        def file1 = files.get(0)
+//                        //  println '混淆文件路径：'+file1.path
+//                        from file1.path
+//                        into destination
+//                        // 复制混淆规则并且重命名
+//                        rename(file1.name, 'proguard.txt')
+//                    }
+//                }
+//
+//                // 补丁生成需要的mapping.txt和methodsMap.robust文件
+//                copy {
+//                    // 混淆mapping文件的路径，\sdk\build\outputs\mapping\release\mapping.txt
+//                    from(buildDir.toString() + File.separator + 'outputs' + File.separator + 'mapping' + File.separator + 'release') {
+//                        include 'mapping.txt'
+//                    }
+//                    // 拷贝到目录 \sdk\robustjar\release
+//                    into projectDir.toString() + File.separator + 'robustjar' + File.separator + 'release'
+//                }
+//
+//                copy {
+//                    // robust生成的methodsMap文件路径，\sdk\build\outputs\robust\methodsMap.robust
+//                    from(buildDir.toString() + File.separator + 'outputs' + File.separator + 'robust') {
+//                        include 'methodsMap.robust'
+//                    }
+//                    // 拷贝到目录 \sdk\robustjar\release
+//                    into projectDir.toString() + File.separator + 'robustjar' + File.separator + 'release'
+//                }
+//
+//                // 若不存在aidl目录，创建aidl空目录
+//                createDir(destination + File.separator + "aidl")
+//                // 同上
+//                createDir(destination + File.separator + "assets")
+//                // 同上
+//                createDir(destination + File.separator + "jni")
+//                // 同上
+//                createDir(destination + File.separator + "libs")
+//                // 同上
+//                createDir(destination + File.separator + "res")
+//
+//                // 将清单文件application节点的内容和activity节点的内容替换，例如下面
+////                <application
+////                android:allowBackup = "true"
+////                tools:replace = "android:label"
+////                android:label = "sdk"
+////                android:supportsRtl = "true"
+////                android:icon = "@android:drawable/ic_dialog_info"
+////                android:theme = "@android:style/Theme.Black">
+////                <activity android: name = ".MainActivity" >
+////                <intent - filter >
+////                < action android: name = "android.intent.action.MAIN" />
+////                            <category android:name="android.intent.category.LAUNCHER"/ >
+////                </intent-filter>
+////                    </ activity >
+////                < /application>
+////                转换成
+////                <application
+////                    android:allowBackup="true"
+////                    tools:replace="android:label"
+////                    android:label="sdk"
+////                    android:supportsRtl="true">
+////                </ application >
+//
+////                def oldStr = ["<application[\\s\\S]*?>", "<activity[\\s\\S]*?</activity>"]
+////                def newStr = ["<application\n" + "        android:allowBackup=\"true\"\n" + "        android:supportsRtl=\"true\">", ""]
+////                // 处理 \sdk\build\intermediates\manifests\full\(渠道)\release\AndroidManifest.xml
+////                String strBuffer = fileReader(manifestPath + File.separator + "AndroidManifest.xml", oldStr, newStr)
+////                // 输出至 \sdk\robustjar\(渠道)\release\origin\AndroidManifest.xml
+////                fileWrite(destination + File.separator + "AndroidManifest.xml", strBuffer)
+//
+//                println '输出robust插桩jar包成功!'
+//
+//                // 执行打jar包的task，这里会做原jar包的过滤处理，只保留我们需要的代码
+//                tasks.findByName('jar_').execute()
+//
+//                // 执行打aar包的task，其实就是将目录\sdk\robustjar\develop\release\origin压缩成aar后缀的压缩包
+//                tasks.findByName('aar_' + flavor).execute()
+//
+//            }
+//        }
+//    }
+
+//}
+    // 根据渠道生成打jar包和aar包的对应的task
+
+    // 遍历所有渠道，生成对应渠道打jar包的task，名字为jar_(渠道)
+//    tasks.create(name: 'jar_', type: Jar) {
+//
+//        // jar包命名为classes.jar
+//        baseName 'classes'
+//
+//        String intermediatesPath = buildDir.toString() + File.separator + "intermediates"
+//
+//        // gradle-3.0.0 & robust-0.4.71对应的路径为 \sdk\build\intermediates\transforms\proguard\(渠道)\release\0.jar
+//        String robustJarPath = intermediatesPath + File.separator + "transforms" + File.separator + "proguard" + File.separator + "release" + File.separator + "0.jar"
+//
+//        def zipFile = new File(robustJarPath)
+//        // 将jar包解压
+//        FileTree jarTree = zipTree(zipFile)
+//
+//        from jarTree
+//
+//        // jar包输出路径为 \sdk\robustjar\release\origin
+//        File destDir = file(projectDir.toString() + File.separator + 'robustjar' + File.separator + 'release' + File.separator + 'origin')
+//        // 设置输出路径
+//        setDestinationDir destDir
+//
+//        include {
+//            // 只打包我们需要的类
+//            it.path.startsWith('com.innotech.innotechpush') || it.path.startsWith('com/meituan/robust') || it.path.startsWith('com/oubowu/secret')
+//        }
+//
+//        exclude {
+//            // println "执行排除：" + it.path
+//            // 排除R相关class文件，排除MainActivity.class文件
+//            it.path.startsWith('com/oubowu/sdk/R$') || it.path.startsWith('com/oubowu/sdk/R.class') || it.path.startsWith('com/oubowu/sdk/MainActivity.class')
+//        }
+//
+//        println '压缩jar包完毕！！！！！！！！'
+//    }
+//
+//    // 遍历所有渠道，生成对应渠道打aar包的task，名字为aar_(渠道)
+//    tasks.create(name: 'aar_' + flavor, type: Zip) {
+//        // aar包输出路径为 \sdk\robustjar\(渠道)\release\aar
+//        File destDir = file(projectDir.toString() + File.separator + 'robustjar' + File.separator + flavor + File.separator + 'release' + File.separator + 'aar')
+//        // aar包命名为 library-(渠道)-release.aar
+//        archiveName 'library-' + flavor + '-release.aar'
+//        // 源路径为 \sdk\robustjar\(渠道)\release\origin
+//        from projectDir.toString() + File.separator + 'robustjar' + File.separator + flavor + File.separator + 'release' + File.separator + 'origin'
+//        // 设置压缩后输出的路径
+//        destinationDir destDir
+//
+//        println '压缩aar包完毕！！！！！！！！'
+//    }

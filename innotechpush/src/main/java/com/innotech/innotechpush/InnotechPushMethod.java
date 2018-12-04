@@ -21,6 +21,8 @@ import com.innotech.innotechpush.utils.NetWorkUtils;
 import com.innotech.innotechpush.utils.SignUtils;
 import com.innotech.innotechpush.utils.TokenUtils;
 import com.innotech.innotechpush.utils.Utils;
+import com.meituan.robust.patch.annotaion.Add;
+import com.meituan.robust.patch.annotaion.Modify;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,7 +42,9 @@ public class InnotechPushMethod {
      *
      * @param context：Android平台上app的上下文，建议传入当前app的application context
      */
+    @Modify
     public static void updateUserInfo(final Context context, final RequestCallback mCallBack) {
+        LogUtils.e(context,"实验实验实验 updateUserInfo");
         try {
             //channel为空时说明部分数据被系统回收掉了，需要重新初始化一下
             if (TextUtils.isEmpty(UserInfoModel.getInstance().getChannel())) {
@@ -474,10 +478,12 @@ public class InnotechPushMethod {
         }
     }
 
+    @Modify
     public static void launcher(Activity activity) {
         if (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41()) {
             HuaweiSDK.huaWeiConnect(activity);
         }
+        LogUtils.e(activity,getStringupdate()+"修复这个方法了");
     }
 
     private static String getTK(Context context) {
@@ -492,6 +498,12 @@ public class InnotechPushMethod {
             LogUtils.e(context, "getTK异常：" + e.getMessage());
         }
         return tk;
+    }
+
+    //增加方法
+    @Add
+    public static String getStringupdate() {
+        return "Robust 这是新增加的";
     }
 
 }
