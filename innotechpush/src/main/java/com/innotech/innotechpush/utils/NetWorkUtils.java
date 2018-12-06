@@ -53,57 +53,60 @@ public class NetWorkUtils {
      * log server日志
      */
     public static final String PATH_LOG = "/log";
-//    public static final String URL_LOG = "http://" + HOST_LOG + PATH_LOG;
+    //    public static final String URL_LOG = "http://" + HOST_LOG + PATH_LOG;
     public static final String URL_LOG = "https://" + HOST_LOG + PATH_LOG;
 
     public synchronized static void sendPostRequest(final Context context, final String urlStr, final String paramsStr, final String sign, final RequestCallback mCallBack) {
         //开启线程来发起网络请求
-        new Thread(() -> {
-            HttpURLConnection connection = null;
-            BufferedReader reader = null;
-            try {
-                LogUtils.e(context, "sendPostRequest() url:" + urlStr + " sign:" + sign + " paramsStr:" + paramsStr);
-                URL url = new URL(urlStr);
-                connection = (HttpURLConnection) url.openConnection();
-                if (sign != null) {
-                    connection.setRequestProperty("Authorization", sign);
-                }
-                connection.setRequestMethod("POST");
-                connection.setConnectTimeout(CONNECT_TIMEOUT);
-                connection.setReadTimeout(CONNECT_TIMEOUT);
-                connection.setRequestProperty("Connection", "Keep-Alive");
-                connection.setRequestProperty("Charset", "UTF-8");
-                connection.setRequestProperty("Content-Type", "application/json");
-                DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-                out.write(paramsStr.getBytes());
-                InputStream in = connection.getInputStream();
-                //下面对获取到的输入流进行读取
-                reader = new BufferedReader(new InputStreamReader(in));
-                StringBuilder response = new StringBuilder();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
-                LogUtils.e(context, "sendPostRequest() response:" + response.toString());
-                SaveData.saveData(context, response.toString(), urlStr, mCallBack);
-            } catch (Exception e) {
-                LogUtils.e(context, "sendPostRequest方法出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
-                if (mCallBack != null) {
-                    mCallBack.onFail("sendPostRequest方法出现异常 Exception:" + e.getMessage());
-                }
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        LogUtils.e(context, "BufferedReader关闭出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
-                        if (mCallBack != null) {
-                            mCallBack.onFail("BufferedReader关闭出现异常 Exception:" + e.getMessage());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                HttpURLConnection connection = null;
+                BufferedReader reader = null;
+                try {
+                    LogUtils.e(context, "sendPostRequest() url:" + urlStr + " sign:" + sign + " paramsStr:" + paramsStr);
+                    URL url = new URL(urlStr);
+                    connection = (HttpURLConnection) url.openConnection();
+                    if (sign != null) {
+                        connection.setRequestProperty("Authorization", sign);
+                    }
+                    connection.setRequestMethod("POST");
+                    connection.setConnectTimeout(CONNECT_TIMEOUT);
+                    connection.setReadTimeout(CONNECT_TIMEOUT);
+                    connection.setRequestProperty("Connection", "Keep-Alive");
+                    connection.setRequestProperty("Charset", "UTF-8");
+                    connection.setRequestProperty("Content-Type", "application/json");
+                    DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+                    out.write(paramsStr.getBytes());
+                    InputStream in = connection.getInputStream();
+                    //下面对获取到的输入流进行读取
+                    reader = new BufferedReader(new InputStreamReader(in));
+                    StringBuilder response = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        response.append(line);
+                    }
+                    LogUtils.e(context, "sendPostRequest() response:" + response.toString());
+                    SaveData.saveData(context, response.toString(), urlStr, mCallBack);
+                } catch (Exception e) {
+                    LogUtils.e(context, "sendPostRequest方法出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
+                    if (mCallBack != null) {
+                        mCallBack.onFail("sendPostRequest方法出现异常 Exception:" + e.getMessage());
+                    }
+                } finally {
+                    if (reader != null) {
+                        try {
+                            reader.close();
+                        } catch (IOException e) {
+                            LogUtils.e(context, "BufferedReader关闭出现异常 Exception:" + e.getMessage() + " e.toString():" + e.toString());
+                            if (mCallBack != null) {
+                                mCallBack.onFail("BufferedReader关闭出现异常 Exception:" + e.getMessage());
+                            }
                         }
                     }
-                }
-                if (connection != null) {
-                    connection.disconnect();
+                    if (connection != null) {
+                        connection.disconnect();
+                    }
                 }
             }
         }).start();

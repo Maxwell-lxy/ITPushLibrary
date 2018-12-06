@@ -76,21 +76,24 @@ public class SocketImpl implements ISocket {
      * 写数据
      */
     private void writeData() {
-        writeThread = new Thread(() -> {
-            while (true) {
-                boolean isInterrupted = Thread.currentThread().isInterrupted();
-                if (isInterrupted) break;
-                try {
-                    WriteData writeData = writeQueue.take();
+        writeThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    boolean isInterrupted = Thread.currentThread().isInterrupted();
+                    if (isInterrupted) break;
                     try {
-                        mDataOutputStream.write(writeData.getData());
-                        writeData.getResultQueue().put(true);
-                    } catch (IOException e) {
-                        writeData.getResultQueue().put(false);
+                        WriteData writeData = writeQueue.take();
+                        try {
+                            mDataOutputStream.write(writeData.getData());
+                            writeData.getResultQueue().put(true);
+                        } catch (IOException e) {
+                            writeData.getResultQueue().put(false);
+                            Log.e(TAG_SOCKET, "writeData InterruptedException:" + e.getMessage());
+                        }
+                    } catch (InterruptedException e) {
                         Log.e(TAG_SOCKET, "writeData InterruptedException:" + e.getMessage());
                     }
-                } catch (InterruptedException e) {
-                    Log.e(TAG_SOCKET, "writeData InterruptedException:" + e.getMessage());
                 }
             }
         });

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -39,28 +40,31 @@ public class MainActivity extends Activity {
         edAlias = findViewById(R.id.edAlias);
         txtSetAliasResult = findViewById(R.id.txtSetAliasResult);
 
-        btnSetAlias.setOnClickListener(v -> {
-            String alias = getNewAliasName();
-            if (alias != null) {
-                txtSetAliasResult.setText("");
-                String aliasStr = edAlias.getText().toString();
-                InnotechPushMethod.setAlias(MainActivity.this, aliasStr, new RequestCallback() {
-                    @Override
-                    public void onSuccess(String msg) {
-                        Log.i("Innotech_Push", ">>>>>>>>>>>>setAlias onSuccess msg:" + msg);
-                        updateUI("Set Alias success!");
-                    }
+        btnSetAlias.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String alias = getNewAliasName();
+                if (alias != null) {
+                    txtSetAliasResult.setText("");
+                    String aliasStr = edAlias.getText().toString();
+                    InnotechPushMethod.setAlias(MainActivity.this, aliasStr, new RequestCallback() {
+                        @Override
+                        public void onSuccess(String msg) {
+                            Log.i("Innotech_Push", ">>>>>>>>>>>>setAlias onSuccess msg:" + msg);
+                            updateUI("Set Alias success!");
+                        }
 
-                    @Override
-                    public void onFail(String msg) {
-                        Log.i("Innotech_Push", ">>>>>>>>>>>setAlias onFail msg:" + msg);
-                        updateUI("Set Alias Fail!");
-                    }
-                });
-            } else {
-                Toast.makeText(MainActivity.this, "别名不能够为空", Toast.LENGTH_SHORT).show();
+                        @Override
+                        public void onFail(String msg) {
+                            Log.i("Innotech_Push", ">>>>>>>>>>>setAlias onFail msg:" + msg);
+                            updateUI("Set Alias Fail!");
+                        }
+                    });
+                } else {
+                    Toast.makeText(MainActivity.this, "别名不能够为空", Toast.LENGTH_SHORT).show();
+                }
+
             }
-
         });
     }
 
