@@ -44,7 +44,7 @@ public class InnotechPushMethod {
      */
     @Modify
     public static void updateUserInfo(final Context context, final RequestCallback mCallBack) {
-        LogUtils.e(context,"实验实验实验 updateUserInfo");
+//        LogUtils.e(context,"实验实验实验 updateUserInfo");
         try {
             //channel为空时说明部分数据被系统回收掉了，需要重新初始化一下
             if (TextUtils.isEmpty(UserInfoModel.getInstance().getChannel())) {
@@ -483,7 +483,7 @@ public class InnotechPushMethod {
         if (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41()) {
             HuaweiSDK.huaWeiConnect(activity);
         }
-        LogUtils.e(activity,getStringupdate()+"修复这个方法了");
+//        LogUtils.e(activity,getStringupdate()+"修复这个方法了");
     }
 
     private static String getTK(Context context) {

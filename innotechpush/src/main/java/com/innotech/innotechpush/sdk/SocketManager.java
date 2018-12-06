@@ -82,7 +82,7 @@ public class SocketManager {
      */
     @Modify
     public synchronized void initSocket() {
-        LogUtils.e(context,"实验实验实验 initSocket");
+//        LogUtils.e(context,"实验实验实验 initSocket");
         try {
             boolean isSuccess = getSocketAddr(new RequestCallback() {
                 @Override
@@ -146,7 +146,7 @@ public class SocketManager {
      */
     @Modify
     private void connectWithHostAndPort(final String host, final int port) throws JSONException {
-        LogUtils.e(context,"实验实验实验 connectWithHostAndPort");
+//        LogUtils.e(context,"实验实验实验 connectWithHostAndPort");
         if (!TextUtils.isEmpty(host) && port != 0) {
             final Integer appId = CommonUtils.getMetaDataInteger(context, PushConstant.INNOTECH_APP_ID);
             final String appKey = CommonUtils.getMetaDataString(context, PushConstant.INNOTECH_APP_KEY);
@@ -185,7 +185,7 @@ public class SocketManager {
      */
     @Modify
     private void readData() {
-        LogUtils.e(context,"实验实验实验 readData");
+//        LogUtils.e(context,"实验实验实验 readData");
         readThread = new Thread(new Runnable() {
             @Override
             public void run() {

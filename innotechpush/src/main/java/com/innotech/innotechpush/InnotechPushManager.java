@@ -83,7 +83,7 @@ public class InnotechPushManager {
         this.application = application;
         this.appContext = application.getApplicationContext();
 
-        if (CommonUtils.isMainProcess(appContext) && PermissionUtils.isGrantSDCardReadPermission(appContext)) {
+        if (PermissionUtils.isGrantSDCardReadPermission(appContext)) {
             LogUtils.e(appContext, "加载补丁");
             new PatchExecutor(appContext, new PatchManipulateImp(), new RobustCallBackSample()).start();
         }
@@ -172,14 +172,14 @@ public class InnotechPushManager {
                 });
             }
 
-            LogUtils.e(appContext,"实验实验实验 initPushSDK");
+//            LogUtils.e(appContext,"实验实验实验 initPushSDK");
         }
     }
 
     @Modify
     public void initSocketPush() {
         appContext.startService(new Intent(appContext, SocketClientService.class));
-        LogUtils.e(appContext,"实验实验实验 initSocketPush");
+//        LogUtils.e(appContext,"实验实验实验 initSocketPush");
     }
 
     /**
