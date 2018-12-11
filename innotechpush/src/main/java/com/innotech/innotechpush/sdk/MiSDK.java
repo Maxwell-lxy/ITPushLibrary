@@ -51,12 +51,15 @@ public class MiSDK {
         };
         Logger.setLogger(context, newLogger);
         //开启一个10s的定时器，10s小米注册没有成功则注册union渠道
-        new Handler().postDelayed(() -> {
-            String regId = TokenSP.getString(context, TokenSP.KEY_MI_REGID, "");
-            if (TextUtils.isEmpty(regId)) {
-                InnotechPushManager.getInstance().initGeTuiPush();
-                LogUtils.e(context, "MiPushClient.registerPush fail init GeTui push");
-                DbUtils.addClientLog(context, LogCode.LOG_INIT, "MiPushClient.registerPush fail init GeTui push");
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                String regId = TokenSP.getString(context, TokenSP.KEY_MI_REGID, "");
+                if (TextUtils.isEmpty(regId)) {
+                    InnotechPushManager.getInstance().initGeTuiPush();
+                    LogUtils.e(context, "MiPushClient.registerPush fail init GeTui push");
+                    DbUtils.addClientLog(context, LogCode.LOG_INIT, "MiPushClient.registerPush fail init GeTui push");
+                }
             }
         }, 10000);
     }

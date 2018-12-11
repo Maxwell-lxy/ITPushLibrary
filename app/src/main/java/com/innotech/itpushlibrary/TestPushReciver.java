@@ -23,6 +23,7 @@ public class TestPushReciver extends PushReciver {
     @Override
     public void onReceiveGuid(Context context, String guid) {
         super.onReceiveGuid(context, guid);
+        LogUtils.e(context, "onReceiveGuid guid:" + guid);
         Message msg = new Message();
         msg.what = 2;
         Bundle b = new Bundle();// 存放数据

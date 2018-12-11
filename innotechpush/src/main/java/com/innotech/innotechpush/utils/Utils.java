@@ -420,24 +420,4 @@ public class Utils {
                 (ip >> 24 & 0xFF);
     }
 
-    /**
-     * 判断用户是否修改过通知权限
-     *
-     * @param context
-     * @return
-     */
-    public static boolean getChange(Context context) {
-        boolean result = false;
-        int openNopticeLastValue = UserInfoSPUtils.getInt(context, UserInfoSPUtils.KEY_OPEN_NOTICE, -1);
-        int openNopticeCurValue = isNotificationEnabled(context) ? 0 : 1;
-        if (openNopticeLastValue == -1) {
-            result = true;
-        } else {
-            result = openNopticeLastValue != openNopticeCurValue ? true : false;
-        }
-        UserInfoSPUtils.putInt(context, UserInfoSPUtils.KEY_OPEN_NOTICE, openNopticeCurValue);
-        LogUtils.e(context, "openNopticeLastValue=" + openNopticeLastValue + " openNopticeCurValue=" + openNopticeCurValue + " result:" + result);
-        return result;
-    }
-
 }

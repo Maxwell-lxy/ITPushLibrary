@@ -117,44 +117,34 @@ public class InnotechPushManager {
                 application.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
                     @Override
                     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-//                        LogUtils.e(appContext, "onActivityCreated" + activity.getLocalClassName());
                     }
 
                     @Override
                     public void onActivityStarted(Activity activity) {
-//                        LogUtils.e(appContext, "onActivityStarted"+ Utils.isBackground(appContext));
-                        try {
-                            String guid = TokenUtils.getGuid(appContext);
-                            if (CommonUtils.isCanRunService(appContext, SocketClientService.class.getName()) && !TextUtils.isEmpty(guid)) {
-                                appContext.startService(new Intent(appContext, SocketClientService.class));
-                            }
-                        } catch (JSONException e) {
+                        String guid = TokenUtils.getGuid(appContext);
+                        if (CommonUtils.isCanRunService(appContext, SocketClientService.class.getName()) && !TextUtils.isEmpty(guid)) {
+                            appContext.startService(new Intent(appContext, SocketClientService.class));
                         }
                     }
 
                     @Override
                     public void onActivityResumed(Activity activity) {
-//                        LogUtils.e(appContext, "onActivityResumed"+ Utils.isBackground(appContext));
                     }
 
                     @Override
                     public void onActivityPaused(Activity activity) {
-//                        LogUtils.e(appContext, "onActivityPaused"+ Utils.isBackground(appContext));
                     }
 
                     @Override
                     public void onActivityStopped(Activity activity) {
-//                        LogUtils.e(appContext, "onActivityStopped" + Utils.isBackground(appContext));
                     }
 
                     @Override
                     public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-//                        LogUtils.e(appContext, "onActivitySaveInstanceState");
                     }
 
                     @Override
                     public void onActivityDestroyed(Activity activity) {
-//                        LogUtils.e(appContext, "onActivityDestroyed");
                     }
                 });
             }

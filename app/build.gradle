@@ -14,15 +14,15 @@ android {
         applicationId "com.innotech.itpushlibrary"
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 211
-        versionName "2.1.1"
+        versionCode 212
+        versionName "2.1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 INNOTECH_PUSH_DEBUG: true,
-//                INNOTECH_APP_ID    : 1008,
-//                INNOTECH_APP_KEY   : "ddddddd",
-                INNOTECH_APP_ID     : 1000,
-                INNOTECH_APP_KEY    : "YWJjZGRk",
+                INNOTECH_APP_ID    : 1008,
+                INNOTECH_APP_KEY   : "ddddddd",
+//                INNOTECH_APP_ID     : 1000,
+//                INNOTECH_APP_KEY    : "YWJjZGRk",
                 //小米
                 MI_APP_ID          : "2882303761517836599",
                 MI_APP_KEY         : "5131783646599",
@@ -59,10 +59,6 @@ android {
             signingConfig signingConfigs.releaseSigning
             debuggable true
         }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
