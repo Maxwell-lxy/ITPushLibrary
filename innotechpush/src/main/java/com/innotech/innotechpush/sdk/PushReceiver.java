@@ -86,7 +86,7 @@ public class PushReceiver extends BroadcastReceiver {
                         || CommonUtils.isMIUI()
                         || CommonUtils.isMeizuDevice()
                         || (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41())
-//                        || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
+                        || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
                         ) {
                     SocketManager.getInstance(context).ackCmd(list, 102);
                 } else {

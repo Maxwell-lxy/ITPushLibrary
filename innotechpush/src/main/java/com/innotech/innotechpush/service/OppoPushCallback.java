@@ -6,6 +6,8 @@ import android.util.Log;
 import com.coloros.mcssdk.callback.PushAdapter;
 import com.coloros.mcssdk.mode.SubscribeResult;
 import com.innotech.innotechpush.bean.UserInfoModel;
+import com.innotech.innotechpush.config.LogCode;
+import com.innotech.innotechpush.db.DbUtils;
 import com.innotech.innotechpush.utils.BroadcastUtils;
 
 import java.util.List;
@@ -21,10 +23,11 @@ public class OppoPushCallback extends PushAdapter {
     public void onRegister(int code, String s) {
         if (code == 0) {
             Log.e("innotech_push", "注册成功，registerId:" + s);
-//            UserInfoModel.getInstance().setDevice_token1(s);
-//            BroadcastUtils.sendUpdateUserInfoBroadcast(context);
+            UserInfoModel.getInstance().setDevice_token1(s);
+            BroadcastUtils.sendUpdateUserInfoBroadcast(context);
         } else {
             Log.e("innotech_push", "注册失败，code=" + code + ",msg=" + s);
+            DbUtils.addClientLog(context, LogCode.LOG_INIT, "注册失败，code=" + code + ",msg=" + s);
         }
     }
 

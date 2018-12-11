@@ -55,6 +55,7 @@ public class MiSDK {
             @Override
             public void run() {
                 String regId = TokenSP.getString(context, TokenSP.KEY_MI_REGID, "");
+                LogUtils.e(context, "MiPushClient.registerPush regId：" + regId);
                 if (TextUtils.isEmpty(regId)) {
                     InnotechPushManager.getInstance().initGeTuiPush();
                     LogUtils.e(context, "MiPushClient.registerPush fail init GeTui push");

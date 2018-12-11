@@ -217,7 +217,7 @@ public class SocketManager {
                                                     || CommonUtils.isMIUI()
                                                     || CommonUtils.isMeizuDevice()
                                                     || (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41())
-//                                        || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
+                                                    || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
                                                     ) {
                                                 ackCmd(list, 101);
                                             } else {
@@ -244,7 +244,7 @@ public class SocketManager {
                                                 || CommonUtils.isMIUI()
                                                 || CommonUtils.isMeizuDevice()
                                                 || (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41())
-//                                        || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
+                                                || (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(context))
                                                 ) {
                                             ackCmd(list, 101);
                                         } else {

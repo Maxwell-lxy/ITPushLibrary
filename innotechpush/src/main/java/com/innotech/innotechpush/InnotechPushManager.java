@@ -86,7 +86,7 @@ public class InnotechPushManager {
 
         SugarContext.init(application);
         UserInfoModel.getInstance().init(appContext);
-
+        LogUtils.e(appContext, "是否支持oppo推送：" + com.coloros.mcssdk.PushManager.isSupportPush(appContext));
         if (CommonUtils.isMainProcess(appContext)) {
             if (Utils.isXiaomiDevice() || Utils.isMIUI()) {
                 new MiSDK(appContext);
@@ -94,14 +94,12 @@ public class InnotechPushManager {
                 new MeizuSDK(appContext);
             } else if (Utils.isHuaweiDevice() && PushConstant.hasHuawei && HuaweiSDK.isUpEMUI41()) {//华为设备时，开启华为推送
                 new HuaweiSDK(application);
+            } else if (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(appContext)) {//oppo设备时，开启oppo推送
+                String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
+                String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
+                com.coloros.mcssdk.PushManager.getInstance().register(appContext, appKey, appSecret, new OppoPushCallback(application));
             } else { //其他设备时，开启个推推送和socket长连接
                 initGeTuiPush();
-                LogUtils.e(appContext, "是否支持oppo推送：" + com.coloros.mcssdk.PushManager.isSupportPush(appContext));
-                if (Utils.isOPPO() && PushConstant.hasOppo && com.coloros.mcssdk.PushManager.isSupportPush(appContext)) {//oppo设备时，开启oppo推送
-                    String appKey = Utils.getMetaDataString(application, "OPPO_APP_KEY");
-                    String appSecret = Utils.getMetaDataString(application, "OPPO_APP_SECRET");
-                    com.coloros.mcssdk.PushManager.getInstance().register(appContext, appKey, appSecret, new OppoPushCallback(application));
-                }
                 LogUtils.e(appContext, "是否支持vivo推送：" + PushClient.getInstance(appContext).isSupport());
                 if (Utils.isVivo() && PushConstant.hasVivo && PushClient.getInstance(appContext).isSupport()) {
                     PushClient.getInstance(appContext).initialize();
