@@ -6,6 +6,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.innotech.innotechpush.InnotechPushManager;
+import com.innotech.innotechpush.bean.Channel;
+import com.innotech.innotechpush.bean.UserInfoModel;
 import com.innotech.innotechpush.config.LogCode;
 import com.innotech.innotechpush.config.PushConstant;
 import com.innotech.innotechpush.db.DbUtils;
@@ -57,6 +59,7 @@ public class MiSDK {
                 String regId = TokenSP.getString(context, TokenSP.KEY_MI_REGID, "");
                 LogUtils.e(context, "MiPushClient.registerPush regId：" + regId);
                 if (TextUtils.isEmpty(regId)) {
+                    UserInfoModel.getInstance().setChannel(Channel.UNION);
                     InnotechPushManager.getInstance().initGeTuiPush();
                     LogUtils.e(context, "MiPushClient.registerPush fail init GeTui push");
                     DbUtils.addClientLog(context, LogCode.LOG_INIT, "MiPushClient.registerPush fail init GeTui push");
