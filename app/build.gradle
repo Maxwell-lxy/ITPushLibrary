@@ -14,8 +14,8 @@ android {
         applicationId "com.innotech.itpushlibrary"
         minSdkVersion 14
         targetSdkVersion 27
-        versionCode 212
-        versionName "2.1.2"
+        versionCode 213
+        versionName "2.1.3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [
                 INNOTECH_PUSH_DEBUG: true,
